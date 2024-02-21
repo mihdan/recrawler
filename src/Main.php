@@ -65,7 +65,7 @@ class Main {
 		$this->load_requirements();
 		$this->setup_hooks();
 
-		do_action( 'mihdan_index_now/init', $this );
+		do_action( 'recrawler/init', $this );
 	}
 
 	/**
@@ -177,10 +177,10 @@ class Main {
 	public function add_css_for_column(): void {
 		?>
 		<style>
-			.column-index-now {
+			.column-recrawler {
 				width: 8em;
 			}
-			.column-index-now img {
+			.column-recrawler img {
 				vertical-align: bottom;
 			}
 		</style>
@@ -188,16 +188,16 @@ class Main {
 	}
 
 	public function add_last_update_column( array $columns ): array {
-		$columns['index-now'] = sprintf(
+		$columns['recrawler'] = sprintf(
 			'<span class="dashicons dashicons-share" title="%s"></span>',
-			__( 'IndexNow: Last Update', 'recrawler' )
+			__( 'ReCrawler: Last Update', 'recrawler' )
 		);
 
 		return $columns;
 	}
 
 	public function add_last_update_column_content( string $column_name, int $post_id ): void {
-		if ( $column_name !== 'index-now' ) {
+		if ( $column_name !== 'recrawler' ) {
 			return;
 		}
 
@@ -219,8 +219,8 @@ class Main {
 			return $actions;
 		}
 
-		$actions['index_now'] = sprintf(
-			'<a title="%s" href="%s">IndexNow</a>',
+		$actions['recrawler'] = sprintf(
+			'<a title="%s" href="%s">ReCrawler</a>',
 			esc_attr( __( 'Notify the search engine', 'recrawler' ) ),
 			1
 		);
@@ -262,18 +262,18 @@ class Main {
 	private function drop_tables() {
 		global $wpdb;
 
-		$sql = "DROP TABLE IF EXISTS {$wpdb->prefix}index_now_log";
+		$sql = "DROP TABLE IF EXISTS {$wpdb->prefix}recrawler_log";
 		$wpdb->query( $sql );
 	}
 
 	private function create_tables( bool $upgrade = false ) {
 		global $wpdb;
 
-		$table_name      = $wpdb->prefix . 'index_now_log';
+		$table_name      = $wpdb->prefix . 'recrawler_log';
 		$charset_collate = $wpdb->get_charset_collate();
 
 		if ( $upgrade || $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) !== $table_name ) {
-			$sql = "CREATE TABLE {$wpdb->prefix}index_now_log (
+			$sql = "CREATE TABLE {$wpdb->prefix}recrawler_log (
     			log_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     			created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
     			level enum('emergency','alert','critical','error','warning','notice','info','debug') NOT NULL DEFAULT 'debug',

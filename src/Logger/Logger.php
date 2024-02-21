@@ -7,7 +7,7 @@ use WP_Post;
 class Logger extends AbstractLogger {
 	public function get_logger_table_name() {
 		global $wpdb;
-		return $wpdb->prefix . 'index_now_log';
+		return $wpdb->prefix . 'recrawler_log';
 	}
 
 	public function log( $level, $message, array $context = [] ) {

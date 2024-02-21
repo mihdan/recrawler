@@ -1,4 +1,4 @@
-=== Index Now ===
+=== ReCrawler ===
 Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, index-now, yandex, bing, google, seo, cloudflare, duck-duck-go, recrawler
@@ -36,11 +36,11 @@ Search Engines adopting the ReCrawler protocol agree that submitted URLs will be
 ### ⛑️ Documentation and support ###
 If you have some questions or suggestions, welcome to our [GitHub repository](https://github.com/mihdan/recrawler/issues).
 
-### 💙 Love Index Now for WordPress? ###
+### 💙 Love ReCrawler for WordPress? ###
 If the plugin was useful, rate it with a [5 star rating](https://wordpress.org/support/plugin/recrawler/reviews/) and write a few nice words.
 
 ### 🏳️ Translations ###
-[Help translate Index Now](https://translate.wordpress.org/projects/wp-plugins/recrawler/)
+[Help translate ReCrawler](https://translate.wordpress.org/projects/wp-plugins/recrawler/)
 
 - 🇺🇸 English (en_US) - [Mikhail kobzarev](https://profiles.wordpress.org/mihdan)
 - 🇷🇺 Русский (ru_RU) - [Mikhail kobzarev](https://profiles.wordpress.org/mihdan)
@@ -144,12 +144,12 @@ See the documentation available from each search engine for more details about R
 
 = From your WordPress dashboard =
 1. Visit 'Plugins > Add New'
-2. Search for 'Index Now'
-3. Activate Index Now from your Plugins page.
+2. Search for 'ReCrawler'
+3. Activate ReCrawler from your Plugins page.
 4. [Optional] Configure plugin in 'WP Booster > True Lazy Analytics'.
 
 = From WordPress.org =
-1. Download Index Now.
+1. Download ReCrawler.
 2. Upload the 'recrawler' directory to your '/wp-content/plugins/' directory, using your favorite method (ftp, sftp, scp, etc...)
-3. Activate Index Now from your Plugins page.
-4. [Optional] Configure plugin in 'Index Now > Index Now'.
+3. Activate ReCrawler from your Plugins page.
+4. [Optional] Configure plugin in 'ReCrawler > Index Now'.

@@ -65,9 +65,9 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 	public function __construct( Logger $logger, WPOSA $wposa ) {
 		$this->logger     = $logger;
 		$this->wposa      = $wposa;
-		$this->host       = apply_filters( 'mihdan_index_now/host', wp_parse_url( get_home_url(), PHP_URL_HOST ) );
-		$this->post_types = apply_filters( 'mihdan_index_now/post_types', (array) $this->wposa->get_option( 'post_types', 'general', [] ) );
-		$this->taxonomies = apply_filters( 'mihdan_index_now/taxonomies', (array) $this->wposa->get_option( 'taxonomies', 'general', [] ) );
+		$this->host       = apply_filters( 'recrawler/host', wp_parse_url( get_home_url(), PHP_URL_HOST ) );
+		$this->post_types = apply_filters( 'recrawler/post_types', (array) $this->wposa->get_option( 'post_types', 'general', [] ) );
+		$this->taxonomies = apply_filters( 'recrawler/taxonomies', (array) $this->wposa->get_option( 'taxonomies', 'general', [] ) );
 		$this->api_key    = $this->wposa->get_option( 'api_key', 'index_now', Utils::generate_key() );
 	}
 
@@ -77,15 +77,15 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 		}
 
 		add_action( 'parse_request', [ $this, 'set_virtual_key_file' ] );
-		add_action( 'mihdan_index_now/post_added', [ $this, 'ping_on_post_update' ], 10, 2 );
-		add_action( 'mihdan_index_now/post_updated', [ $this, 'ping_on_post_update' ], 10, 2 );
+		add_action( 'recrawler/post_added', [ $this, 'ping_on_post_update' ], 10, 2 );
+		add_action( 'recrawler/post_updated', [ $this, 'ping_on_post_update' ], 10, 2 );
 
 		if ( $this->is_ping_on_comment() ) {
-			add_action( 'mihdan_index_now/comment_updated', [ $this, 'ping_on_insert_comment' ], 10, 2 );
+			add_action( 'recrawler/comment_updated', [ $this, 'ping_on_insert_comment' ], 10, 2 );
 		}
 
 		if ( $this->is_ping_on_term() ) {
-			add_action( 'mihdan_index_now/term_updated', [ $this, 'ping_on_insert_term' ], 10, 2 );
+			add_action( 'recrawler/term_updated', [ $this, 'ping_on_insert_term' ], 10, 2 );
 		}
 	}
 

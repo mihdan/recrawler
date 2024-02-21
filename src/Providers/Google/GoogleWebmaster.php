@@ -45,8 +45,8 @@ class GoogleWebmaster extends WebmasterAbstract {
 			return;
 		}
 
-		add_action( 'mihdan_index_now/post_added', [ $this, 'ping' ] );
-		add_action( 'mihdan_index_now/post_updated', [ $this, 'ping' ] );
+		add_action( 'recrawler/post_added', [ $this, 'ping' ] );
+		add_action( 'recrawler/post_updated', [ $this, 'ping' ] );
 	}
 
 	/**

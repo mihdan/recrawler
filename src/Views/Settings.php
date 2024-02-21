@@ -285,7 +285,7 @@ class Settings {
 				'placeholder' => __( 'Set the API key', 'recrawler' ),
 				'default'     => Utils::generate_key(),
 				'help_tab'    => 'index_now_api_key',
-				'desc'        => sprintf( '<a style="border-bottom: 1px dotted #2271b1; text-decoration: none; margin-left: 10px;" href="#" onclick="document.getElementById(\'mihdan_index_now_index_now[api_key]\').value=\'%s\'">%s</a>', esc_attr( Utils::generate_key() ), __( 'Show example', 'recrawler' ) ),
+				'desc'        => sprintf( '<a style="border-bottom: 1px dotted #2271b1; text-decoration: none; margin-left: 10px;" href="#" onclick="document.getElementById(\'recrawler_index_now[api_key]\').value=\'%s\'">%s</a>', esc_attr( Utils::generate_key() ), __( 'Show example', 'recrawler' ) ),
 			)
 		);
 
@@ -413,7 +413,7 @@ class Settings {
 				array(
 					'id'      => 'host_id',
 					'type'    => 'select',
-					'name'    => __( 'Host ID', 'mihdan-index-now' ),
+					'name'    => __( 'Host ID', 'recrawler' ),
 					'options' => $this->get_yandex_webmaster_host_ids()
 				)
 			);
@@ -429,12 +429,12 @@ class Settings {
 				array(
 					'id'          => 'button_get_token',
 					'type'        => 'button',
-					'name'        => __( 'Token', 'mihdan-index-now' ),
+					'name'        => __( 'Token', 'recrawler' ),
 					'placeholder' => $this->wposa->get_option( 'access_token', 'yandex_webmaster' )
-						? __( 'Update Token', 'mihdan-index-now' )
-						: __( 'Get Token', 'mihdan-index-now' ),
+						? __( 'Update Token', 'recrawler' )
+						: __( 'Get Token', 'recrawler' ),
 					'desc' => $this->wposa->get_option( 'access_token', 'yandex_webmaster' )
-						? __( 'Expires In', 'mihdan-index-now' ) . ': ' . date( 'd.m.Y', $this->wposa->get_option( 'expires_in', 'yandex_webmaster' ) )
+						? __( 'Expires In', 'recrawler' ) . ': ' . date( 'd.m.Y', $this->wposa->get_option( 'expires_in', 'yandex_webmaster' ) )
 						: '',
 				)
 			);
@@ -488,8 +488,8 @@ class Settings {
 		$this->wposa->add_section(
 			array(
 				'id'    => 'logs',
-				'title' => __( 'Logs', 'mihdan-index-now' ),
-				'desc'  => __( 'Module for logging incoming request from search engine and outgoing request from site.', 'mihdan-index-now' ),
+				'title' => __( 'Logs', 'recrawler' ),
+				'desc'  => __( 'Module for logging incoming request from search engine and outgoing request from site.', 'recrawler' ),
 			)
 		);
 
@@ -498,7 +498,7 @@ class Settings {
 			array(
 				'id'      => 'enable',
 				'type'    => 'switch',
-				'name'    => __( 'Enable', 'mihdan-index-now' ),
+				'name'    => __( 'Enable', 'recrawler' ),
 				'default' => 'on',
 			)
 		);
@@ -508,7 +508,7 @@ class Settings {
 			array(
 				'id'      => 'key_logging',
 				'type'    => 'switch',
-				'name'    => __( 'Key logging', 'mihdan-index-now' ),
+				'name'    => __( 'Key logging', 'recrawler' ),
 				'default' => 'on',
 			)
 		);
@@ -518,7 +518,7 @@ class Settings {
 			array(
 				'id'      => 'outgoing_requests',
 				'type'    => 'switch',
-				'name'    => __( 'Outgoing requests', 'mihdan-index-now' ),
+				'name'    => __( 'Outgoing requests', 'recrawler' ),
 				'default' => 'on',
 			)
 		);
@@ -528,7 +528,7 @@ class Settings {
 			array(
 				'id'      => 'cron_events',
 				'type'    => 'switch',
-				'name'    => __( 'Cron events', 'mihdan-index-now' ),
+				'name'    => __( 'Cron events', 'recrawler' ),
 				'default' => 'off',
 			)
 		);
@@ -538,7 +538,7 @@ class Settings {
 			array(
 				'id'      => 'bulk_actions',
 				'type'    => 'switch',
-				'name'    => __( 'Bulk Actions', 'mihdan-index-now' ),
+				'name'    => __( 'Bulk Actions', 'recrawler' ),
 				'default' => 'off',
 			)
 		);
@@ -548,9 +548,9 @@ class Settings {
 			array(
 				'id'      => 'lifetime',
 				'type'    => 'number',
-				'name'    => __( 'Lifetime', 'mihdan-index-now' ),
+				'name'    => __( 'Lifetime', 'recrawler' ),
 				'default' => 1,
-				'desc'    => __( 'Logs lifetime in days', 'mihdan-index-now' ),
+				'desc'    => __( 'Logs lifetime in days', 'recrawler' ),
 			)
 		);
 
@@ -558,8 +558,8 @@ class Settings {
 			array(
 				'id'           => 'plugins',
 				'reset_button' => false,
-				'title'        => __( 'Plugins', 'mihdan-index-now' ),
-				'desc'         => __( 'You can also install our other useful plugins.', 'mihdan-index-now' ),
+				'title'        => __( 'Plugins', 'recrawler' ),
+				'desc'         => __( 'You can also install our other useful plugins.', 'recrawler' ),
 			)
 		);
 
@@ -606,7 +606,7 @@ class Settings {
 					$result = plugins_api( 'query_plugins', $args );
 
 					if ( empty( $result->info['results'] ) ) {
-						return __( 'HTTP error', 'mihdan-index-now' );
+						return __( 'HTTP error', 'recrawler' );
 					}
 
 					ob_start();
@@ -668,12 +668,12 @@ class Settings {
 								</div>
 								<div class="wposa-plugin__footer">
 									<ul class="wposa-plugin__meta">
-										<li><b><?php esc_html_e( 'Version', 'mihdan-index-now' ); ?>:</b> <?php echo esc_html( $plugin['version'] ); ?></li>
-										<li><b><?php esc_html_e( 'Installations', 'mihdan-index-now' ); ?>:</b> <?php echo esc_html( number_format( $plugin['active_installs'], 0, '', ' ' ) ); ?></li>
-										<li><b><?php esc_html_e( 'Downloaded', 'mihdan-index-now' ); ?>:</b> <?php echo esc_html( number_format( $plugin['downloaded'], 0, '', ' ' ) ); ?></li>
+										<li><b><?php esc_html_e( 'Version', 'recrawler' ); ?>:</b> <?php echo esc_html( $plugin['version'] ); ?></li>
+										<li><b><?php esc_html_e( 'Installations', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['active_installs'], 0, '', ' ' ) ); ?></li>
+										<li><b><?php esc_html_e( 'Downloaded', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['downloaded'], 0, '', ' ' ) ); ?></li>
 									</ul>
 									<div class="wposa-plugin__install">
-										<a href="<?php echo esc_url( $install_url ); ?>" class="install-now button"><?php esc_html_e( 'Install', 'mihdan-index-now' ); ?></a>
+										<a href="<?php echo esc_url( $install_url ); ?>" class="install-now button"><?php esc_html_e( 'Install', 'recrawler' ); ?></a>
 									</div>
 								</div>
 							</div>

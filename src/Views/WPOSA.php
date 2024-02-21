@@ -997,7 +997,7 @@ class WPOSA {
 		<div class="wposa">
 			<div class="wposa-header">
 				<div class="wposa-header--left">
-					<img class="wposa-logo" title="IndexNow" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/index-now-logo--gradient.svg' ) ); ?>" width="80" alt="" />
+					<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/recrawler-logo--gradient.svg' ) ); ?>" width="80" alt="" />
 				</div>
 				<div class="wposa-header--center">
 					<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
@@ -1253,7 +1253,7 @@ class WPOSA {
 				$( '#button_get_token' ).on(
 					'click',
 					function() {
-						const CLIENT_ID = document.getElementById( 'mihdan_index_now_yandex_webmaster[client_id]' ).value;
+						const CLIENT_ID = document.getElementById( 'recrawler_yandex_webmaster[client_id]' ).value;
 
 						window.location.href = CODE_ENDPOINT + CLIENT_ID;
 					}
@@ -1456,11 +1456,11 @@ class WPOSA {
 			.wposa-form-table__row_type_number .regular-text {
 				width: 50px;
 			}
-			.wposa-form-table__row_mihdan_index_now_logs_enable label,
-			.wposa-form-table__row_mihdan_index_now_yandex_webmaster_enable label,
-			.wposa-form-table__row_mihdan_index_now_google_webmaster_enable label,
-			.wposa-form-table__row_mihdan_index_now_bing_webmaster_enable label,
-			.wposa-form-table__row_mihdan_index_now_index_now_enable label {
+			.wposa-form-table__row_recrawler_logs_enable label,
+			.wposa-form-table__row_recrawler_yandex_webmaster_enable label,
+			.wposa-form-table__row_recrawler_google_webmaster_enable label,
+			.wposa-form-table__row_recrawler_bing_webmaster_enable label,
+			.wposa-form-table__row_recrawler_index_now_enable label {
 				color: #135e96 !important;
 			}
 
@@ -1484,7 +1484,7 @@ class WPOSA {
 			.wposa__table td {
 				padding: 7px;
 			}
-			.wposa-card--mihdan_index_now_wpshop {
+			.wposa-card--recrawler_wpshop {
 				padding: 0;
 				border: 0;
 			}
@@ -1495,15 +1495,15 @@ class WPOSA {
 				background-color: #fff;
 			}
 
-			.wposa-card--mihdan_index_now_rtfm {
+			.wposa-card--recrawler_rtfm {
 				position: sticky;
 				top: 50px;
 			}
 
-			.wposa-form-table__row_mihdan_index_now_plugins_plugins th {
+			.wposa-form-table__row_recrawler_plugins_plugins th {
 				display: none;
 			}
-			.wposa-form-table__row_mihdan_index_now_plugins_plugins td {
+			.wposa-form-table__row_recrawler_plugins_plugins td {
 				padding: 0;
 			}
 			.wposa-plugins {

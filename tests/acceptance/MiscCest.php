@@ -19,8 +19,8 @@ class MiscCest
 			return 'input[id="' . $id . '"]';
 		};
 
-		$I->seeCheckboxIsChecked( $input_id( 'wposa-mihdan_index_now_general[post_types][post]' ) );
-		$I->dontSeeCheckboxIsChecked( $input_id( 'wposa-mihdan_index_now_general[post_types][page]' ) );
-		$I->dontSeeCheckboxIsChecked( $input_id( 'wposa-mihdan_index_now_general[post_types][attachment]' ) );
+		$I->seeCheckboxIsChecked( $input_id( 'wposa-recrawler_general[post_types][post]' ) );
+		$I->dontSeeCheckboxIsChecked( $input_id( 'wposa-recrawler_general[post_types][page]' ) );
+		$I->dontSeeCheckboxIsChecked( $input_id( 'wposa-recrawler_general[post_types][attachment]' ) );
 	}
 }

@@ -14,13 +14,13 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 global $wpdb;
 
 $options = [
-	'mihdan_index_now_general',
-	'mihdan_index_now_index_now',
-	'mihdan_index_now_bing_webmaster',
-	'mihdan_index_now_google_webmaster',
-	'mihdan_index_now_yandex_webmaster',
-	'mihdan_index_now_logs',
-	'mihdan_index_now_version',
+	'recrawler_general',
+	'recrawler_index_now',
+	'recrawler_bing_webmaster',
+	'recrawler_google_webmaster',
+	'recrawler_yandex_webmaster',
+	'recrawler_logs',
+	'recrawler_version',
 ];
 
 if ( is_multisite() ) {
@@ -34,7 +34,7 @@ if ( is_multisite() ) {
 
 	foreach ( $sites as $site_id ) {
 		switch_to_blog( $site_id );
-		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}index_now_log" ); // phpcs:ignore
+		$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}recrawler_log" ); // phpcs:ignore
 		restore_current_blog();
 	}
 } else {
@@ -44,5 +44,5 @@ if ( is_multisite() ) {
 	}
 
 	// Delete Log table.
-	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}index_now_log" ); // phpcs:ignore
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}recrawler_log" ); // phpcs:ignore
 }

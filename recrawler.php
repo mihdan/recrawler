@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'RECRAWLER_VERSION', '0.1.0' );
 define( 'RECRAWLER_SLUG', 'recrawler' );
-define( 'RECRAWLER_PREFIX', 'mihdan_index_now' );
+define( 'RECRAWLER_PREFIX', 'recrawler' );
 define( 'RECRAWLER_NAME', 'ReCrawler' );
 define( 'RECRAWLER_FILE', __FILE__ );
 define( 'RECRAWLER_DIR', __DIR__ );

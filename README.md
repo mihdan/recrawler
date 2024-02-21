@@ -1,6 +1,6 @@
-# 🤖  IndexNow
+# 🤖  ReCrawler
 
-IndexNow is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.
+ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.
 
 Improve your rankings by taking control of the crawling and indexing process, so search engines know what to focus on!
 
