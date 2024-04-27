@@ -24,7 +24,7 @@ return array(
 		Finder::create()
 		      ->files()
 		      ->ignoreVCS( true )
-		      ->notName( '/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.(json|lock)/' )
+		      ->notName( '/LICENSE|COPYING|AUTHORS|Dockerfile|.*\\.pubkey|.*\\.sh|.*\\.xml|.*\\.yml|.*\\.cnf|.*\\.asc|.*\\.md|.*\\.json|.*\\.dist|Makefile|composer\\.(json|lock)/' )
 		      ->exclude(
 			      array(
 				      'doc',

@@ -215,7 +215,7 @@ class Log_List_Table extends WP_List_Table {
 
 	// заполнение колонки cb
 	function column_cb( $item ){
-		echo '<input type="checkbox" name="log_rows[]" id="cb-select-'. $item->log_id .'" value="'. $item->log_id .'" />';
+		echo '<input type="checkbox" name="log_rows[]" id="cb-select-'. esc_attr( $item->log_id ) .'" value="'. esc_attr( $item->log_id ) .'" />';
 	}
 
 	/**
@@ -224,7 +224,7 @@ class Log_List_Table extends WP_List_Table {
 	private function bulk_action_handler() {
 		global $wpdb;
 
-		if ( ! empty( $_POST['_wpnonce'] ) && ! wp_verify_nonce( wp_unslash( $_POST['_wpnonce'] ), 'bulk-' . $this->_args['plural'] ) ) {
+		if ( ! empty( $_POST['_wpnonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'bulk-' . $this->_args['plural'] ) ) {
 			return;
 		}
 

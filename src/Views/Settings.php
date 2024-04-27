@@ -131,7 +131,7 @@ class Settings {
 			->add_sidebar_card(
 				[
 					'id'    => 'donate',
-					'title' => __( 'Enjoyed IndexNow?', 'recrawler' ),
+					'title' => __( 'Enjoyed ReCrawler?', 'recrawler' ),
 					'desc'  => __( '<p>Please leave us a <a href="https://wordpress.org/support/plugin/recrawler/reviews/#new-post" target="_blank" title="Rate &amp; review it">★★★★★</a> rating. We really appreciate your support</p>', 'recrawler' ),
 				]
 			)
@@ -139,7 +139,7 @@ class Settings {
 				[
 					'id'    => 'rtfm',
 					'title' => __( 'Do you need help?', 'recrawler' ),
-					'desc'  => __( '<p>Here are some available options to help solve your problems.</p><ol><li><a href="https://wordpress.org/plugins/recrawler/" target="_blank">Plugin home page</a></li><li><a href="https://www.kobzarev.com/projects/index-now/" target="_blank">Plugin docs</a></li><li><a href="https://wordpress.org/support/plugin/recrawler/" target="_blank">Support forums</a></li><li><a href="https://github.com/mihdan/recrawler/" target="_blank">Issue tracker</a></li><li><a href="https://t.me/+rBLAx8RzcNk1ZWY6" target="_blank">Help via Telegram</a></li></ol>', 'recrawler' ),
+					'desc'  => __( '<p>Here are some available options to help solve your problems.</p><ol><li><a href="https://wordpress.org/plugins/recrawler/" target="_blank">Plugin home page</a></li><li><a href="https://www.kobzarev.com/projects/recrawler/" target="_blank">Plugin docs</a></li><li><a href="https://wordpress.org/support/plugin/recrawler/" target="_blank">Support forums</a></li><li><a href="https://github.com/mihdan/recrawler/" target="_blank">Issue tracker</a></li><li><a href="https://t.me/+rBLAx8RzcNk1ZWY6" target="_blank">Help via Telegram</a></li></ol>', 'recrawler' ),
 				]
 			);
 

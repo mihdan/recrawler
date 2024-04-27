@@ -22,9 +22,6 @@ use Mihdan\ReCrawler\Views\Settings;
 use Mihdan\ReCrawler\Views\WPOSA;
 use WP_Post;
 use WP_List_Table;
-use Mihdan\ReCrawler\Dependencies\Auryn\Injector;
-use Mihdan\ReCrawler\Dependencies\Auryn\InjectionException;
-use Mihdan\ReCrawler\Dependencies\Auryn\ConfigException;
 use WP_Site;
 
 /**
@@ -34,9 +31,9 @@ class Main {
 	/**
 	 * DIC container.
 	 *
-	 * @var Injector $injector
+	 * @var Container $container
 	 */
-	private $injector;
+	private $container;
 
 	/**
 	 * Settings instance.
@@ -55,10 +52,10 @@ class Main {
 	/**
 	 * Constructor.
 	 *
-	 * @param Injector $injector Injector instnace.
+	 * @param Container $container Container instnace.
 	 */
-	public function __construct( Injector $injector ) {
-		$this->injector = $injector;
+	public function __construct( Container $container ) {
+		$this->container = $container;
 	}
 
 	public function init() {
@@ -69,64 +66,54 @@ class Main {
 	}
 
 	/**
-	 * Make a class from DIC.
-	 *
-	 * @param string $class_name Full class name.
-	 * @param array  $args List of arguments.
-	 *
-	 * @return mixed
-	 *
-	 * @throws InjectionException If a cyclic gets detected when provisioning.
-	 * @throws ConfigException If $nameOrInstance is not a string or an object.
+	 * @throws NotFoundExceptionInterface
+	 * @throws ContainerExceptionInterface
 	 */
-	public function make( string $class_name, array $args = [] ) {
-		return $this->injector->share( $class_name )->make( $class_name, $args );
-	}
-
 	private function load_requirements() {
 
 		if ( ! function_exists( 'dbDelta' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		}
 
-		$this->logger = $this->make( Logger::class );
+		$this->logger = $this->container->make( Logger::class );
 
-		$wposa = $this->make(
+		$this->container->set(
 			WPOSA::class,
-			[
-				':plugin_name'    => Utils::get_plugin_name(),
-				':plugin_version' => Utils::get_plugin_version(),
-				':plugin_slug'    => Utils::get_plugin_slug(),
-				':plugin_prefix'  => Utils::get_plugin_prefix(),
-			]
+			function( Container $c ) {
+				return new WPOSA(
+					Utils::get_plugin_name(),
+					Utils::get_plugin_version(),
+					Utils::get_plugin_slug(),
+					Utils::get_plugin_prefix()
+				);
+			}
 		);
 
-		$this->wposa = $wposa;
+		$this->wposa = $this->container->get( WPOSA::class );
 		$this->wposa->setup_hooks();
 
-		( $this->make( Hooks::class ) )->setup_hooks();
+		( $this->container->make( Hooks::class ) )->setup_hooks();
 
-		( $this->make( HelpTab::class ) )->setup_hooks();
-		( $this->make( Settings::class ) )->setup_hooks();
-		( $this->make( Cron::class ) )->setup_hooks();
-		( $this->make( YandexIndexNow::class ) )->setup_hooks();
-		( $this->make( BingIndexNow::class ) )->setup_hooks();
-		( $this->make( SeznamIndexNow::class ) )->setup_hooks();
-		( $this->make( NaverIndexNow::class ) )->setup_hooks();
-		( $this->make( IndexNow::class ) )->setup_hooks();
+		( $this->container->make( HelpTab::class ) )->setup_hooks();
+		( $this->container->make( Settings::class ) )->setup_hooks();
+		( $this->container->make( Cron::class ) )->setup_hooks();
+		( $this->container->make( YandexIndexNow::class ) )->setup_hooks();
+		( $this->container->make( BingIndexNow::class ) )->setup_hooks();
+		( $this->container->make( SeznamIndexNow::class ) )->setup_hooks();
+		( $this->container->make( NaverIndexNow::class ) )->setup_hooks();
+		( $this->container->make( IndexNow::class ) )->setup_hooks();
 
-		( $this->make( YandexWebmaster::class ) )->setup_hooks();
-		( $this->make( BingWebmaster::class ) )->setup_hooks();
-		( $this->make( GoogleWebmaster::class ) )->setup_hooks();
+		( $this->container->make( YandexWebmaster::class ) )->setup_hooks();
+		( $this->container->make( BingWebmaster::class ) )->setup_hooks();
+		( $this->container->make( GoogleWebmaster::class ) )->setup_hooks();
 	}
 
 	/**
 	 * Setup hooks.
 	 */
-	public function setup_hooks() {
+	public function setup_hooks(): void {
 		add_filter( 'plugin_action_links', [ $this, 'add_settings_link' ], 10, 2 );
 		add_action( 'admin_menu', [ $this, 'add_log_menu_page' ] );
-		add_action( 'template_redirect', [ $this, 'parse_incoming_request' ] );
 		add_filter( 'set_screen_option_logs_per_page', [ $this, 'set_screen_option' ], 10, 3 );
 		add_action( 'admin_init', [ $this, 'maybe_upgrade' ] );
 
@@ -310,8 +297,8 @@ class Main {
 
 		$hook = add_submenu_page(
 			RECRAWLER_SLUG,
-			'Log',
-			'Log',
+			__( 'Log', 'recrawler' ),
+			__( 'Log', 'recrawler' ),
 			'manage_options',
 			RECRAWLER_SLUG . '-log',
 			[ $this, 'render_log_page' ]
@@ -320,7 +307,7 @@ class Main {
 		add_action(
 			"load-$hook",
 			function () {
-				$GLOBALS[ RECRAWLER_PREFIX . '_log' ] = $this->make( Log_List_Table::class );
+				$GLOBALS[ RECRAWLER_PREFIX . '_log' ] = $this->container->make( Log_List_Table::class );
 			}
 		);
 	}
@@ -331,7 +318,7 @@ class Main {
 	public function render_log_page() {
 		?>
 		<div class="wrap">
-			<h2><?php esc_html_e( get_admin_page_title(), 'recrawler' ); ?></h2>
+			<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
 			<form action="" method="post">
 				<?php
 				/**
@@ -369,41 +356,5 @@ class Main {
 
 	private function is_logging_enabled(): bool {
 		return $this->wposa->get_option( 'enable', 'logs', 'on' ) === 'on';
-	}
-
-	/**
-	 * Parse incoming request.
-	 */
-	public function parse_incoming_request() { return;
-
-		$actual_link = ( is_ssl() ? "https" : "http" ) . "://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-		$post_id     = url_to_postid( $actual_link );
-
-		if ( $post_id === 0 ) {
-			return;
-		}
-
-		$data = [
-			'post_id'       => $post_id,
-			'status_code'   => 200,
-			'search_engine' => 'yandex',
-			'direction'     => 'incoming',
-		];
-
-		$this->logger->debug( 'Бот запросил страницу<br>' . Utils::get_user_agent(), $data );
-	}
-
-	/**
-	 * Google Webmaster ping.
-	 *
-	 * @param WP_Post $post WP_Post unstance.
-	 */
-	public function google_webmaster_ping( WP_Post $post ) {
-		$url = 'https://www.google.com/webmasters/sitemaps/ping?sitemap=%s';
-		$url = sprintf( $url, site_url( 'sitemap_index.xml' ) );
-		wp_remote_get( $url );
-
-		$url = sprintf( $url, site_url( 'sitemap.xml' ) );
-		wp_remote_get( $url );
 	}
 }

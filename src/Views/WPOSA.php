@@ -661,7 +661,7 @@ class WPOSA {
 
 		$html .= $this->get_field_description( $args );
 
-		echo $html;
+		echo wp_kses( $html, self::ALLOWED_HTML );
 	}
 
 
@@ -1004,7 +1004,7 @@ class WPOSA {
 					<div class="wposa-version"><?php esc_html_e( 'Version' ); ?>: <?php echo esc_html( $this->plugin_version )?></div>
 				</div>
 				<div class="wposa-header--right">
-					<p><?php esc_html_e( 'IndexNow is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
+					<p><?php esc_html_e( 'ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
 				</div>
 			</div>
 			<?php $this->show_navigation(); ?>

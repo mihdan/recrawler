@@ -18,8 +18,6 @@
 
 namespace Mihdan\ReCrawler;
 
-use \Mihdan\ReCrawler\Dependencies\Auryn\Injector;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -33,6 +31,7 @@ define( 'RECRAWLER_DIR', __DIR__ );
 define( 'RECRAWLER_BASENAME', plugin_basename( __FILE__ ) );
 define( 'RECRAWLER_URL', plugin_dir_url( __FILE__ ) );
 
-require_once __DIR__ . '/vendor-prefixed/autoload.php';
-
-( new Main( new Injector() ) )->init();
+if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor-prefixed/autoload.php';
+	( new Main( new Container() ) )->init();
+}

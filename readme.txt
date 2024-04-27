@@ -44,11 +44,24 @@ If the plugin was useful, rate it with a [5 star rating](https://wordpress.org/s
 
 - 🇺🇸 English (en_US) - [Mikhail kobzarev](https://profiles.wordpress.org/mihdan)
 - 🇷🇺 Русский (ru_RU) - [Mikhail kobzarev](https://profiles.wordpress.org/mihdan)
-- 🇺🇦 Українська (uk_UA) - [Eugen Kalinsky](https://profiles.wordpress.org/seojacky)
-- 🇳🇱 Dutch (nl_NL) - [Peter Smits](https://profiles.wordpress.org/psmits1567)
 - [You could be next](https://translate.wordpress.org/projects/wp-plugins/recrawler/)...
 
 Can you help with plugin translation? Please feel free to contribute!
+
+### External services ###
+
+This plugin uses external services, which are documented below with links to the service’s Privacy Policy. These services are integral to the functionality and features offered by the plugin. However, we acknowledge the importance of transparency regarding the use of such services.
+
+1. Yandex Webmaster - [https://webmaster.yandex.ru](https://webmaster.yandex.ru)
+2. Yandex IndexNow - [https://yandex.com/indexnow](https://yandex.com/indexnow)
+3. Bing IndexNow - [https://www.bing.com/indexnow](https://www.bing.com/indexnow)
+4. Bing Webmaster - [https://ssl.bing.com/webmaster/](https://ssl.bing.com/webmaster/)
+5. Google Indexing API - [https://indexing.googleapis.com/](https://indexing.googleapis.com/)
+6. Naver IndexNow - [https://searchadvisor.naver.com/indexnow](https://searchadvisor.naver.com/indexnow)
+7. Seznam IndexNow - [https://search.seznam.cz/indexnow](https://search.seznam.cz/indexnow)
+8. IndexNow - [https://api.indexnow.org](https://api.indexnow.org)
+9. Google Developers Console - [https://console.developers.google.com/](https://console.developers.google.com/)
+10. Yandex oauth - [https://oauth.yandex.ru/](https://oauth.yandex.ru/)
 
 == Frequently Asked Questions ==
 
