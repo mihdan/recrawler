@@ -77,7 +77,7 @@ class YandexWebmaster extends WebmasterAbstract {
 			$data = [];
 			$data['body'] = [
 				'grant_type'    => 'authorization_code',
-				'code'          => $_GET['code'],
+				'code'          => wp_unslash( sanitize_text_field( $_GET['code'] ) ),
 				'client_id'     => $this->get_client_id(),
 				'client_secret' => $this->get_client_secret(),
 			];

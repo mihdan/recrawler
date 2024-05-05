@@ -269,7 +269,11 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 			return;
 		}
 
-		// Exclude key file from cache.
+		/**
+		 * A constant for disabling cache in popular plugins like:
+		 * - WP Super Cache
+		 * - WP Rocket
+		 */
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
 			define( 'DONOTCACHEPAGE', true );
 		}

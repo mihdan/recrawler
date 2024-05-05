@@ -108,7 +108,7 @@ class Utils {
 	 * @return mixed|string
 	 */
 	public static function get_user_agent(): string {
-		return wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' );
+		return wp_unslash( sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' ) );
 	}
 
 	/**

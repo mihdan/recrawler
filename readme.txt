@@ -1,7 +1,7 @@
 === ReCrawler ===
 Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
-Tags: indexnow, index-now, yandex, bing, google, seo, cloudflare, duck-duck-go, recrawler
+Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 6.4
 Stable tag: 0.1.0
