@@ -8,7 +8,7 @@
  * Author Email: renakdup@gmail.com
  * Author Site: https://wp-yoda.com/en/
  *
- * Version: 0.2.5
+ * Version: 0.2.6
  * Source Code: https://github.com/renakdup/simple-php-dic
  *
  * Licence: MIT License
@@ -22,6 +22,7 @@ use Closure;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 use function array_key_exists;
@@ -91,7 +92,7 @@ class Container implements ContainerInterface {
 	protected array $resolved = [];
 
 	/**
-	 * @var ReflectionClass[]
+	 * @var array<string, ReflectionClass<object>>
 	 */
 	protected array $reflection_cache = [];
 
@@ -237,8 +238,10 @@ class Container implements ContainerInterface {
 	 * @throws ReflectionException
 	 */
 	protected function resolve_parameter( ReflectionParameter $param ) {
-		if ( $param_class = $param->getClass() ) {
-			return $this->get( $param_class->getName() );
+		$param_type = $param->getType();
+
+		if ( $param_type instanceof ReflectionNamedType && ! $param_type->isBuiltin() ) {
+			return $this->get( $param_type->getName() );
 		}
 
 		if ( $param->isOptional() ) {
