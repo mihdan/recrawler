@@ -126,8 +126,6 @@ class Main {
 				add_filter( "manage_{$post_type}_posts_columns", [ $this, 'add_last_update_column' ] );
 				add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'add_last_update_column_content' ], 10, 2 );
 			}
-
-			add_action( 'admin_head', [ $this, 'add_css_for_column' ] );
 		}
 
 		register_activation_hook( RECRAWLER_FILE, [ $this, 'activate_plugin' ] );
@@ -159,19 +157,6 @@ class Main {
 		switch_to_blog( $new_site->id );
 		$this->create_tables();
 		restore_current_blog();
-	}
-
-	public function add_css_for_column(): void {
-		?>
-		<style>
-			.column-recrawler {
-				width: 8em;
-			}
-			.column-recrawler img {
-				vertical-align: bottom;
-			}
-		</style>
-		<?php
 	}
 
 	public function add_last_update_column( array $columns ): array {

@@ -220,9 +220,6 @@ class WPOSA {
 	public function admin_scripts() {
 		global $wp_version;
 
-		// jQuery is needed.
-		wp_enqueue_script( 'jquery' );
-
 		// Color Picker.
 		wp_enqueue_script(
 			'iris',
@@ -230,6 +227,41 @@ class WPOSA {
 			array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ),
 			$wp_version,
 			true
+		);
+
+		wp_enqueue_script(
+			Utils::get_plugin_prefix() . '-admin',
+			Utils::get_plugin_asset_url( 'js/admin.js' ),
+			[ 'jquery', 'iris' ],
+			filemtime( Utils::get_plugin_asset_path( 'js/admin.js' ) ),
+			[
+				'in_footer' => true,
+			]
+		);
+
+		$settings = [
+			'redirect_url' => esc_url( admin_url( 'admin.php?page=' . Utils::get_plugin_slug() ) ),
+		];
+
+		wp_add_inline_script(
+			Utils::get_plugin_prefix() . '-admin',
+			'var recrawlerSettings = ' . json_encode( $settings ),
+			'before'
+		);
+
+		wp_localize_script(
+			Utils::get_plugin_prefix() . '-admin',
+			'recrawlerLocalize',
+			[
+				'are_you_sure' => esc_js( __( 'Are you sure?', 'recrawler' ) )
+			]
+		);
+
+		wp_enqueue_style(
+			Utils::get_plugin_prefix() . '-admin',
+			Utils::get_plugin_asset_url( 'css/admin.css' ),
+			[],
+			filemtime( Utils::get_plugin_asset_path( 'css/admin.css' ) )
 		);
 	}
 
@@ -1107,7 +1139,6 @@ class WPOSA {
 			<?php endforeach; ?>
 		</div>
 		<?php
-		$this->script();
 	}
 
 	/**
@@ -1122,501 +1153,6 @@ class WPOSA {
 		<a title="<?php echo esc_attr__( 'Click to show Help tab', 'recrawler' ); ?>" class="wpsa-help-tab-toggle" data-tab="<?php echo esc_attr( $tab_id ); ?>"><?php echo esc_html( $tab_icon ); ?></a>
 		<?php
 		return ob_get_clean();
-	}
-
-	/**
-	 * Tabbable JavaScript codes & Initiate Color Picker
-	 *
-	 * This code uses localstorage for displaying active tabs
-	 */
-	public function script() {
-		?>
-		<script>
-			jQuery( document ).ready( function( $ ) {
-
-				const
-					$show_settings_toggler = $('.show-settings'),
-					$help = $('.wpsa-help-tab-toggle'),
-					wp = window.wp;
-
-				$help.on(
-					'click',
-					function () {
-						const $this = $(this);
-						const tab = '#tab-link-<?php echo esc_js( RECRAWLER_PREFIX ); ?>_' + $this.data('tab');
-
-						if ( $show_settings_toggler.attr('aria-expanded') === 'false' ) {
-							$show_settings_toggler.trigger('click');
-						}
-
-						$(tab).find('a').trigger('click');
-					}
-				);
-
-				//Initiate Color Picker.
-				$('.color-picker').iris();
-
-				// Switches option sections
-				$( '.group' ).hide();
-				var activetab = '';
-				if ( 'undefined' != typeof localStorage ) {
-					activetab = localStorage.getItem( 'activetab' );
-				}
-				if ( '' != activetab && $( activetab ).length ) {
-					$( activetab ).fadeIn();
-				} else {
-					$( '.group:first' ).fadeIn();
-				}
-				$( '.group .collapsed' ).each( function() {
-					$( this )
-						.find( 'input:checked' )
-						.parent()
-						.parent()
-						.parent()
-						.nextAll()
-						.each( function() {
-							if ( $( this ).hasClass( 'last' ) ) {
-								$( this ).removeClass( 'hidden' );
-								return false;
-							}
-							$( this )
-								.filter( '.hidden' )
-								.removeClass( 'hidden' );
-						});
-				});
-
-				if ( '' != activetab && $( activetab + '-tab' ).length ) {
-					$( activetab + '-tab' ).addClass( 'nav-tab-active' );
-				} else {
-					$( '.nav-tab-wrapper a:first' ).addClass( 'nav-tab-active' );
-				}
-				$( '.nav-tab-wrapper a' ).click( function( evt ) {
-					$( '.nav-tab-wrapper a' ).removeClass( 'nav-tab-active' );
-					$( this )
-						.addClass( 'nav-tab-active' )
-						.blur();
-					var clicked_group = $( this ).attr( 'href' );
-					if ( 'undefined' != typeof localStorage ) {
-						localStorage.setItem( 'activetab', $( this ).attr( 'href' ) );
-					}
-					$( '.group' ).hide();
-					$( clicked_group ).fadeIn();
-					evt.preventDefault();
-				});
-
-				$( '.wpsa-browse' ).on( 'click', function( event ) {
-					event.preventDefault();
-
-					var self = $( this );
-
-					// Create the media frame.
-					var file_frame = ( wp.media.frames.file_frame = wp.media({
-						title: self.data( 'uploader_title' ),
-						button: {
-							text: self.data( 'uploader_button_text' )
-						},
-						multiple: false
-					}) );
-
-					file_frame.on( 'select', function() {
-						attachment = file_frame
-							.state()
-							.get( 'selection' )
-							.first()
-							.toJSON();
-
-						self
-							.prev( '.wpsa-url' )
-							.val( attachment.url )
-							.change();
-					});
-
-					// Finally, open the modal
-					file_frame.open();
-				});
-
-				$( 'input.wpsa-url' )
-					.on( 'change keyup paste input', function() {
-						var self = $( this );
-						self
-							.next()
-							.parent()
-							.children( '.wpsa-image-preview' )
-							.children( 'img' )
-							.attr( 'src', self.val() );
-					})
-					.change();
-
-				const REDIRECT_URL  = '<?php echo esc_url( admin_url( 'admin.php?page=' . Utils::get_plugin_slug() ) ); ?>';
-				const CODE_ENDPOINT = 'https://oauth.yandex.ru/authorize?state=yandex-webmaster&response_type=code&force_confirm=yes&redirect_uri=' + REDIRECT_URL + '&client_id=';
-
-				$( '#button_get_token' ).on(
-					'click',
-					function() {
-						const CLIENT_ID = document.getElementById( 'recrawler_yandex_webmaster[client_id]' ).value;
-
-						window.location.href = CODE_ENDPOINT + CLIENT_ID;
-					}
-				);
-
-				$( 'input:button[id$="_reset_form"]' ).on(
-					'click',
-					function() {
-						const
-							$button = $( this ),
-							$nonce  = $( this ).parents( 'form' ).find( '#_wpnonce' );
-
-						if ( confirm( '<?php echo esc_attr( __( 'Are you sure?', 'recrawler' ) ); ?>' ) ) {
-							wp.ajax.post(
-								'<?php echo esc_html( Utils::get_plugin_prefix() ); ?>_reset_form',
-								{
-									section: $button.data( 'section' ),
-									nonce:   $nonce.val(),
-								}
-							).always( function ( response ) {
-								if ( response === 'ok' ) {
-									document.location.reload();
-								} else {
-									console.log( response );
-								}
-							} );
-						}
-					}
-				);
-			});
-
-		</script>
-
-		<style>
-			#wpbody-content .wposa .metabox-holder {
-				padding-left: 0;
-			}
-			.toplevel_page_recrawler #screen-meta-links {
-				position: relative;
-				z-index: 10;
-			}
-			.wposa {
-				position: relative;
-				clear: both;
-				z-index: 9;
-				top: -30px;
-			}
-			.wposa .buttons-group {
-				display: flex;
-				gap: 10px;
-			}
-			.wposa .button {}
-			.wposa .button-danger {
-				color: #d63638;
-				border-color: #d63638;
-			}
-			.wposa-header {
-				display: grid;
-				grid-template-columns: 80px 120px auto;
-				grid-gap: 15px;
-				align-items: center;
-				margin-bottom: 20px;
-				background-color: #fff;
-				padding: 14px 20px;
-				position: relative;
-				margin-left: -20px;
-				border-top: 1px solid #c3c4c7;
-				border-bottom: 1px solid #c3c4c7;
-			}
-			.wposa-header--left {
-
-			}
-			.wposa-header--center {
-
-			}
-			.wposa-header--right {
-				color: #909090;
-			}
-			.wposa-header--right > p {
-				max-width: 600px;
-			}
-			.wposa-logo {
-				display: block;
-			}
-			.wposa-heading {
-				font-size: 24px;
-				font-weight: 400;
-				line-height: 1.3;
-			}
-			.wposa-version {
-				font-size: 13px;
-			}
-
-			#wpbody-content .metabox-holder {
-				padding-top: 5px;
-			}
-			.wpsa-image-preview img {
-				height: auto;
-				max-width: 70px;
-			}
-			.wposa-field--separator {
-				background: #ccc;
-				border: 0;
-				color: #ccc;
-				height: 1px;
-				position: absolute;
-				left: 0;
-				width: 99%;
-			}
-			.group .form-table input.color-picker {
-				max-width: 100px;
-			}
-			.wpsa-help-tab-toggle {
-				display: inline-block;
-				width: 14px;
-				height: 14px;
-				line-height: 14px;
-				text-align: center;
-				border-radius: 50%;
-				border: 2px solid #2271b1;
-				cursor: help;
-				font-size: 12px;
-				vertical-align: text-bottom;
-				user-select: none;
-			}
-			.wposa__grid {
-				display: grid;
-				grid-gap: 20px;
-				grid-template-columns: auto 300px;
-			}
-
-			.wposa .description {
-				max-width: 350px;
-			}
-
-			input.wposa-field--switch {
-				position: relative;
-				-webkit-appearance: none;
-				appearance: none;
-				outline: none;
-				width: 40px;
-				height: 20px;
-				background-color: #ffffff;
-				border: 1px solid #D9DADC;
-				border-radius: 50px;
-				box-shadow: inset -20px 0 0 0 #ffffff;
-			}
-
-			input.wposa-field--switch:before {
-				display: none !important;
-			}
-			input.wposa-field--switch:after {
-				content: "";
-				position: absolute;
-				top: 0;
-				left: 1px;
-				width: 18px;
-				height: 18px;
-				background-color: transparent;
-				border-radius: 50%;
-				box-shadow: 2px 0 6px rgba(0,0,0,0.2);
-				transition-property: left;
-				transition-duration: 3s;
-			}
-
-			input.wposa-field--switch:checked {
-				border-color: #135e96;
-				box-shadow: inset 20px 0 0 0 #135e96;
-			}
-
-			input.wposa-field--switch:checked:after {
-				left: auto;
-				right: 1px;
-				box-shadow: -2px 0px 3px rgba(0,0,0,0.05);
-			}
-
-			input.wposa-field--switch:hover:after {
-				/*box-shadow: 0 0 3px rgba(0,0,0,0.3);*/
-			}
-
-			.wposa-nav-tab {}
-			.wposa-nav-tab--disabled {
-				cursor: not-allowed;
-			}
-			.wposa-badge {
-				font-size: 0.8em;
-				background-color: #d63638;
-				color: #fff;
-				border-radius: 2px;
-				padding: 0 5px;
-				display: inline-block;
-				font-weight: normal;
-			}
-			.wposa-section-description {
-				max-width: 600px;
-			}
-			.wposa-form-table__row_type_hidden {
-				display: none;
-			}
-			.wposa-form-table__row_type_number .regular-text {
-				width: 50px;
-			}
-			.wposa-form-table__row_recrawler_logs_enable label,
-			.wposa-form-table__row_recrawler_yandex_webmaster_enable label,
-			.wposa-form-table__row_recrawler_google_webmaster_enable label,
-			.wposa-form-table__row_recrawler_bing_webmaster_enable label,
-			.wposa-form-table__row_recrawler_index_now_enable label {
-				color: #135e96 !important;
-			}
-
-			.wrap-column--form form {
-				max-width: 600px;
-			}
-			.wpsa-card img {
-				display: block;
-				border: 0;
-			}
-			.wposa__table {
-				border: 1px solid #c3c4c7;
-				border-collapse: collapse;
-			}
-			.wposa__table th {
-				text-align: left;
-				vertical-align: top;
-				line-height: 1.2em;
-			}
-			.wposa__table th,
-			.wposa__table td {
-				padding: 7px;
-			}
-			.wposa-card--recrawler_wpshop {
-				padding: 0;
-				border: 0;
-			}
-			.wposa__table tr:nth-child(even) {
-				background-color: #f0f0f1;
-			}
-			.wposa__table tr:nth-child(odd) {
-				background-color: #fff;
-			}
-
-			.wposa-card--recrawler_rtfm {
-				position: sticky;
-				top: 50px;
-			}
-
-			.wposa-form-table__row_recrawler_plugins_plugins th {
-				display: none;
-			}
-			.wposa-form-table__row_recrawler_plugins_plugins td {
-				padding: 0;
-			}
-			.wposa-plugins {
-				display: grid;
-				grid-gap: 20px;
-				grid-template-columns: repeat(3, 1fr);
-			}
-			.wposa-plugins a {
-				text-decoration: none;
-			}
-			.wposa-plugins__item {
-				border: 1px solid #c3c4c7;
-				background: #fff;
-			}
-			.wposa-plugin {
-				display: flex;
-				flex-direction: column;
-				justify-content: space-between;
-			}
-			.wposa-plugin__content {
-				display: grid;
-				grid-gap: 20px;
-				grid-template-columns: 100px auto;
-				padding: 20px;
-			}
-			.wposa-plugin__icon {}
-			.wposa-plugin__data {}
-			.wposa-plugin__name {
-				font-weight: bold;
-				margin-bottom: 5px;
-				font-size: 1.2em;
-			}
-			.wposa-plugin__description {
-				font-size: 0.9em;
-			}
-			.wposa-plugin__footer {
-				background: #f6f7f7;
-				padding: 20px 20px;
-				display: grid;
-				grid-gap: 20px;
-				grid-template-columns: 1fr 1fr;
-			}
-			.wposa-plugin__install {
-				align-self: end;
-				text-align: right;
-			}
-			.wposa-plugin__meta {
-				margin: 0;
-				padding: 0;
-				font-size: 0.9em;
-			}
-			.wposa-plugin__meta > li {
-				padding: 0;
-				margin-bottom: 2px;
-			}
-			@media (max-width : 1480px) {
-				.wposa-plugins {
-					grid-template-columns: 1fr 1fr;
-				}
-			}
-			@media (max-width: 782px) {
-				.wposa__grid {
-					grid-template-columns: 1fr;
-				}
-				.wposa__column {
-					padding-right: 10px;
-				}
-			}
-			@media (max-width : 992px) {
-				.wposa-plugins {
-					grid-template-columns: 1fr;
-				}
-			}
-			@media (max-width: 544px) {
-				.toplevel_page_recrawler #wpcontent {
-					/*padding-left: 0;*/
-				}
-				.wposa {
-					top: -60px;
-				}
-				.wposa-header--right {
-					display: none
-				}
-				.form-table th {
-					padding: 10px 0;
-				}
-				.wposa-plugins {
-					grid-template-columns: 1fr;
-				}
-			}
-			.wposa__helptab {
-				max-width: 600px;
-			}
-			.wposa code {
-				white-space: nowrap;
-			}
-			.wposa-overflow {
-				overflow-x: auto;
-				max-width: 300px;
-			}
-			.wposa-footer {
-				display: grid;
-				grid-gap: 20px;
-				grid-template-columns: 1fr 1fr;
-				padding-top: 50px;
-			}
-			.wposa-footer__column {}
-			.wposa-footer__column--left {}
-			.wposa-footer__column--right {
-				text-align: right;
-			}
-		</style>
-		<?php
 	}
 
 	/**

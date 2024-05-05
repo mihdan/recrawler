@@ -61,6 +61,17 @@ class Utils {
 	}
 
 	/**
+	 * Get plugin asset path.
+	 *
+	 * @param string $asset Asset path.
+	 *
+	 * @return string
+	 */
+	public static function get_plugin_asset_path( string $asset ): string {
+		return self::get_plugin_path() . '/assets/' . $asset;
+	}
+
+	/**
 	 * Get plugin slug.
 	 *
 	 * @return string

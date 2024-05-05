@@ -51,8 +51,6 @@ class Log_List_Table extends WP_List_Table {
 		) );
 
 		$this->prepare_items();
-
-		add_action( 'wp_print_scripts', [ __CLASS__, '_list_table_css' ] );
 	}
 
 	/**
@@ -149,34 +147,6 @@ class Log_List_Table extends WP_List_Table {
 		return [
 			'delete' => 'Delete',
 		];
-	}
-
-	static function _list_table_css(){
-		?>
-		<style>
-			table.logs .column-log_id{ width:3em; }
-			table.logs .column-level{ width:4em; }
-			table.logs .column-direction{ width:4em; }
-			table.logs .column-search_engine{ width:8.5em; }
-			table.logs .column-status_code{ width:6em; }
-			table.logs .column-created_at{ width:10em; }
-			table.logs span.level {
-				border-radius: 50%;
-				width: 6px;
-				height: 6px;
-				color: transparent;
-				display: inline-block;
-				vertical-align: middle;
-			}
-			table.logs span.level--error {
-				background-color: #f00;
-			}
-			table.logs span.level--info,
-			table.logs span.level--debug {
-				background-color: #0f0;
-			}
-		</style>
-		<?php
 	}
 
 	// вывод каждой ячейки таблицы...
