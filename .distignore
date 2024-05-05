@@ -13,6 +13,7 @@
 /Thumbs.db
 /behat.yml
 /circle.yml
+/codeception.yml
 /composer.json
 /composer.lock
 /Gruntfile.js
@@ -20,6 +21,7 @@
 /package-lock.json
 /phpunit.xml
 /phpunit.xml.dist
+/psalm.xml
 /multisite.xml
 /multisite.xml.dist
 /phpcs.xml
