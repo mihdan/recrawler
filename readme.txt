@@ -3,8 +3,8 @@ Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
-Tested up to: 6.4
-Stable tag: 0.1.0
+Tested up to: 6.5
+Stable tag: 0.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -150,7 +150,10 @@ See the documentation available from each search engine for more details about R
 
 == Changelog ==
 
-= 0.1.0 (21.02.2022) =
+= 0.1.1 (12.05.2024) =
+* Added WordPress 6.5+ support
+
+= 0.1.0 (21.02.2024) =
 * Init plugin
 
 == Installation ==
