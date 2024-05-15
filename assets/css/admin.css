@@ -20,6 +20,10 @@
 	color: #d63638;
 	border-color: #d63638;
 }
+.wposa-img {
+	max-width: 600px;
+	height: auto;
+}
 .wposa-header {
 	display: grid;
 	grid-template-columns: 80px 120px auto;
