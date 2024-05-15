@@ -23,6 +23,7 @@ use Mihdan\ReCrawler\Views\WPOSA;
 use WP_Post;
 use WP_List_Table;
 use WP_Site;
+use WP_Query;
 
 /**
  * Class Main.
@@ -124,7 +125,10 @@ class Main {
 		if ( $this->wposa->get_option( 'show_last_update_column', 'general', 'on' ) === 'on' ) {
 			foreach ( (array) $this->wposa->get_option( 'post_types', 'general', [] ) as $post_type ) {
 				add_filter( "manage_{$post_type}_posts_columns", [ $this, 'add_last_update_column' ] );
+				add_filter( "manage_edit-{$post_type}_sortable_columns", [ $this, 'add_sorting_by_last_update_column' ] );
+
 				add_action( "manage_{$post_type}_posts_custom_column", [ $this, 'add_last_update_column_content' ], 10, 2 );
+				add_action( 'pre_get_posts', [ $this, 'do_sorting_by_last_update_column' ] );
 			}
 		}
 
@@ -181,6 +185,24 @@ class Main {
 
 		echo esc_html( date( 'd.m.Y H:i', $last_update ) );
 	}
+
+	public function add_sorting_by_last_update_column( array $columns ): array {
+		$columns['recrawler'] = 'recrawler';
+
+		return $columns;
+	}
+
+	public function do_sorting_by_last_update_column( WP_Query $query ) {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( $query->get( 'orderby' ) === 'recrawler' ) {
+			$query->set( 'meta_key', Utils::get_plugin_prefix() . '_last_update' );
+			$query->set( 'orderby', 'meta_value_num' );
+		}
+	}
+
 
 	public function post_row_actions( array $actions, WP_Post $post ): array {
 		if ( ! in_array( $post->post_type, (array) $this->wposa->get_option( 'post_types', 'general', [] ), true ) ) {
