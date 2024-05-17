@@ -669,8 +669,8 @@ class Settings {
 								<div class="wposa-plugin__footer">
 									<ul class="wposa-plugin__meta">
 										<li><b><?php esc_html_e( 'Version', 'recrawler' ); ?>:</b> <?php echo esc_html( $plugin['version'] ); ?></li>
-										<li><b><?php esc_html_e( 'Installations', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['active_installs'], 0, '', ' ' ) ); ?></li>
-										<li><b><?php esc_html_e( 'Downloaded', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['downloaded'], 0, '', ' ' ) ); ?></li>
+										<li><b><?php esc_html_e( 'Installations', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['active_installs'], 0, '', '.' ) ); ?></li>
+										<li><b><?php esc_html_e( 'Downloaded', 'recrawler' ); ?>:</b> <?php echo esc_html( number_format( $plugin['downloaded'], 0, '', '.' ) ); ?></li>
 									</ul>
 									<div class="wposa-plugin__install">
 										<a href="<?php echo esc_url( $install_url ); ?>" class="install-now button"><?php esc_html_e( 'Install', 'recrawler' ); ?></a>
