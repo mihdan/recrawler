@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -150,6 +150,12 @@ See the documentation available from each search engine for more details about R
 
 == Changelog ==
 
+= 0.1.2 (15.05.2024) =
+* Added ability to sort by ReCrawler column in the list of Posts
+* Added ability to migrate from IndexNow plugin in automatic mode
+* Updated screenshots of the application
+* Reduced the size of images in Google API documentation
+
 = 0.1.1 (12.05.2024) =
 * Added WordPress 6.5+ support
 
@@ -162,7 +168,7 @@ See the documentation available from each search engine for more details about R
 1. Visit 'Plugins > Add New'
 2. Search for 'ReCrawler'
 3. Activate ReCrawler from your Plugins page.
-4. [Optional] Configure plugin in 'WP Booster > True Lazy Analytics'.
+4. [Optional] Configure plugin in 'ReCrawler'.
 
 = From WordPress.org =
 1. Download ReCrawler.

@@ -8,6 +8,7 @@
 namespace Mihdan\ReCrawler;
 
 use Mihdan\ReCrawler\Logger\Logger;
+use Mihdan\ReCrawler\Migrations\Migrations;
 use Mihdan\ReCrawler\Providers\Bing\BingIndexNow;
 use Mihdan\ReCrawler\Providers\Bing\BingWebmaster;
 use Mihdan\ReCrawler\Providers\Google\GoogleWebmaster;
@@ -107,6 +108,7 @@ class Main {
 		( $this->container->make( YandexWebmaster::class ) )->setup_hooks();
 		( $this->container->make( BingWebmaster::class ) )->setup_hooks();
 		( $this->container->make( GoogleWebmaster::class ) )->setup_hooks();
+		( $this->container->make( Migrations::class ) )->setup_hooks();
 	}
 
 	/**
