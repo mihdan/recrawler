@@ -1,4 +1,5 @@
 jQuery( document ).ready( function( $ ) {
+	const ACTIVE_TAB = 'wposa_active_tab';
 
 	const
 		$show_settings_toggler = $('.show-settings'),
@@ -23,17 +24,21 @@ jQuery( document ).ready( function( $ ) {
 	$('.color-picker').iris();
 
 	// Switches option sections
-	$( '.group' ).hide();
-	var activetab = '';
+	$( '.wposa__group' ).hide();
+
+	let active_tab = '';
+
 	if ( 'undefined' != typeof localStorage ) {
-		activetab = localStorage.getItem( 'activetab' );
+		active_tab = localStorage.getItem( ACTIVE_TAB );
 	}
-	if ( '' != activetab && $( activetab ).length ) {
-		$( activetab ).fadeIn();
+
+	if ( '' !== active_tab && $( active_tab ).length ) {
+		$( active_tab ).fadeIn();
 	} else {
-		$( '.group:first' ).fadeIn();
+		$( '.wposa__group:first' ).fadeIn();
 	}
-	$( '.group .collapsed' ).each( function() {
+
+	$( '.wposa__group .collapsed' ).each( function() {
 		$( this )
 			.find( 'input:checked' )
 			.parent()
@@ -51,8 +56,8 @@ jQuery( document ).ready( function( $ ) {
 			});
 	});
 
-	if ( '' != activetab && $( activetab + '-tab' ).length ) {
-		$( activetab + '-tab' ).addClass( 'nav-tab-active' );
+	if ( '' != active_tab && $( active_tab + '-tab' ).length ) {
+		$( active_tab + '-tab' ).addClass( 'nav-tab-active' );
 	} else {
 		$( '.nav-tab-wrapper a:first' ).addClass( 'nav-tab-active' );
 	}
@@ -63,9 +68,9 @@ jQuery( document ).ready( function( $ ) {
 			.blur();
 		var clicked_group = $( this ).attr( 'href' );
 		if ( 'undefined' != typeof localStorage ) {
-			localStorage.setItem( 'activetab', $( this ).attr( 'href' ) );
+			localStorage.setItem( ACTIVE_TAB, $( this ).attr( 'href' ) );
 		}
-		$( '.group' ).hide();
+		$( '.wposa__group' ).hide();
 		$( clicked_group ).fadeIn();
 		evt.preventDefault();
 	});

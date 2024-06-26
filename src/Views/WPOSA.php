@@ -200,16 +200,35 @@ class WPOSA {
 
 	public function setup_hooks() {
 		// Enqueue the admin scripts.
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ) );
+		add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
 
 		// Hook it up.
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', [ $this, 'admin_init' ] );
 
 		// Menu.
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
 
 		// Ajax.
 		add_action( 'wp_ajax_' . Utils::get_plugin_prefix() . '_reset_form', [ $this, 'reset_form' ] );
+
+		// Hide all admin notices.
+		add_action( 'in_admin_header', [ $this, 'hide_admin_notices' ] );
+	}
+
+	/**
+	 * Hide all admin notices for plugin pages.
+	 *
+	 * @return void
+	 */
+	public function hide_admin_notices(): void {
+		$current_screen = get_current_screen();
+
+		if ( ! in_array( $current_screen->id, [ 'toplevel_page_recrawler', 'recrawler_page_recrawler-log' ] ) ) {
+			return;
+		}
+
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**
@@ -1025,7 +1044,7 @@ class WPOSA {
 		<div class="wposa">
 			<div class="wposa-header">
 				<div class="wposa-header--left">
-					<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/recrawler-logo--gradient.svg' ) ); ?>" width="80" alt="" />
+					<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/logo.svg' ) ); ?>" width="80" alt="" />
 				</div>
 				<div class="wposa-header--center">
 					<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
@@ -1041,7 +1060,7 @@ class WPOSA {
 					<?php $this->show_forms(); ?>
 				</div>
 				<?php if ( $this->get_sidebar_cards_total() ) : ?>
-					<div class="wposa__column">
+					<div class="wposa__column wposa__sidebar">
 						<?php foreach ( $this->get_sidebar_cards() as $card ) : ?>
 							<div class="card wposa-card wposa-card--<?php echo esc_attr( $this->get_prefix() )?>_<?php echo esc_attr( $card['id'] )?>">
 								<?php if ( ! empty( $card['title'] ) ) : ?>
@@ -1106,8 +1125,7 @@ class WPOSA {
 				<?php
 				$form = wp_parse_args( $form, $default );
 				?>
-				<!-- style="display: none;" -->
-				<div id="<?php echo esc_attr( $form['id'] ); ?>" class="group" >
+				<div id="<?php echo esc_attr( $form['id'] ); ?>" class="wposa__group" >
 					<form class="wposa__form" method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
 						<?php
 						do_action( 'wsa_form_top_' . $form['id'], $form );

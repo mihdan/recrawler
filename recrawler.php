@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ReCrawler
  * Description: ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.
- * Version: 0.1.2.2
+ * Version: 0.1.3
  * Author: Mikhail Kobzarev
  * Author URI: https://www.kobzarev.com/
  * Plugin URI: https://wordpress.org/plugins/recrawler/
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RECRAWLER_VERSION', '0.1.2.2' );
+define( 'RECRAWLER_VERSION', '0.1.3' );
 define( 'RECRAWLER_SLUG', 'recrawler' );
 define( 'RECRAWLER_PREFIX', 'recrawler' );
 define( 'RECRAWLER_NAME', 'ReCrawler' );
