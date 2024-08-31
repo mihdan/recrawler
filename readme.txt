@@ -3,8 +3,8 @@ Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
-Tested up to: 6.5
-Stable tag: 0.1.3
+Tested up to: 6.6
+Stable tag: 0.1.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -149,6 +149,9 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 0.1.4 (31.08.2024) =
+* Fixed tab switching bug
 
 = 0.1.3 (26.06.2024) =
 * Updated logo of the application

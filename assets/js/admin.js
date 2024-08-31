@@ -1,5 +1,5 @@
 jQuery( document ).ready( function( $ ) {
-	const ACTIVE_TAB = 'wposa_active_tab';
+	const ACTIVE_TAB = 'recrawler_active_tab';
 
 	const
 		$show_settings_toggler = $('.show-settings'),
