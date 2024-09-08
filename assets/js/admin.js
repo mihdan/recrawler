@@ -56,13 +56,14 @@ jQuery( document ).ready( function( $ ) {
 			});
 	});
 
-	if ( '' != active_tab && $( active_tab + '-tab' ).length ) {
+	if ( '' !== active_tab && $( active_tab + '-tab' ).length ) {
 		$( active_tab + '-tab' ).addClass( 'nav-tab-active' );
 	} else {
-		$( '.nav-tab-wrapper a:first' ).addClass( 'nav-tab-active' );
+		$( '.wposa .nav-tab-wrapper a:first' ).addClass( 'nav-tab-active' );
 	}
-	$( '.nav-tab-wrapper a' ).click( function( evt ) {
-		$( '.nav-tab-wrapper a' ).removeClass( 'nav-tab-active' );
+
+	$( '.wposa .nav-tab-wrapper a' ).click( function( evt ) {
+		$( '.wposa .nav-tab-wrapper a' ).removeClass( 'nav-tab-active' );
 		$( this )
 			.addClass( 'nav-tab-active' )
 			.blur();
