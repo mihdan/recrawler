@@ -132,28 +132,35 @@ class WPOSA {
 	 *
 	 * @var string
 	 */
-	private $plugin_name;
+	private string $plugin_name;
 
 	/**
 	 * Plugin version.
 	 *
 	 * @var string
 	 */
-	private $plugin_version;
+	private string $plugin_version;
 
 	/**
 	 * Plugin slug.
 	 *
 	 * @var string
 	 */
-	private $plugin_slug;
+	private string $plugin_slug;
 
 	/**
 	 * Plugin prefix.
 	 *
 	 * @var string
 	 */
-	private $plugin_prefix;
+	private string $plugin_prefix;
+
+	/**
+	 * Tabs array.
+	 *
+	 * @var   array
+	 */
+	private array $tabs_array = array();
 
 	/**
 	 * Sections array.
@@ -161,7 +168,7 @@ class WPOSA {
 	 * @var   array
 	 * @since 1.0.0
 	 */
-	private $sections_array = array();
+	private array $sections_array = array();
 
 	/**
 	 * Fields array.
@@ -169,14 +176,14 @@ class WPOSA {
 	 * @var   array
 	 * @since 1.0.0
 	 */
-	private $fields_array = array();
+	private array $fields_array = array();
 
 	/**
 	 * Sidebar card array.
 	 *
 	 * @var array $sidebar_cards
 	 */
-	private $sidebar_cards = [];
+	private array $sidebar_cards = [];
 
 	/**
 	 * Constructor.
@@ -284,6 +291,19 @@ class WPOSA {
 		);
 	}
 
+	/**
+	 * Add a single section.
+	 *
+	 * @param array $tab
+	 * @since 1.0.0
+	 */
+	public function add_tab( array $tab ) {
+		$tab['id'] = $this->get_prefix() . '_' . $tab['id'];
+
+		$this->tabs_array[] = $tab;
+
+		return $this;
+	}
 
 	/**
 	 * Set Sections.
@@ -439,24 +459,24 @@ class WPOSA {
 		 *
 		 * @since 1.0.0
 		 */
-		foreach ( $this->sections_array as $section ) {
-			if ( get_option( $section['id'] ) === false ) {
+		foreach ( $this->tabs_array as $tab ) {
+			if ( get_option( $tab['id'] ) === false ) {
 				// Add a new field as section ID.
-				add_option( $section['id'], '', '', false );
+				add_option( $tab['id'], '', '', false );
 			}
 
 			// Deals with sections description.
-			if ( isset( $section['desc'] ) && ! empty( $section['desc'] ) ) {
+			if ( isset( $tab['desc'] ) && ! empty( $tab['desc'] ) ) {
 				// Build HTML.
-				$section['desc'] = '<div class="inside wposa-section-description">' . wp_kses( $section['desc'], self::ALLOWED_HTML ) . '</div>';
+				$tab['desc'] = '<div class="inside wposa-section-description">' . wp_kses( $tab['desc'], self::ALLOWED_HTML ) . '</div>';
 
 				// Create the callback for description.
-				$callback = function() use ( $section ) {
-					echo wp_kses( str_replace( '"', '\"', $section['desc'] ), self::ALLOWED_HTML );
+				$callback = function() use ( $tab ) {
+					echo wp_kses( str_replace( '"', '\"', $tab['desc'] ), self::ALLOWED_HTML );
 				};
 
-			} elseif ( isset( $section['callback'] ) ) {
-				$callback = $section['callback'];
+			} elseif ( isset( $tab['callback'] ) ) {
+				$callback = $tab['callback'];
 			} else {
 				$callback = null;
 			}
@@ -470,7 +490,7 @@ class WPOSA {
 			 * @param string $page | Page is same as section ID.
 			 * @since 1.0.0
 			 */
-			add_settings_section( $section['id'], $section['title'], $callback, $section['id'] );
+			add_settings_section( $tab['id'], $tab['title'], $callback, $tab['id'] );
 		} // foreach ended.
 
 		/**
@@ -585,7 +605,7 @@ class WPOSA {
 		} // foreach ended.
 
 		// Creates our settings in the fields table.
-		foreach ( $this->sections_array as $section ) {
+		foreach ( $this->tabs_array as $tab ) {
 			/**
 			 * Registers a setting and its sanitization callback.
 			 *
@@ -594,7 +614,7 @@ class WPOSA {
 			 * @param callable  $sanitize_callback = ''
 			 * @since 1.0.0
 			 */
-			register_setting( $section['id'], $section['id'], array( $this, 'sanitize_fields' ) );
+			register_setting( $tab['id'], $tab['id'], array( $this, 'sanitize_fields' ) );
 		} // foreach ended.
 
 	} // admin_init() ended.
@@ -785,7 +805,7 @@ class WPOSA {
 			$args['section'], $args['id']
 		);
 		foreach ( $args['options'] as $key => $label ) {
-			$checked = isset( $value[ $key ] ) ? $value[ $key ] : '0';
+			$checked = $value[ $key ] ?? -1;
 			$html   .= sprintf( '<label for="wposa-%1$s[%2$s][%3$s]">', $args['section'], $args['id'], $key );
 			$html   .= sprintf( '<input type="checkbox" class="checkbox" id="wposa-%1$s[%2$s][%3$s]" name="%1$s[%2$s][%3$s]" value="%3$s" %4$s />', $args['section'], $args['id'], $key, checked( $checked, $key, false ) );
 			$html   .= sprintf( '%1$s</label><br>', $label );
@@ -1035,7 +1055,8 @@ class WPOSA {
 			'manage_options',
 			$this->plugin_slug,
 			array( $this, 'plugin_page' ),
-			'dashicons-rest-api'
+			'data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjYTdhYWFkIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGltYWdlLXJlbmRlcmluZz0ib3B0aW1pemVRdWFsaXR5IiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdGV4dC1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdmlld0JveD0iMCAwIDE2MDAwMCAxNjAwMDAiPgogIDxwYXRoIGQ9Ik03OTc4OCAzNzZjNDM5NzcgMCA3OTYyNyAzNTY1MSA3OTYyNyA3OTYyOHMtMzU2NTAgNzk2MjctNzk2MjcgNzk2MjdTMTYwIDEyMzk4MSAxNjAgODAwMDQgMzU4MTEgMzc2IDc5Nzg4IDM3NnptMCA4NzQwYzM5MTUwIDAgNzA4ODcgMzE3MzcgNzA4ODcgNzA4ODggMCAzOTE1MC0zMTczNyA3MDg4Ny03MDg4NyA3MDg4Ny0zOTE1MSAwLTcwODg4LTMxNzM3LTcwODg4LTcwODg3IDAtMzkxNTEgMzE3MzctNzA4ODggNzA4ODgtNzA4ODh6IiBjbGFzcz0iZmlsMCIvPgoJPHBhdGggZD0iTTEwNTc4MyA0ODY2NmM5MjU0IDAgMTY3NTYgNzc1MiAxNjc1NiAxNzMxNSAwIDQzNjMtMTM2NCA3MTU4LTM5NDIgMTAyMDMtMTIxNCAxNDM0LTQ4NDQgMjE4NC03NjQ2IDMyNTgtMzQ1MCAxMzI0LTY0MTAgMzk3NS04Njk2IDM0NjktNzU2MC0xNjc0LTEzMjI4LTg2MTgtMTMyMjgtMTY5MzAgMC05NTYzIDc1MDEtMTczMTUgMTY3NTYtMTczMTV6bS01MDc1NC04MTJjOTUxNCAwIDE3MjI3IDc5NzAgMTcyMjcgMTc4MDEgMCA0NDg2LTE0MDIgNzM1OS00MDUyIDEwNDg5LTEyNDkgMTQ3NS00OTgwIDIyNDYtNzg2MSAzMzUxLTM1NDggMTM2MC02NTkxIDQwODYtODk0MCAzNTY1LTc3NzMtMTcyMC0xMzYwMC04ODU5LTEzNjAwLTE3NDA1IDAtOTgzMSA3NzEyLTE3ODAxIDE3MjI2LTE3ODAxem00NDE1NyAzNjcwMmMtMTE1MzEgNjEtMTU1NTUgMzA3Mi0yMDQ1NSA3ODE2LTQ5MTYtNDcwNy04OTcxLTc3MDgtMjA1MDQtNzcwOC0xMTU1MSAwLTIyMzM1IDExODY5LTMwODkwIDI3OTUzIDEwOTMwIDc1NjUgMTkzMDQgMTYxMTQgMzA4NTUgMTYxMTQgMTE1MDYgMCAxNTgwMC0zMDIzIDIwNzEwLTc3MTEgNDk1OSA0NjkzIDkwMTkgNzY2MyAyMDU1MiA3NjAyIDExNTY4LTYxIDE5ODgwLTg2NTQgMzA3NzAtMTYyNzctODY0MS0xNjAzOS0xOTQ3MC0yNzg1MC0zMTAzOC0yNzc4OXoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBzdHJva2U9IiNhN2FhYWQiIHN0cm9rZS13aWR0aD0iMjAwIiBkPSJtNjM2NTMgNzI1MzYgMTUyMTUtMTU0MzIgMTU0MzIgMTUyMTUtMTExMSAxNDY0Mi0xNDI4NC0yNDYxOS0xNjA0NyAyNTY2MnoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBkPSJNMTE0NDE5IDYyNjg3YzM3MjMtNDAzNiAxOTIwMC0yMDAwNCAyNDcxMS0xMTY1NCAxMjg2IDE5NDkgMTA5NyAyNzM5LTEyNiA0MjcyLTc2NS03MjMtMTQxMS0xNTI2LTIzNzctMTk0Ni0zMzc5LTE0NjktMTI3NzcgMTMwNTItMTQ1MjYgMTU3MzAtMTc2NyAyMTIxLTQ5MjAgMjQwOC03MDQyIDY0MC0yMTIxLTE3NjgtMjQwOC00OTIxLTY0MC03MDQyeiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0xMTgyNjAgNjU4ODhjMTItMTQgMTQyMjQtMTk0OTUgMTk2MTktMTM2OTIgOTY0IDEwMzggMTEyNSAxNTMxIDExMjUgMzEwOSIgY2xhc3M9ImZpbDIiLz4KCTxwYXRoIGQ9Ik0zNTcwMSA2MzQ1NGMtMjczMi01MzM5LTY1NTQtMTI3OTMtMTI4MDYtMTQ1MTgtMTQzIDE2Ni0zNjAgNDE5LTczMSA4NjUtODY0LTk0OC0yNTQ1LTI4ODktNjE3LTM4NTAgODQxOC00MTk4IDE4MDUzIDY0NDMgMjI2MzkgMTIyMTEgMTQ2MSAyMzQzIDc0NyA1NDI3LTE1OTYgNjg4OC0yMzQzIDE0NjItNTQyNyA3NDctNjg4OS0xNTk2eiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0zOTk0NCA2MDgwOGMtMzQ3OC01NTc2LTEwNjM0LTE0OTM4LTE3NzA4LTEzNDc0LTE5NCA1NTktNzIgMTgxMi03MiAyNDY3IiBjbGFzcz0iZmlsMiIvPgo8L3N2Zz4K'
+			//Utils::get_plugin_asset_url( 'images/icons/icon.svg')
 		);
 	}
 
@@ -1089,7 +1110,7 @@ class WPOSA {
 			esc_html__( 'Secondary Navigation', 'recrawler' )
 		);
 
-		foreach ( $this->sections_array as $tab ) {
+		foreach ( $this->tabs_array as $tab ) {
 			if ( isset( $tab['disabled'] ) && $tab['disabled'] === true ) {
 				if ( isset( $tab['badge'] ) ) {
 					$html .= sprintf( '<span class="nav-tab wposa-nav-tab wposa-nav-tab--disabled" id="%1$s-tab">%2$s <span class="wposa-badge">%3$s</span></span>', $tab['id'], $tab['title'], $tab['badge'] );
@@ -1121,7 +1142,7 @@ class WPOSA {
 		);
 		?>
 		<div class="metabox-holder">
-			<?php foreach ( $this->sections_array as $form ) : ?>
+			<?php foreach ( $this->tabs_array as $form ) : ?>
 				<?php
 				$form = wp_parse_args( $form, $default );
 				?>

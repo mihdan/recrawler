@@ -33,14 +33,14 @@
   "prefer-stable": true,
   "config": {
     "platform": {
-      "php": "7.4"
+      "php": "8.1"
     },
     "allow-plugins": {
       "kylekatarnls/update-helper": true
     }
   },
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.1",
     "ext-json": "*",
     "psr/log": "^1.1",
     "google/apiclient": "^2.12.1"

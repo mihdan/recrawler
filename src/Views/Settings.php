@@ -7,6 +7,7 @@
 
 namespace Mihdan\ReCrawler\Views;
 
+use Mihdan\ReCrawler\Enums\BlockAiCrawlerEnum;
 use Mihdan\ReCrawler\Utils;
 
 /**
@@ -143,7 +144,7 @@ class Settings {
 				]
 			);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'    => 'general',
 				'title' => __( 'General', 'recrawler' ),
@@ -258,7 +259,24 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
+			array(
+				'id'    => 'ai',
+				'title' => __( 'AI', 'recrawler' ),
+			)
+		);
+
+		$this->wposa->add_field(
+			'ai',
+			array(
+				'id'      => 'bots',
+				'type'    => 'multicheck',
+				'name'    => __( 'Block AI Crawlers', 'recrawler' ),
+				'options' => BlockAiCrawlerEnum::toArray(),
+			)
+		);
+
+		$this->wposa->add_tab(
 			array(
 				'id'    => 'index_now',
 				'title' => __( 'IndexNow', 'recrawler' ),
@@ -310,7 +328,7 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'    => 'bing_webmaster',
 				'title' => __( 'Bing API', 'recrawler' ),
@@ -338,7 +356,7 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'    => 'google_webmaster',
 				'title' => __( 'Google API', 'recrawler' ),
@@ -367,7 +385,7 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'       => 'yandex_webmaster',
 				'title'    => __( 'Yandex API', 'recrawler' ),
@@ -485,7 +503,7 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'    => 'logs',
 				'title' => __( 'Logs', 'recrawler' ),
@@ -554,7 +572,7 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_section(
+		$this->wposa->add_tab(
 			array(
 				'id'           => 'plugins',
 				'reset_button' => false,
