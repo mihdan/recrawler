@@ -9,9 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
       - name: Install composer requirements
-        run: composer install --no-dev --prefer-dist --no-progress --no-suggest
+        run: composer install --no-dev --prefer-dist --no-progress
       - name: Prefix dependencies
         run: composer prefix-dependencies
       - name: WordPress plugin deploy
