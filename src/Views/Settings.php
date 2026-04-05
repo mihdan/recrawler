@@ -330,6 +330,35 @@ class Settings {
 
 		$this->wposa->add_tab(
 			array(
+				'id'   => 'websub',
+				'title' => __( 'WebSub', 'recrawler' ),
+				'desc'  => __( 'WebSub (formerly PubSubHubbub) is a W3C Recommendation for open, server-to-server push notifications. When your content changes, the plugin notifies configured hubs, which then push updates to all subscribers in real time. It also adds hub discovery links to your feeds and HTML so that subscribers can find your hubs automatically.', 'recrawler' ),
+			)
+		);
+
+		$this->wposa->add_field(
+			'websub',
+			array(
+				'id'      => 'enable',
+				'type'    => 'switch',
+				'name'    => __( 'Enable', 'recrawler' ),
+				'default' => 'off',
+			)
+		);
+
+		$this->wposa->add_field(
+			'websub',
+			array(
+				'id'      => 'hubs',
+				'type'    => 'textarea',
+				'name'    => __( 'Hub URLs', 'recrawler' ),
+				'desc'    => __( 'One hub URL per line. Leave empty to use the default hubs: <code>https://pubsubhubbub.appspot.com/</code> and <code>https://pubsubhubbub.superfeedr.com/</code>.', 'recrawler' ),
+				'placeholder' => implode( "\n", [ 'https://pubsubhubbub.appspot.com/', 'https://pubsubhubbub.superfeedr.com/' ] ),
+			)
+		);
+
+		$this->wposa->add_tab(
+			array(
 				'id'    => 'bing_webmaster',
 				'title' => __( 'Bing API', 'recrawler' ),
 				'desc'  => __( 'Easy to plug-in API solution that websites can call to notify Bing whenever website contents is updated or created allowing instant crawling, indexing and discovery of your site content.', 'recrawler' ),
