@@ -16,6 +16,7 @@ use Mihdan\ReCrawler\Providers\IndexNow\IndexNow;
 use Mihdan\ReCrawler\Providers\Seznam\SeznamIndexNow;
 use Mihdan\ReCrawler\Providers\Naver\NaverIndexNow;
 use Mihdan\ReCrawler\Providers\BlockAiCrawler;
+use Mihdan\ReCrawler\Providers\WebSub\WebSub;
 use Mihdan\ReCrawler\Providers\Yandex\YandexIndexNow;
 use Mihdan\ReCrawler\Providers\Yandex\YandexWebmaster;
 use Mihdan\ReCrawler\Views\HelpTab;
@@ -110,6 +111,7 @@ class Main {
 		( $this->container->make( YandexWebmaster::class ) )->setup_hooks();
 		( $this->container->make( BingWebmaster::class ) )->setup_hooks();
 		( $this->container->make( GoogleWebmaster::class ) )->setup_hooks();
+		( $this->container->make( WebSub::class ) )->setup_hooks();
 		( $this->container->make( Migrations::class ) )->setup_hooks();
 	}
 
@@ -275,7 +277,7 @@ class Main {
     			log_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
     			created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
     			level enum('emergency','alert','critical','error','warning','notice','info','debug') NOT NULL DEFAULT 'debug',
-    			search_engine enum('index-now','yandex-index-now','yandex-webmaster','bing-index-now','bing-webmaster','site','google-webmaster','seznam-index-now','naver-index-now') NOT NULL DEFAULT 'site',
+    			search_engine enum('index-now','yandex-index-now','yandex-webmaster','bing-index-now','bing-webmaster','site','google-webmaster','seznam-index-now','naver-index-now','websub') NOT NULL DEFAULT 'site',
     			direction enum('incoming','outgoing','internal') NOT NULL DEFAULT 'incoming',
     			status_code INT(11) unsigned NOT NULL,
     			message text NOT NULL,

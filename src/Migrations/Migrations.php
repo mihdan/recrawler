@@ -191,6 +191,27 @@ class Migrations {
 	}
 
 	/**
+	 * Migrate to 0.3.0: add 'websub' to search_engine enum.
+	 *
+	 * @return bool|null
+	 * @noinspection PhpUnused
+	 */
+	protected function migrate_0_3_0(): bool {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'recrawler_log';
+
+		$wpdb->query(
+			"ALTER TABLE `{$table}`
+			MODIFY COLUMN `search_engine`
+			ENUM('index-now','yandex-index-now','yandex-webmaster','bing-index-now','bing-webmaster','site','google-webmaster','seznam-index-now','naver-index-now','websub')
+			NOT NULL DEFAULT 'site'"
+		);
+
+		return true;
+	}
+
+	/**
 	 * Migrate to 0.1.2
 	 *
 	 * @return bool|null

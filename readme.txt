@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +17,7 @@ ReCrawler is a small WordPress Plugin for quickly notifying search engines whene
 
 Improve your rankings by taking control of the crawling and indexing process, so search engines know what to focus on!
 
-Once installed, it detects pages/terms creation/update/deletion in WordPress and automatically submits the URLs in the background via ReCrawler, Google API, Bing API, and Yandex API protocols.
+Once installed, it detects pages/terms creation/update/deletion in WordPress and automatically submits the URLs in the background via ReCrawler, Google API, Bing API, Yandex API, and WebSub (formerly PubSubHubbub) protocols.
 
 It ensures that search engines invariably have the latest updates about your site.
 
@@ -62,6 +62,8 @@ This plugin uses external services, which are documented below with links to the
 8. IndexNow - [https://api.indexnow.org](https://api.indexnow.org)
 9. Google Developers Console - [https://console.developers.google.com/](https://console.developers.google.com/)
 10. Yandex oauth - [https://oauth.yandex.ru/](https://oauth.yandex.ru/)
+11. WebSub Hub (Google) - [https://pubsubhubbub.appspot.com/](https://pubsubhubbub.appspot.com/)
+12. WebSub Hub (Superfeedr) - [https://pubsubhubbub.superfeedr.com/](https://pubsubhubbub.superfeedr.com/)
 
 == Frequently Asked Questions ==
 
@@ -149,6 +151,9 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 0.3.0 (06.04.2025) =
+* Добавлена поддержка протокола WebSub (ранее PubSubHubbub)
 
 = 0.2.0 (06.04.2025) =
 * Добавлена возможность блокировки ИИ-ботов
