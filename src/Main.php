@@ -15,6 +15,7 @@ use Mihdan\ReCrawler\Providers\Google\GoogleWebmaster;
 use Mihdan\ReCrawler\Providers\IndexNow\IndexNow;
 use Mihdan\ReCrawler\Providers\Seznam\SeznamIndexNow;
 use Mihdan\ReCrawler\Providers\Naver\NaverIndexNow;
+use Mihdan\ReCrawler\Providers\BlockAiCrawler;
 use Mihdan\ReCrawler\Providers\Yandex\YandexIndexNow;
 use Mihdan\ReCrawler\Providers\Yandex\YandexWebmaster;
 use Mihdan\ReCrawler\Views\HelpTab;
@@ -94,6 +95,7 @@ class Main {
 		$this->wposa = $this->container->get( WPOSA::class );
 		$this->wposa->setup_hooks();
 
+		( $this->container->make( BlockAiCrawler::class ) )->setup_hooks();
 		( $this->container->make( Hooks::class ) )->setup_hooks();
 
 		( $this->container->make( HelpTab::class ) )->setup_hooks();
