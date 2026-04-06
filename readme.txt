@@ -155,6 +155,7 @@ See the documentation available from each search engine for more details about R
 = 0.3.1 (06.04.2025) =
 * Добавлена интеграция с плагином SQLite Database Integration
 * Добавлена фильтрация Типов записей в WebSub в зависимости от Основных настроек
+* Добавлена отправка HTTP-заголовков `Link` для WebSub по рекомендации W3C
 
 = 0.3.0 (06.04.2025) =
 * Добавлена поддержка протокола WebSub (ранее PubSubHubbub)

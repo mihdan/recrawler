@@ -21,9 +21,10 @@ class WebSub implements SearchEngineInterface {
 	/**
 	 * Default hub endpoints.
 	 */
-	const DEFAULT_HUBS = [
+	public const DEFAULT_HUBS = [
 		'https://pubsubhubbub.appspot.com/',
 		'https://pubsubhubbub.superfeedr.com/',
+		'https://websubhub.com/hub',
 	];
 
 	/**
@@ -96,6 +97,7 @@ class WebSub implements SearchEngineInterface {
 		add_action( 'rdf_header', [ $this, 'add_rdf_links' ] );
 
 		add_action( 'wp_head', [ $this, 'add_html_head_links' ] );
+		add_action( 'send_headers', [ $this, 'add_http_headers' ] );
 
 		add_filter( 'rss2_ns', [ $this, 'add_atom_namespace' ] );
 		add_filter( 'rdf_ns', [ $this, 'add_atom_namespace' ] );
@@ -205,19 +207,73 @@ class WebSub implements SearchEngineInterface {
 	 * Get topic URLs to notify about.
 	 *
 	 * WebSub publishers typically notify about feed URLs since subscribers
-	 * subscribe to feeds, not individual post URLs.
+	 * subscribe to feeds, not individual post URLs. This method dynamically
+	 * discovers all feed URLs associated with the given post, including
+	 * main site feeds, taxonomy term feeds, and author feeds.
 	 *
 	 * @param int $post_id Post ID.
 	 *
 	 * @return string[]
 	 */
 	private function get_topic_urls( int $post_id ): array {
-		$urls = [
-			get_bloginfo( 'rss2_url' ),
-			get_bloginfo( 'atom_url' ),
-		];
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return [];
+		}
 
-		return apply_filters( 'recrawler/websub/topic_urls', array_unique( array_filter( $urls ) ), $post_id );
+		$feed_urls = [];
+		$feed_types = [ 'rss2', 'atom' ];
+
+		foreach ( $feed_types as $feed_type ) {
+			// Add main site feeds.
+			$feed_urls[] = get_feed_link( $feed_type );
+
+			// Add post type archive feeds (if applicable).
+			$post_type_archive_feed = get_post_type_archive_feed_link( $post->post_type );
+			if ( $post_type_archive_feed ) {
+				$feed_urls[] = $post_type_archive_feed;
+			}
+
+			// Add tag-specific feeds.
+			$tags = wp_get_post_tags( $post_id );
+			foreach ( $tags as $tag ) {
+				$feed_url = get_term_feed_link( $tag->term_id, 'post_tag', $feed_type );
+				if ( $feed_url && ! is_wp_error( $feed_url ) ) {
+					$feed_urls[] = $feed_url;
+				}
+			}
+
+			// Add category-specific feeds.
+			$categories = wp_get_post_categories( $post_id );
+			foreach ( $categories as $category ) {
+				$feed_url = get_term_feed_link( $category, 'category', $feed_type );
+				if ( $feed_url && ! is_wp_error( $feed_url ) ) {
+					$feed_urls[] = $feed_url;
+				}
+			}
+
+			// Add custom taxonomy feeds.
+			$taxonomies = get_object_taxonomies( $post->post_type );
+			foreach ( $taxonomies as $taxonomy ) {
+				if ( in_array( $taxonomy, [ 'post_tag', 'category' ], true ) ) {
+					continue; // Already handled above.
+				}
+				$terms = wp_get_post_terms( $post_id, $taxonomy );
+				foreach ( $terms as $term ) {
+					$feed_url = get_term_feed_link( $term->term_id, $taxonomy, $feed_type );
+					if ( $feed_url && ! is_wp_error( $feed_url ) ) {
+						$feed_urls[] = $feed_url;
+					}
+				}
+			}
+
+			// Add author feed.
+			$feed_urls[] = get_author_feed_link( $post->post_author, $feed_type );
+		}
+
+		$feed_urls = apply_filters( 'recrawler/websub/feed_urls', $feed_urls, $post_id );
+
+		return array_unique( array_filter( $feed_urls ) );
 	}
 
 	/**
@@ -266,6 +322,27 @@ class WebSub implements SearchEngineInterface {
 		foreach ( $this->get_hubs() as $hub_url ) {
 			printf( "<link rel=\"hub\" href=\"%s\" />\n", esc_url( $hub_url ) );
 		}
+	}
+
+	/**
+	 * Add WebSub HTTP Link headers to HTTP responses.
+	 *
+	 * Sends Link headers for hub discovery as required by the W3C WebSub spec.
+	 * This allows subscribers to discover the hub URLs via HTTP headers.
+	 *
+	 * @return void
+	 */
+	public function add_http_headers(): void {
+		$hubs = $this->get_hubs();
+		$self = get_self_link();
+
+		// Add hub headers (multiple Link headers allowed).
+		foreach ( $hubs as $hub_url ) {
+			header( sprintf( 'Link: <%s>; rel="hub"', esc_url_raw( $hub_url ) ), false );
+		}
+
+		// Add self header (exactly one).
+		header( sprintf( 'Link: <%s>; rel="self"', esc_url_raw( $self ) ), false );
 	}
 
 	/**
