@@ -274,12 +274,12 @@ class Main {
 
 		if ( $upgrade || $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) !== $table_name ) {
 			$sql = "CREATE TABLE {$wpdb->prefix}recrawler_log (
-    			log_id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    			log_id bigint(20) NOT NULL AUTO_INCREMENT,
     			created_at datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-    			level enum('emergency','alert','critical','error','warning','notice','info','debug') NOT NULL DEFAULT 'debug',
-    			search_engine enum('index-now','yandex-index-now','yandex-webmaster','bing-index-now','bing-webmaster','site','google-webmaster','seznam-index-now','naver-index-now','websub') NOT NULL DEFAULT 'site',
-    			direction enum('incoming','outgoing','internal') NOT NULL DEFAULT 'incoming',
-    			status_code INT(11) unsigned NOT NULL,
+    			level varchar(255) NOT NULL DEFAULT 'debug',
+    			search_engine varchar(255) NOT NULL DEFAULT 'site',
+    			direction varchar(255) NOT NULL DEFAULT 'incoming',
+    			status_code INT(11) NOT NULL DEFAULT 0,
     			message text NOT NULL,
     			PRIMARY KEY (log_id)
 				) {$charset_collate};";
