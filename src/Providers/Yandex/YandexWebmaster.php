@@ -18,6 +18,8 @@ class YandexWebmaster extends WebmasterAbstract {
 	private const RECRAWL_ENDPOINT = 'https://api.webmaster.yandex.net/v4/user/%s/hosts/%s/recrawl/queue';
 	private const QUOTA_ENDPOINT   = 'https://api.webmaster.yandex.net/v4/user/%s/hosts/%s/recrawl/quota';
 
+	public const CRON_EVENT_NAME = 'recrawler__yandex_webmaster_refresh_token';
+
 	public function get_slug(): string {
 		return 'yandex-webmaster';
 	}
@@ -61,6 +63,9 @@ class YandexWebmaster extends WebmasterAbstract {
 	public function setup_hooks() {
 
 		add_action( 'admin_init', [ $this, 'get_api_token' ] );
+		add_action( 'admin_init', [ $this, 'schedule_token_refresh' ] );
+		add_action( self::CRON_EVENT_NAME, [ $this, 'refresh_token_cron' ] );
+		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
 		if ( ! $this->is_enabled() ) {
 			return;
@@ -69,6 +74,22 @@ class YandexWebmaster extends WebmasterAbstract {
 		//$this->get_quota();
 		add_action( 'recrawler/post_added', [ $this, 'ping' ] );
 		add_action( 'recrawler/post_updated', [ $this, 'ping' ] );
+	}
+
+	/**
+	 * Add custom cron schedules for token refresh.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array
+	 */
+	public function add_cron_schedules( $schedules ) {
+		for ( $i = 1; $i <= 6; $i++ ) {
+			$schedules[ 'recrawler_' . $i . 'months' ] = array(
+				'interval' => $i * MONTH_IN_SECONDS,
+				'display'  => sprintf( __( 'Every %d month(s)', 'recrawler' ), $i ),
+			);
+		}
+		return $schedules;
 	}
 
 	public function get_api_token() {
@@ -250,5 +271,102 @@ class YandexWebmaster extends WebmasterAbstract {
 				'quota_remainder' => 0,
 			];
 		}
+	}
+
+	/**
+	 * Schedule cron job for automatic token refresh.
+	 */
+	public function schedule_token_refresh() {
+		$refresh_token = $this->wposa->get_option( 'refresh_token', 'yandex_webmaster' );
+
+		if ( ! $refresh_token ) {
+			// Clear scheduled job if no refresh token
+			$timestamp = wp_next_scheduled( self::CRON_EVENT_NAME );
+			if ( $timestamp ) {
+				wp_unschedule_event( $timestamp, self::CRON_EVENT_NAME );
+			}
+			return;
+		}
+
+		$refresh_period_months = (int) $this->wposa->get_option( 'token_refresh_period', 'yandex_webmaster', 5 );
+		$cron_schedule_name = 'recrawler_' . $refresh_period_months . 'months';
+
+		// Check if we need to reschedule due to period change
+		$next_scheduled = wp_next_scheduled( self::CRON_EVENT_NAME );
+
+		if ( $next_scheduled ) {
+			// Unschedule existing event to apply new period
+			wp_unschedule_event( $next_scheduled, self::CRON_EVENT_NAME );
+		}
+
+		// Schedule with new period
+		wp_schedule_event( time(), $cron_schedule_name, self::CRON_EVENT_NAME );
+
+		$this->logger->info(
+			sprintf(
+				__( 'Yandex Webmaster token refresh scheduled every %d months', 'recrawler' ),
+				$refresh_period_months
+			),
+			[ 'search_engine' => $this->get_slug() ]
+		);
+	}
+
+	/**
+	 * Refresh token via cron job.
+	 */
+	public function refresh_token_cron() {
+		$refresh_token = $this->wposa->get_option( 'refresh_token', 'yandex_webmaster' );
+		$client_id = $this->get_client_id();
+		$client_secret = $this->get_client_secret();
+
+		if ( ! $refresh_token || ! $client_id || ! $client_secret ) {
+			$this->logger->error(
+				__( 'Cannot refresh Yandex Webmaster token: missing credentials', 'recrawler' ),
+				[ 'search_engine' => $this->get_slug() ]
+			);
+			return;
+		}
+
+		$data = [
+			'body' => [
+				'grant_type'    => 'refresh_token',
+				'refresh_token' => $refresh_token,
+				'client_id'     => $client_id,
+				'client_secret' => $client_secret,
+			],
+		];
+
+		$response    = wp_remote_post( self::TOKEN_ENDPOINT, $data );
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		$log_data = [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ];
+
+		if ( $status_code !== 200 ) {
+			$message = isset( $body['error_description'] ) ? $body['error_description'] : 'Unknown error';
+			$this->logger->error( $message, $log_data );
+			return;
+		}
+
+		$this->wposa->set_option( 'access_token', $body['access_token'], 'yandex_webmaster' );
+		$this->wposa->set_option( 'refresh_token', $body['refresh_token'], 'yandex_webmaster' );
+		$this->wposa->set_option( 'expires_in', $body['expires_in'] + current_time( 'timestamp' ), 'yandex_webmaster' );
+
+		$user_id = $this->get_api_user_id( $body['access_token'] );
+
+		if ( $user_id ) {
+			$this->wposa->set_option( 'user_id', $user_id, 'yandex_webmaster' );
+
+			$host_ids = $this->get_api_host_id( $user_id, $body['access_token'] );
+
+			if ( $host_ids ) {
+				$this->wposa->set_option( 'host_ids', serialize( $host_ids ), 'yandex_webmaster' );
+			}
+		}
+
+		$this->logger->info(
+			__( 'Yandex Webmaster token refreshed successfully', 'recrawler' ),
+			$log_data
+		);
 	}
 }
