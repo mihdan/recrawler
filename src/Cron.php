@@ -3,9 +3,10 @@ namespace Mihdan\ReCrawler;
 
 use Mihdan\ReCrawler\Logger\Logger;
 use Mihdan\ReCrawler\Views\WPOSA;
+use Mihdan\ReCrawler\ActionScheduler;
 
 class Cron {
-	public const EVENT_NAME = 'recrawler__clear-log';
+	public const ACTION_NAME = 'recrawler/cron/clear_log';
 
 	/**
 	 * Logger instance.
@@ -31,14 +32,27 @@ class Cron {
 		$this->logger = $logger;
 		$this->wposa  = $wposa;
 	}
+
 	public function setup_hooks() {
-		add_action( 'admin_init', [ $this, 'add_task' ] );
-		add_action( self::EVENT_NAME, [ $this, 'clear_log' ] );
+		add_action( 'admin_init', [ $this, 'schedule_task' ] );
+		add_action( self::ACTION_NAME, [ $this, 'clear_log' ] );
 	}
 
-	public function add_task() {
-		if ( ! wp_next_scheduled( self::EVENT_NAME ) ) {
-			wp_schedule_event( time(), 'hourly', self::EVENT_NAME );
+	/**
+	 * Schedule log cleanup via ActionScheduler.
+	 *
+	 * @return void
+	 */
+	public function schedule_task() {
+		// Check if already scheduled.
+		$next_scheduled = ActionScheduler::next( self::ACTION_NAME );
+
+		if ( ! $next_scheduled ) {
+			ActionScheduler::recurring(
+				time(),
+				HOUR_IN_SECONDS,
+				self::ACTION_NAME
+			);
 		}
 	}
 

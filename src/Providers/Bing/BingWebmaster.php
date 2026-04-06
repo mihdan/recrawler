@@ -9,7 +9,7 @@ namespace Mihdan\ReCrawler\Providers\Bing;
 
 use Mihdan\ReCrawler\WebmasterAbstract;
 use Mihdan\ReCrawler\Utils;
-
+use Mihdan\ReCrawler\ActionScheduler;
 class BingWebmaster extends WebmasterAbstract {
 	private const RECRAWL_ENDPOINT = 'https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlbatch?apikey=%s';
 
@@ -38,8 +38,36 @@ class BingWebmaster extends WebmasterAbstract {
 			return;
 		}
 
-		add_action( 'recrawler/post_added', [ $this, 'ping' ] );
-		add_action( 'recrawler/post_updated', [ $this, 'ping' ] );
+		add_action( 'recrawler/post_added', [ $this, 'schedule_ping' ] );
+		add_action( 'recrawler/post_updated', [ $this, 'schedule_ping' ] );
+
+		// Register async action handler.
+		add_action( 'recrawler/webmaster/ping/' . $this->get_slug(), [ $this, 'async_ping_handler' ], 10, 1 );
+	}
+
+	/**
+	 * Schedule async ping action.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return void
+	 */
+	public function schedule_ping( int $post_id ) {
+		ActionScheduler::async(
+			'recrawler/webmaster/ping/' . $this->get_slug(),
+			[ 'post_id' => $post_id ]
+		);
+	}
+
+	/**
+	 * Async action handler for ping.
+	 *
+	 * @param int $post_id Post ID.
+	 *
+	 * @return void
+	 */
+	public function async_ping_handler( int $post_id ) {
+		$this->ping( $post_id );
 	}
 
 	/**

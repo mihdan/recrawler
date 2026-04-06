@@ -9,6 +9,7 @@ namespace Mihdan\ReCrawler\Providers\Yandex;
 
 use Mihdan\ReCrawler\Utils;
 use Mihdan\ReCrawler\WebmasterAbstract;
+use Mihdan\ReCrawler\ActionScheduler;
 
 class YandexWebmaster extends WebmasterAbstract {
 
@@ -18,7 +19,7 @@ class YandexWebmaster extends WebmasterAbstract {
 	private const RECRAWL_ENDPOINT = 'https://api.webmaster.yandex.net/v4/user/%s/hosts/%s/recrawl/queue';
 	private const QUOTA_ENDPOINT   = 'https://api.webmaster.yandex.net/v4/user/%s/hosts/%s/recrawl/quota';
 
-	public const CRON_EVENT_NAME = 'recrawler__yandex_webmaster_refresh_token';
+	public const ACTION_NAME = 'recrawler/yandex_webmaster/refresh_token';
 
 	public function get_slug(): string {
 		return 'yandex-webmaster';
@@ -64,7 +65,7 @@ class YandexWebmaster extends WebmasterAbstract {
 
 		add_action( 'admin_init', [ $this, 'get_api_token' ] );
 		add_action( 'admin_init', [ $this, 'schedule_token_refresh' ] );
-		add_action( self::CRON_EVENT_NAME, [ $this, 'refresh_token_cron' ] );
+		add_action( 'recrawler/yandex_webmaster/refresh_token', [ $this, 'refresh_token_cron' ] );
 		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
 		if ( ! $this->is_enabled() ) {
@@ -72,8 +73,11 @@ class YandexWebmaster extends WebmasterAbstract {
 		}
 
 		//$this->get_quota();
-		add_action( 'recrawler/post_added', [ $this, 'ping' ] );
-		add_action( 'recrawler/post_updated', [ $this, 'ping' ] );
+		add_action( 'recrawler/post_added', [ $this, 'schedule_ping' ] );
+		add_action( 'recrawler/post_updated', [ $this, 'schedule_ping' ] );
+
+		// Register async action handler.
+		add_action( 'recrawler/webmaster/ping/' . $this->get_slug(), [ $this, 'async_ping_handler' ], 10, 2 );
 	}
 
 	/**
@@ -204,9 +208,54 @@ class YandexWebmaster extends WebmasterAbstract {
 	 *
 	 * @link https://yandex.com/dev/webmaster/doc/dg/reference/host-recrawl-post.html
 	 */
-	public function ping( int $post_id ) {
+	public function schedule_ping( int $post_id ) {
+		$host_ids = $this->wposa->get_option( 'host_ids', 'yandex_webmaster' );
 
-		$url = sprintf( $this->get_ping_endpoint(), $this->get_user_id(), $this->get_host_id() );
+		if ( empty( $host_ids ) ) {
+			return;
+		}
+
+		$host_ids_array = maybe_unserialize( $host_ids );
+
+		foreach ( $host_ids_array as $host_id ) {
+			ActionScheduler::async(
+				'recrawler/webmaster/ping/' . $this->get_slug(),
+				[
+					'post_id' => $post_id,
+					'host_id' => $host_id,
+				]
+			);
+		}
+	}
+
+	/**
+	 * Async action handler for ping.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $host_id Host ID.
+	 *
+	 * @return void
+	 */
+	public function async_ping_handler( int $post_id, string $host_id ) {
+		$this->ping_with_host( $post_id, $host_id );
+	}
+
+	public function ping( int $post_id ) {
+		$host_id = $this->get_host_id();
+		$this->ping_with_host( $post_id, $host_id );
+	}
+
+	/**
+	 * Ping with specific host ID.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $host_id Host ID.
+	 *
+	 * @return void
+	 */
+	private function ping_with_host( int $post_id, string $host_id ) {
+
+		$url = sprintf( $this->get_ping_endpoint(), $this->get_user_id(), $host_id );
 
 		$args = array(
 			'timeout' => 30,
@@ -274,33 +323,34 @@ class YandexWebmaster extends WebmasterAbstract {
 	}
 
 	/**
-	 * Schedule cron job for automatic token refresh.
+	 * Schedule cron job for automatic token refresh via ActionScheduler.
 	 */
 	public function schedule_token_refresh() {
 		$refresh_token = $this->wposa->get_option( 'refresh_token', 'yandex_webmaster' );
 
 		if ( ! $refresh_token ) {
 			// Clear scheduled job if no refresh token
-			$timestamp = wp_next_scheduled( self::CRON_EVENT_NAME );
-			if ( $timestamp ) {
-				wp_unschedule_event( $timestamp, self::CRON_EVENT_NAME );
-			}
+			ActionScheduler::cancel( self::ACTION_NAME );
 			return;
 		}
 
 		$refresh_period_months = (int) $this->wposa->get_option( 'token_refresh_period', 'yandex_webmaster', 5 );
-		$cron_schedule_name = 'recrawler_' . $refresh_period_months . 'months';
+		$interval_in_seconds = $refresh_period_months * MONTH_IN_SECONDS;
 
 		// Check if we need to reschedule due to period change
-		$next_scheduled = wp_next_scheduled( self::CRON_EVENT_NAME );
+		$next_scheduled = ActionScheduler::next( self::ACTION_NAME );
 
 		if ( $next_scheduled ) {
 			// Unschedule existing event to apply new period
-			wp_unschedule_event( $next_scheduled, self::CRON_EVENT_NAME );
+			ActionScheduler::cancel( self::ACTION_NAME );
 		}
 
 		// Schedule with new period
-		wp_schedule_event( time(), $cron_schedule_name, self::CRON_EVENT_NAME );
+		ActionScheduler::recurring(
+			time(),
+			$interval_in_seconds,
+			self::ACTION_NAME
+		);
 
 		$this->logger->info(
 			sprintf(
