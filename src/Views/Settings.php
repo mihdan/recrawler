@@ -464,6 +464,25 @@ class Settings {
 					'options' => $this->get_yandex_webmaster_host_ids()
 				)
 			);
+
+			$this->wposa->add_field(
+				'yandex_webmaster',
+				array(
+					'id'      => 'token_refresh_period',
+					'type'    => 'select',
+					'name'    => __( 'Token Refresh Period', 'recrawler' ),
+					'desc'    => __( 'Cron will automatically refresh the token before it expires based on this period', 'recrawler' ),
+					'options' => [
+						1 => __( '1 month', 'recrawler' ),
+						2 => __( '2 months', 'recrawler' ),
+						3 => __( '3 months', 'recrawler' ),
+						4 => __( '4 months', 'recrawler' ),
+						5 => __( '5 months', 'recrawler' ),
+						6 => __( '6 months', 'recrawler' ),
+					],
+					'default' => 3,
+				)
+			);
 		}
 
 		// Показать кнопку только если заполнены доступы к API.

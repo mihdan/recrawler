@@ -15,7 +15,7 @@ use Mihdan\ReCrawler\SearchEngineInterface;
 use Mihdan\ReCrawler\Utils;
 use Mihdan\ReCrawler\Views\WPOSA;
 use WP_Post;
-
+use Mihdan\ReCrawler\ActionScheduler;
 class WebSub implements SearchEngineInterface {
 
 	/**
@@ -89,8 +89,12 @@ class WebSub implements SearchEngineInterface {
 			return;
 		}
 
-		add_action( 'recrawler/post_added', [ $this, 'publish' ], 10, 2 );
-		add_action( 'recrawler/post_updated', [ $this, 'publish' ], 10, 2 );
+		add_action( 'recrawler/post_added', [ $this, 'schedule_publish' ], 10, 2 );
+		add_action( 'recrawler/post_updated', [ $this, 'schedule_publish' ], 10, 2 );
+
+		// Register async action handlers.
+		add_action( 'recrawler/websub/publish', [ $this, 'async_publish_handler' ], 10, 3 );
+		add_action( 'recrawler/websub/ping_hub', [ $this, 'async_ping_hub_handler' ], 10, 2 );
 
 		add_action( 'atom_head', [ $this, 'add_atom_links' ] );
 		add_action( 'rss2_head', [ $this, 'add_rss2_links' ] );
@@ -101,6 +105,82 @@ class WebSub implements SearchEngineInterface {
 
 		add_filter( 'rss2_ns', [ $this, 'add_atom_namespace' ] );
 		add_filter( 'rdf_ns', [ $this, 'add_atom_namespace' ] );
+	}
+
+	/**
+	 * Schedule content update notification to all configured hubs.
+	 *
+	 * Per the WebSub spec, the publisher notifies the hub about its topic feed URLs.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 *
+	 * @return void
+	 */
+	public function schedule_publish( int $post_id, WP_Post $post ): void {
+		$allowed_post_types = array_filter(
+			(array) $this->wposa->get_option( 'post_types', 'general', [] ),
+			static function ( string $post_type ): bool {
+				$post_type_obj = get_post_type_object( $post_type );
+				if ( ! $post_type_obj ) {
+					return false;
+				}
+				$rewrite = $post_type_obj->rewrite;
+				return ! ( is_array( $rewrite ) && isset( $rewrite['feeds'] ) && $rewrite['feeds'] === false );
+			}
+		);
+
+		if ( ! in_array( $post->post_type, $allowed_post_types, true ) ) {
+			return;
+		}
+
+		$hubs       = $this->get_hubs();
+		$topic_urls = $this->get_topic_urls( $post_id );
+
+		// Schedule async action for publish.
+		ActionScheduler::async(
+			'recrawler/websub/publish',
+			[
+				'post_id'    => $post_id,
+				'hubs'       => $hubs,
+				'topic_urls' => $topic_urls,
+			]
+		);
+	}
+
+	/**
+	 * Async action handler for publish.
+	 *
+	 * @param int    $post_id    Post ID.
+	 * @param array  $hubs       Hub URLs.
+	 * @param array  $topic_urls Topic feed URLs.
+	 *
+	 * @return void
+	 */
+	public function async_publish_handler( int $post_id, array $hubs, array $topic_urls ): void {
+		foreach ( $hubs as $hub_url ) {
+			foreach ( $topic_urls as $topic_url ) {
+				ActionScheduler::async(
+					'recrawler/websub/ping_hub',
+					[
+						'hub_url'   => $hub_url,
+						'topic_url' => $topic_url,
+					]
+				);
+			}
+		}
+	}
+
+	/**
+	 * Async action handler for ping_hub.
+	 *
+	 * @param string $hub_url   Hub endpoint URL.
+	 * @param string $topic_url Topic (feed) URL to notify about.
+	 *
+	 * @return void
+	 */
+	public function async_ping_hub_handler( string $hub_url, string $topic_url ): void {
+		$this->ping_hub( $hub_url, $topic_url );
 	}
 
 	/**

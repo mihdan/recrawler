@@ -9,6 +9,7 @@ namespace Mihdan\ReCrawler;
 
 use Mihdan\ReCrawler\Logger\Logger;
 use Mihdan\ReCrawler\Views\WPOSA;
+use Mihdan\ReCrawler\ActionScheduler;
 use WP;
 use WP_Post;
 use WP_Comment;
@@ -77,16 +78,21 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 		}
 
 		add_action( 'parse_request', [ $this, 'set_virtual_key_file' ] );
-		add_action( 'recrawler/post_added', [ $this, 'ping_on_post_update' ], 10, 2 );
-		add_action( 'recrawler/post_updated', [ $this, 'ping_on_post_update' ], 10, 2 );
+
+		// Schedule async actions instead of direct ping.
+		add_action( 'recrawler/post_added', [ $this, 'schedule_ping' ], 10, 2 );
+		add_action( 'recrawler/post_updated', [ $this, 'schedule_ping' ], 10, 2 );
 
 		if ( $this->is_ping_on_comment() ) {
-			add_action( 'recrawler/comment_updated', [ $this, 'ping_on_insert_comment' ], 10, 2 );
+			add_action( 'recrawler/comment_updated', [ $this, 'schedule_ping_on_comment' ], 10, 2 );
 		}
 
 		if ( $this->is_ping_on_term() ) {
-			add_action( 'recrawler/term_updated', [ $this, 'ping_on_insert_term' ], 10, 2 );
+			add_action( 'recrawler/term_updated', [ $this, 'schedule_ping_on_term' ], 10, 2 );
 		}
+
+		// Register async action handlers.
+		add_action( 'recrawler/indexnow/push/' . $this->get_slug(), [ $this, 'async_push_handler' ], 10, 3 );
 	}
 
 	abstract protected function get_api_url(): string;
@@ -128,34 +134,62 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 	 *
 	 * @link https://yandex.ru/dev/webmaster/doc/dg/reference/host-recrawl-post.html
 	 */
-	public function ping_on_post_update( int $post_id, WP_Post $post ) {
-		$this->maybe_do_ping_post( $post_id );
+	public function schedule_ping( int $post_id, WP_Post $post ) {
+		$this->maybe_schedule_ping_post( $post_id, $post );
 	}
 
-	public function ping_on_insert_comment( int $post_id, WP_Comment $comment ) {
-		$this->maybe_do_ping_post( $post_id );
+	public function schedule_ping_on_comment( int $post_id, WP_Comment $comment ) {
+		$this->maybe_schedule_ping_post( $post_id, $comment );
 	}
 
-	public function ping_on_insert_term( int $term_id, string $taxonomy ) {
-		$this->maybe_do_ping_term( $term_id, $taxonomy );
+	public function schedule_ping_on_term( int $term_id, string $taxonomy ) {
+		$this->maybe_schedule_ping_term( $term_id, $taxonomy );
 	}
 
-	private function maybe_do_ping_post( int $post_id ) {
-
+	private function maybe_schedule_ping_post( int $post_id, $object ) {
 		if ( $this->get_current_search_engine() === $this->get_slug() ) {
-			$this->push( [ get_permalink( $post_id ) ] );
+			$url = is_a( $object, WP_Post::class ) ? get_permalink( $post_id ) : get_permalink( $post_id );
+
+			ActionScheduler::async(
+				'recrawler/indexnow/push/' . $this->get_slug(),
+				[
+					'url_list'    => [ $url ],
+					'search_engine' => $this->get_slug(),
+				]
+			);
 		}
 	}
 
-	private function maybe_do_ping_term( int $term_id, string $taxonomy ) {
-
+	private function maybe_schedule_ping_term( int $term_id, string $taxonomy ) {
 		if ( ! in_array( $taxonomy, $this->get_taxonomies(), true ) ) {
 			return;
 		}
 
 		if ( $this->get_current_search_engine() === $this->get_slug() ) {
-			$this->push( [ get_term_link( $term_id, $taxonomy ) ] );
+			ActionScheduler::async(
+				'recrawler/indexnow/push/' . $this->get_slug(),
+				[
+					'url_list'    => [ get_term_link( $term_id, $taxonomy ) ],
+					'search_engine' => $this->get_slug(),
+				]
+			);
 		}
+	}
+
+	/**
+	 * Async action handler for IndexNow push.
+	 *
+	 * @param array  $url_list     List of URLs to notify.
+	 * @param string $search_engine Search engine slug.
+	 *
+	 * @return void
+	 */
+	public function async_push_handler( array $url_list, string $search_engine ) {
+		if ( $this->get_slug() !== $search_engine ) {
+			return;
+		}
+
+		$this->push( $url_list );
 	}
 
 	public function set_api_url( string $url ): bool {
