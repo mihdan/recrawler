@@ -112,6 +112,22 @@ class WebSub implements SearchEngineInterface {
 	 * @return void
 	 */
 	public function publish( int $post_id, WP_Post $post ): void {
+		$allowed_post_types = array_filter(
+			(array) $this->wposa->get_option( 'post_types', 'general', [] ),
+			static function ( string $post_type ): bool {
+				$post_type_obj = get_post_type_object( $post_type );
+				if ( ! $post_type_obj ) {
+					return false;
+				}
+				$rewrite = $post_type_obj->rewrite;
+				return ! ( is_array( $rewrite ) && isset( $rewrite['feeds'] ) && $rewrite['feeds'] === false );
+			}
+		);
+
+		if ( ! in_array( $post->post_type, $allowed_post_types, true ) ) {
+			return;
+		}
+
 		$hubs       = $this->get_hubs();
 		$topic_urls = $this->get_topic_urls( $post_id );
 
