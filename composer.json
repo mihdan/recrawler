@@ -15,7 +15,8 @@
       "vendor-prefixed/phpseclib/phpseclib/phpseclib/bootstrap.php",
       "vendor-prefixed/guzzlehttp/guzzle/src/functions_include.php",
       "vendor-prefixed/google/apiclient-services/autoload.php",
-      "vendor-prefixed/google/apiclient/src/aliases.php"
+      "vendor-prefixed/google/apiclient/src/aliases.php",
+      "vendor-prefixed/woocommerce/action-scheduler/functions.php"
     ]
   },
   "authors": [

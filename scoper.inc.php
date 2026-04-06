@@ -49,7 +49,6 @@ return array(
 		      ->path( '#^phpseclib/#' )
 		      ->path( '#^rdlowrey/#' )
 		      ->path( '#^whichbrowser/#' )
-		      ->path( '#^woocommerce/#' )
 		      ->in( 'vendor' ),
 
 		// Google API service infrastructure classes.
