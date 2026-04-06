@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ReCrawler
  * Description: ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.
- * Version: 0.3.1
+ * Version: 0.3.2
  * Author: Mikhail Kobzarev
  * Author URI: https://www.kobzarev.com/
  * Plugin URI: https://wordpress.org/plugins/recrawler/
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RECRAWLER_VERSION', '0.3.1' );
+define( 'RECRAWLER_VERSION', '0.3.2' );
 define( 'RECRAWLER_SLUG', 'recrawler' );
 define( 'RECRAWLER_PREFIX', 'recrawler' );
 define( 'RECRAWLER_NAME', 'ReCrawler' );
@@ -31,7 +31,9 @@ define( 'RECRAWLER_DIR', __DIR__ );
 define( 'RECRAWLER_BASENAME', plugin_basename( __FILE__ ) );
 define( 'RECRAWLER_URL', plugin_dir_url( __FILE__ ) );
 
-if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) ) {
+if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) && file_exists( __DIR__ . '/vendor-prefixed/woocommerce/action-scheduler/action-scheduler.php' ) ) {
 	require_once __DIR__ . '/vendor-prefixed/autoload.php';
+	require_once __DIR__ . '/vendor-prefixed/woocommerce/action-scheduler/action-scheduler.php';
+
 	( new Main( new Container() ) )->init();
 }

@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,6 +151,10 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 0.3.2 (07.04.2025) =
+* Добавлен крон для автообновления токена Яндекс.Вебмастер API
+* Начат переход от синхронный задач в пользу асинхронных через ActionScheduler
 
 = 0.3.1 (06.04.2025) =
 * Добавлена интеграция с плагином SQLite Database Integration
