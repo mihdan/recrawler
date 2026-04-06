@@ -8,6 +8,7 @@
 namespace Mihdan\ReCrawler\Views;
 
 use Mihdan\ReCrawler\Enums\BlockAiCrawlerEnum;
+use Mihdan\ReCrawler\Providers\WebSub\WebSub;
 use Mihdan\ReCrawler\Utils;
 
 /**
@@ -349,11 +350,10 @@ class Settings {
 		$this->wposa->add_field(
 			'websub',
 			array(
-				'id'      => 'hubs',
-				'type'    => 'textarea',
-				'name'    => __( 'Hub URLs', 'recrawler' ),
-				'desc'    => __( 'One hub URL per line. Leave empty to use the default hubs: <code>https://pubsubhubbub.appspot.com/</code> and <code>https://pubsubhubbub.superfeedr.com/</code>.', 'recrawler' ),
-				'placeholder' => implode( "\n", [ 'https://pubsubhubbub.appspot.com/', 'https://pubsubhubbub.superfeedr.com/' ] ),
+				'id'   => 'hubs',
+				'type' => 'textarea',
+				'name' => __('Hub URLs', 'recrawler'),
+				'desc' => __('One hub URL per line. Leave empty to use the default hubs: ', 'recrawler').'<br><code>'.implode('</code>,<br><code>', WebSub::DEFAULT_HUBS).'</code>',
 			)
 		);
 
