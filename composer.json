@@ -61,6 +61,7 @@
     "brain/monkey": "^2.6"
   },
   "scripts": {
+    "test": "php -d memory_limit=512M vendor/bin/phpunit --no-coverage tests/phpunit/",
     "phpcs": "phpcs --standard=./phpcs.xml",
     "phpcbf": "phpcbf --standard=./phpcs.xml",
     "psalm": "vendor/bin/psalm --config=psalm.xml",

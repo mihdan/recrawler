@@ -65,7 +65,7 @@ class BlockAiCrawler {
 		}
 	}
 
-	private function block(): void {
+	protected function block(): void {
 		status_header( 403 );
 		nocache_headers();
 		exit;
