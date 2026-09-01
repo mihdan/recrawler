@@ -20,6 +20,8 @@ jobs:
         run: composer --working-dir=php-scoper install
       - name: Generate vendor-prefixed
         run: php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet
+      - name: Remove prefixed packages from vendor
+        run: composer remove-vendor
       - name: Copy remaining vendor to vendor-prefixed
         run: |
           cp -R vendor/* vendor-prefixed/
