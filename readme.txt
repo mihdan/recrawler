@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,6 +151,9 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 0.3.3 (02.09.2026) =
+* Исправлена фатальная ошибка `Cannot redeclare as_enqueue_async_action()` при активации рядом с другими плагинами, поставляющими ActionScheduler (WooCommerce, WPForms, Advanced Ads и др.)
 
 = 0.3.2 (07.04.2025) =
 * Добавлен крон для автообновления токена Яндекс.Вебмастер API
