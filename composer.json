@@ -64,6 +64,7 @@
   },
   "scripts": {
     "test": "php -d memory_limit=512M vendor/bin/phpunit --no-coverage tests/phpunit/",
+    "test-action-scheduler": "php tests/action-scheduler-coexistence.php",
     "phpcs": "phpcs --standard=./phpcs.xml",
     "phpcbf": "phpcbf --standard=./phpcs.xml",
     "psalm": "vendor/bin/psalm --config=psalm.xml",
