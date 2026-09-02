@@ -29,6 +29,8 @@ jobs:
         run: composer dump-autoload
       - name: Run PHPUnit tests
         run: composer test
+      - name: Check ActionScheduler coexistence
+        run: composer test-action-scheduler
   build:
     name: On push tag
     runs-on: ubuntu-latest

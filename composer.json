@@ -15,8 +15,10 @@
       "vendor-prefixed/phpseclib/phpseclib/phpseclib/bootstrap.php",
       "vendor-prefixed/guzzlehttp/guzzle/src/functions_include.php",
       "vendor-prefixed/google/apiclient-services/autoload.php",
-      "vendor-prefixed/google/apiclient/src/aliases.php",
-      "vendor-prefixed/woocommerce/action-scheduler/functions.php"
+      "vendor-prefixed/google/apiclient/src/aliases.php"
+    ],
+    "exclude-from-classmap": [
+      "vendor-prefixed/woocommerce/"
     ]
   },
   "authors": [
@@ -62,6 +64,7 @@
   },
   "scripts": {
     "test": "php -d memory_limit=512M vendor/bin/phpunit --no-coverage tests/phpunit/",
+    "test-action-scheduler": "php tests/action-scheduler-coexistence.php",
     "phpcs": "phpcs --standard=./phpcs.xml",
     "phpcbf": "phpcbf --standard=./phpcs.xml",
     "psalm": "vendor/bin/psalm --config=psalm.xml",
