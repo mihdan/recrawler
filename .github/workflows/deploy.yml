@@ -22,11 +22,17 @@ jobs:
         run: php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet
       - name: Remove prefixed packages from vendor
         run: composer remove-vendor
+      # Порядок важен: dump-autoload должен выполниться ДО копирования, иначе
+      # в vendor-prefixed/composer/ попадёт автолоадер, сгенерированный на
+      # этапе composer install, когда vendor-prefixed был пуст — с пустым
+      # classmap, из-за чего vendor-prefixed/autoload.php падает на
+      # google/apiclient/src/aliases.php. Тот же порядок, что в
+      # composer prefix-dependencies, которым собирается артефакт для деплоя.
+      - name: Dump autoload
+        run: composer dump-autoload
       - name: Copy remaining vendor to vendor-prefixed
         run: |
           cp -R vendor/* vendor-prefixed/
-      - name: Dump autoload
-        run: composer dump-autoload
       - name: Run PHPUnit tests
         run: composer test
       - name: Check ActionScheduler coexistence

@@ -156,6 +156,7 @@ See the documentation available from each search engine for more details about R
 * Исправлена фатальная ошибка `Cannot redeclare as_enqueue_async_action()` при активации рядом с другими плагинами, поставляющими ActionScheduler (WooCommerce, WPForms, Advanced Ads, отдельный плагин Action Scheduler)
 * ActionScheduler исключён из classmap, чтобы не возникало `Cannot declare class ActionScheduler`
 * Добавлен тест на сосуществование с чужими копиями ActionScheduler
+* Исправлен порядок шагов сборки в CI
 
 = 0.3.2 (07.04.2025) =
 * Добавлен крон для автообновления токена Яндекс.Вебмастер API
