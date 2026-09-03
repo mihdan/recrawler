@@ -713,6 +713,7 @@ git commit -m "feat(admin): Вкладки на URL вместо localStorage"
 
 **Interfaces:**
 - Consumes: `WPOSA::get_current_tab()` из задачи 4.
+- Produces: `add_tab()` понимает ключ `'show_in_menu' => bool`, по умолчанию `true`. Вкладка с `false` рисуется в полосе вкладок, но пункта в левом меню не получает. Отключённая вкладка (`'disabled' => true`) в меню не попадает никогда, независимо от `show_in_menu`.
 
 - [ ] **Step 1: Заглушка, записывающая вызовы**
 
@@ -772,6 +773,18 @@ class WposaMenuTest extends TestCase {
 
 		$this->assertNotContains( 'recrawler&tab=ai', $slugs );
 	}
+
+	public function test_tab_can_opt_out_of_menu() {
+		$wposa = new WPOSA( 'ReCrawler', '1.0.0', 'recrawler', 'recrawler' );
+		$wposa->add_tab( [ 'id' => 'general', 'title' => 'General' ] );
+		$wposa->add_tab( [ 'id' => 'plugins', 'title' => 'Plugins', 'show_in_menu' => false ] );
+		$wposa->admin_menu();
+
+		$slugs = array_column( $GLOBALS['__wp_submenus'], 'menu_slug' );
+
+		$this->assertContains( 'recrawler&tab=general', $slugs );
+		$this->assertNotContains( 'recrawler&tab=plugins', $slugs );
+	}
 }
 ```
 
@@ -782,11 +795,26 @@ Expected: FAIL — подменю не регистрируются.
 
 - [ ] **Step 4: Реализация**
 
-В `admin_menu()` после `add_menu_page()`:
+Сначала — дефолт в `add_tab()` (строка 300), рядом с префиксованием id:
+
+```php
+	public function add_tab( array $tab ) {
+		$tab['id'] = $this->get_prefix() . '_' . $tab['id'];
+
+		// Tabs show up in the admin menu unless they opt out.
+		$tab['show_in_menu'] = $tab['show_in_menu'] ?? true;
+
+		$this->tabs_array[] = $tab;
+
+		return $this;
+	}
+```
+
+Затем в `admin_menu()` после `add_menu_page()`:
 
 ```php
 		foreach ( $this->tabs_array as $tab ) {
-			if ( ! empty( $tab['disabled'] ) ) {
+			if ( ! empty( $tab['disabled'] ) || ! $tab['show_in_menu'] ) {
 				continue;
 			}
 
@@ -845,7 +873,7 @@ Expected: PASS. Если `WebmasterProvidersTest::test_setup_hooks_registers_act
 
 - [ ] **Step 7: Проверить глазами**
 
-Ожидается: в левом меню под ReCrawler девять пунктов плюс «Журнал»; при переходе подсвечивается нужный; отключённые вкладки в меню отсутствуют.
+Ожидается: в левом меню под ReCrawler девять пунктов плюс «Журнал»; при переходе подсвечивается нужный; отключённые вкладки в меню отсутствуют. `src/Views/Settings.php` при этом не правится ни в одной строке — дефолт `show_in_menu = true` покрывает все существующие вкладки.
 
 - [ ] **Step 8: Коммит**
 

@@ -57,7 +57,9 @@ $wposa->add_field( 'general', [ 'id' => 'enable', 'section' => 'logs', ... ] );
 ### 3. Все вкладки в левом меню
 
 Каждый таб регистрируется как `add_submenu_page( 'recrawler', $title, $title,
-'manage_options', 'recrawler&tab=' . $id )`.
+'manage_options', 'recrawler&tab=' . $id )`. Управляется ключом `add_tab()`:
+`'show_in_menu' => bool`, по умолчанию `true` — так существующие вызовы в
+`Settings.php` не требуют правки, а спрятать отдельную вкладку из меню можно явно.
 
 Две известные шероховатости WordPress:
 
