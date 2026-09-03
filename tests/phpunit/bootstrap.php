@@ -28,7 +28,7 @@ foreach (spl_autoload_functions() as $loader) {
     }
 }
 
-define('RECRAWLER_VERSION', '0.3.2');
+define('RECRAWLER_VERSION', '1.0.0');
 define('RECRAWLER_SLUG', 'recrawler');
 define('RECRAWLER_PREFIX', 'recrawler');
 define('RECRAWLER_NAME', 'ReCrawler');

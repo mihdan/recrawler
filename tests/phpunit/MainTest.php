@@ -91,7 +91,7 @@ class MainTest extends TestCase {
 	}
 
 	public function test_constants_accessible() {
-		$this->assertSame('0.3.2', RECRAWLER_VERSION);
+		$this->assertSame('1.0.0', RECRAWLER_VERSION);
 		$this->assertSame('recrawler', RECRAWLER_SLUG);
 		$this->assertSame('recrawler', RECRAWLER_PREFIX);
 		$this->assertSame('ReCrawler', RECRAWLER_NAME);
