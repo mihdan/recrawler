@@ -16,16 +16,22 @@ jobs:
           php-version: '8.2'
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
-      # Юнит-тесты гоняются до скоупинга: composer remove-vendor удаляет
-      # vendor/symfony, который нужен Testo в рантайме.
-      - name: Run PHPUnit test suite
-        run: composer test
-      - name: Run Testo test suite
-        run: composer test:testo
       - name: Install php-scoper
         run: composer --working-dir=php-scoper install
       - name: Prefix dependencies into vendor-prefixed
         run: php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet
+      # Пересборка автолоадера обязательна до запуска тестов: после скоупинга
+      # classmap для vendor-prefixed пуст, и google/apiclient/src/aliases.php
+      # роняет автолоадер.
+      - name: Regenerate autoloader for the prefixed tree
+        run: composer dump-autoload
+      # Тесты гоняются строго здесь: autoload.files ссылается на файлы внутри
+      # vendor-prefixed, поэтому до скоупинга автолоадер падает, а
+      # composer remove-vendor следом уносит vendor/symfony, нужный Testo.
+      - name: Run PHPUnit test suite
+        run: composer test
+      - name: Run Testo test suite
+        run: composer test:testo
       - name: Remove prefixed packages from vendor
         run: composer remove-vendor
       # Порядок важен: dump-autoload должен выполниться ДО копирования, иначе
