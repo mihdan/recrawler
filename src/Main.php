@@ -317,6 +317,14 @@ class Main {
 			[ $this, 'render_log_page' ]
 		);
 
+		// The log lives on its own page, so it joins the tab strip as a link.
+		$this->wposa->add_nav_link(
+			[
+				'page'  => RECRAWLER_SLUG . '-log',
+				'title' => __( 'Log', 'recrawler' ),
+			]
+		);
+
 		add_action(
 			"load-$hook",
 			function () {

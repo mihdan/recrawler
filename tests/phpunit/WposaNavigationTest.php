@@ -19,10 +19,11 @@ class WposaNavigationTest extends TestCase {
 		parent::setUp();
 		_reset_wp_mocks();
 		unset( $_GET['tab'] );
+		$_GET['page'] = 'recrawler';
 	}
 
 	public function tearDown(): void {
-		unset( $_GET['tab'] );
+		unset( $_GET['tab'], $_GET['page'] );
 		parent::tearDown();
 	}
 

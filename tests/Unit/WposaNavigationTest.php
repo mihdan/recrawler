@@ -45,6 +45,24 @@ final class WposaNavigationTest
         unset($_GET['tab']);
     }
 
+    public function logLinkIsActiveOnItsOwnPage(): void
+    {
+        _reset_wp_mocks();
+        $_GET['page'] = 'recrawler-log';
+
+        $wposa = $this->makeWposa();
+        $wposa->add_nav_link(['page' => 'recrawler-log', 'title' => 'Log']);
+
+        ob_start();
+        $wposa->show_navigation();
+        $html = (string) ob_get_clean();
+
+        Assert::true(str_contains($html, 'page=recrawler-log'));
+        Assert::false($wposa->is_settings_page());
+
+        unset($_GET['page']);
+    }
+
     public function tabUrlCarriesPageAndTab(): void
     {
         Assert::same(

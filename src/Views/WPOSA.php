@@ -171,6 +171,15 @@ class WPOSA {
 	private array $sections_array = array();
 
 	/**
+	 * Navigation links that point at other admin pages of the plugin.
+	 *
+	 * They show up in the tab strip but carry no settings form.
+	 *
+	 * @var array
+	 */
+	private array $nav_links = array();
+
+	/**
 	 * Fields array.
 	 *
 	 * @var   array
@@ -1213,6 +1222,34 @@ class WPOSA {
 	}
 
 	/**
+	 * Add a navigation link to a separate admin page of the plugin.
+	 *
+	 * Unlike a tab it holds no fields: the page renders itself and only
+	 * borrows the header and the tab strip.
+	 *
+	 * @param array $link ['page' => admin page slug, 'title' => label].
+	 *
+	 * @return $this
+	 */
+	public function add_nav_link( array $link ) {
+		$this->nav_links[] = $link;
+
+		return $this;
+	}
+
+	/**
+	 * Whether the settings page itself is being displayed.
+	 *
+	 * @return bool
+	 */
+	public function is_settings_page(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		return $page === $this->plugin_slug;
+	}
+
+	/**
 	 * Get the id of the tab being displayed.
 	 *
 	 * Falls back to the first tab when the query holds nothing usable, so a
@@ -1274,7 +1311,9 @@ class WPOSA {
 	 * Shows all the settings section labels as tab
 	 */
 	function show_navigation() {
-		$current = $this->get_current_tab();
+		// Off the settings page none of the tabs is active: a separate page,
+		// such as the log, highlights its own link instead.
+		$current = $this->is_settings_page() ? $this->get_current_tab() : '';
 
 		$html = sprintf(
 			'<nav class="nav-tab-wrapper" aria-label="%s">',
@@ -1297,6 +1336,19 @@ class WPOSA {
 					$tab['id'] === $current ? ' nav-tab-active' : ''
 				);
 			}
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		foreach ( $this->nav_links as $link ) {
+			$html .= sprintf(
+				'<a href="%1$s" class="nav-tab%3$s" id="%4$s-tab">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=' . $link['page'] ) ),
+				$link['title'],
+				$page === $link['page'] ? ' nav-tab-active' : '',
+				$link['page']
+			);
 		}
 
 		$html .= '</nav>';
