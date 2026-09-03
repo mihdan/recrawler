@@ -1170,11 +1170,69 @@ class WPOSA {
 	}
 
 	/**
+	 * Get the id of the tab being displayed.
+	 *
+	 * Falls back to the first tab when the query holds nothing usable, so a
+	 * bookmark to a removed tab still opens a working page.
+	 *
+	 * @return string Prefixed tab id.
+	 */
+	public function get_current_tab(): string {
+		$first = $this->tabs_array[0]['id'] ?? '';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['tab'] ) ) {
+			return $first;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$requested = $this->get_prefix() . '_' . sanitize_key( wp_unslash( $_GET['tab'] ) );
+
+		foreach ( $this->tabs_array as $tab ) {
+			if ( $tab['id'] === $requested ) {
+				return $requested;
+			}
+		}
+
+		return $first;
+	}
+
+	/**
+	 * Build the admin URL of a tab.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return string
+	 */
+	public function get_tab_url( string $tab_id ): string {
+		return admin_url(
+			sprintf(
+				'admin.php?page=%1$s&tab=%2$s',
+				$this->plugin_slug,
+				$this->get_tab_slug( $tab_id )
+			)
+		);
+	}
+
+	/**
+	 * Strip the prefix off a tab id.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return string
+	 */
+	public function get_tab_slug( string $tab_id ): string {
+		return str_replace( $this->get_prefix() . '_', '', $tab_id );
+	}
+
+	/**
 	 * Show navigations as tab
 	 *
 	 * Shows all the settings section labels as tab
 	 */
 	function show_navigation() {
+		$current = $this->get_current_tab();
+
 		$html = sprintf(
 			'<nav class="nav-tab-wrapper" aria-label="%s">',
 			esc_html__( 'Secondary Navigation', 'recrawler' )
@@ -1188,7 +1246,13 @@ class WPOSA {
 					$html .= sprintf( '<span class="nav-tab wposa-nav-tab wposa-nav-tab--disabled" id="%1$s-tab">%2$s</span>', $tab['id'], $tab['title'] );
 				}
 			} else {
-				$html .= sprintf( '<a href="#%1$s" class="nav-tab" id="%1$s-tab">%2$s</a>', $tab['id'], $tab['title'] );
+				$html .= sprintf(
+					'<a href="%1$s" class="nav-tab%4$s" id="%2$s-tab">%3$s</a>',
+					esc_url( $this->get_tab_url( $tab['id'] ) ),
+					$tab['id'],
+					$tab['title'],
+					$tab['id'] === $current ? ' nav-tab-active' : ''
+				);
 			}
 		}
 
@@ -1210,9 +1274,13 @@ class WPOSA {
 			'attributes'   => null,
 			'reset_button' => true,
 		);
+
+		// Only the tab named in the query is rendered; the rest are separate URLs.
+		$current = $this->get_current_tab();
 		?>
 		<div class="metabox-holder">
 			<?php foreach ( $this->tabs_array as $form ) : ?>
+				<?php if ( $form['id'] !== $current ) { continue; } ?>
 				<?php
 				$form = wp_parse_args( $form, $default );
 				?>

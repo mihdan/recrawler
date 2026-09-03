@@ -129,6 +129,7 @@ if (!function_exists('esc_url')) { function esc_url($url) { return $url; } }
 if (!function_exists('esc_url_raw')) { function esc_url_raw($url) { return $url; } }
 if (!function_exists('wp_kses_post_deep')) { function wp_kses_post_deep($data) { return $data; } }
 if (!function_exists('sanitize_text_field')) { function sanitize_text_field($str) { return $str; } }
+if (!function_exists('wp_kses')) { function wp_kses($string, $allowed_html = [], $allowed_protocols = []) { return $string; } }
 if (!function_exists('sanitize_key')) { function sanitize_key($key) { return strtolower(preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $key)); } }
 if (!function_exists('add_settings_section')) {
     function add_settings_section($id, $title, $callback, $page, $args = []) {
@@ -192,7 +193,7 @@ if (!function_exists('is_post_publicly_viewable')) { function is_post_publicly_v
 if (!function_exists('get_permalink')) { function get_permalink($post = 0) { return 'https://example.com/post-1/'; } }
 if (!function_exists('get_home_url')) { function get_home_url($blog_id = null, $path = '', $scheme = null) { return 'https://example.com'; } }
 if (!function_exists('get_bloginfo')) { function get_bloginfo($show = '', $filter = 'raw') { return 'https://example.com/feed/'; } }
-if (!function_exists('admin_url')) { function admin_url($path = '', $scheme = 'admin') { return 'https://example.com/wp-admin/'; } }
+if (!function_exists('admin_url')) { function admin_url($path = '', $scheme = 'admin') { return 'https://example.com/wp-admin/' . ltrim((string) $path, '/'); } }
 if (!function_exists('get_admin_page_title')) { function get_admin_page_title($title = '') { return 'ReCrawler Log'; } }
 if (!function_exists('get_self_link')) { function get_self_link() { return 'https://example.com/feed/rss2/'; } }
 if (!function_exists('get_feed_link')) { function get_feed_link($feed = '', $blog_id = null) { return 'https://example.com/feed/rss2/'; } }
