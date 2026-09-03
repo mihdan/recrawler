@@ -46,7 +46,7 @@
   "require": {
     "php": ">=8.2",
     "ext-json": "*",
-    "psr/log": "^2.0",
+    "psr/log": "^3.0",
     "google/apiclient": "^2.12.1",
     "woocommerce/action-scheduler": "^3.9"
   },
