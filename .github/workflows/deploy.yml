@@ -8,17 +8,17 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out the repository
         uses: actions/checkout@v4
-      - name: Setup PHP
+      - name: Set up PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - name: Install composer requirements
+      - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
       - name: Install php-scoper
         run: composer --working-dir=php-scoper install
-      - name: Generate vendor-prefixed
+      - name: Prefix dependencies into vendor-prefixed
         run: php-scoper/vendor/bin/php-scoper add-prefix --output-dir=./vendor-prefixed --force --quiet
       - name: Remove prefixed packages from vendor
         run: composer remove-vendor
@@ -28,31 +28,52 @@ jobs:
       # classmap, из-за чего vendor-prefixed/autoload.php падает на
       # google/apiclient/src/aliases.php. Тот же порядок, что в
       # composer prefix-dependencies, которым собирается артефакт для деплоя.
-      - name: Dump autoload
+      - name: Regenerate autoloader
         run: composer dump-autoload
-      - name: Copy remaining vendor to vendor-prefixed
+      - name: Copy remaining vendor into vendor-prefixed
         run: |
           cp -R vendor/* vendor-prefixed/
-      - name: Run PHPUnit tests
+      - name: Run PHPUnit test suite
         run: composer test
       - name: Check ActionScheduler coexistence
         run: composer test-action-scheduler
+
   build:
-    name: On push tag
+    name: Build release artifact
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Checkout
+      - name: Check out the repository
         uses: actions/checkout@v4
-      - name: Setup PHP
+      - name: Set up PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - name: Install composer requirements
+      - name: Install production dependencies
         run: composer install --no-dev --prefer-dist --no-progress
-      - name: Prefix dependencies
+      - name: Prefix dependencies into vendor-prefixed
         run: composer prefix-dependencies
-      - name: WordPress plugin deploy
+      - name: Upload vendor-prefixed as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor-prefixed
+          path: vendor-prefixed
+          retention-days: 1
+          include-hidden-files: true
+
+  deploy:
+    name: Publish to WordPress.org
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Download vendor-prefixed artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-prefixed
+          path: vendor-prefixed
+      - name: Deploy to the WordPress.org plugin directory
         uses: 10up/action-wordpress-plugin-deploy@stable
         with:
           generate-zip: true

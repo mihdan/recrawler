@@ -165,7 +165,14 @@ Expected: PASS.
 
 - [ ] **Step 10: CI**
 
-В `.github/workflows/deploy.yml` в job `test` после шага с `composer test` добавить шаг с `composer test:testo`. Версию PHP в setup-php поднять до `8.2`.
+В `.github/workflows/deploy.yml` в job `test` после шага `Run PHPUnit test suite` добавить:
+
+```yaml
+      - name: Run Testo test suite
+        run: composer test:testo
+```
+
+Версия PHP в `setup-php` уже `8.2` во всех трёх джобах. Структура workflow: `test` → `build` (собирает `vendor-prefixed` и отдаёт артефактом) → `deploy` (забирает артефакт и публикует на wp.org).
 
 - [ ] **Step 11: Коммит**
 
