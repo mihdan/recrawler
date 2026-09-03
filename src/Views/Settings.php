@@ -174,12 +174,11 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_field(
-			'general',
+		$this->wposa->add_section(
 			array(
-				'id'      => 'ping_when',
-				'type'    => 'html',
-				'name'    => __( 'Notify SE when', 'recrawler' ),
+				'id'    => 'notify',
+				'tab'   => 'general',
+				'title' => __( 'Notify', 'recrawler' ),
 			)
 		);
 
@@ -187,6 +186,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'ping_on_post',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Post added', 'recrawler' ),
 				'default' => 'on',
@@ -197,6 +197,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'ping_on_post_updated',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Post updated', 'recrawler' ),
 				'default' => 'off',
@@ -207,6 +208,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'ping_on_term',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Term added', 'recrawler' ),
 			)
@@ -216,6 +218,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'ping_on_comment',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Comment added', 'recrawler' ),
 			)
@@ -225,6 +228,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'disable_for_bulk_edit',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Disable for Bulk Edit', 'recrawler' ),
 				'default' => 'on',
@@ -235,6 +239,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'show_last_update_column',
+				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Show last update column', 'recrawler' ),
 				'default' => 'on',
@@ -245,6 +250,7 @@ class Settings {
 			'general',
 			array(
 				'id'      => 'ping_delay',
+				'section' => 'notify',
 				'type'    => 'select',
 				'name'    => __( 'Ping Delay', 'recrawler' ),
 				'desc'    => __( 'Delay between notifications for a single URL', 'recrawler' ),
