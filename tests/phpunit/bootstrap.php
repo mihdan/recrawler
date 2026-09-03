@@ -224,7 +224,8 @@ if (!function_exists('get_option')) {
 if (!function_exists('update_option')) {
     function update_option($option, $value, $autoload = null) {
         _track_wp_mock('update_option');
-        return true;
+        $result = _call_if_overridden('update_option', $option, $value, $autoload);
+        return $result ?? true;
     }
 }
 if (!function_exists('get_post_meta')) { function get_post_meta($post_id, $key, $single = false) { $r = _call_if_overridden('get_post_meta', $post_id, $key, $single); return $r ?? ($single ? '' : ''); } }
@@ -276,7 +277,7 @@ if (!function_exists('add_submenu_page')) {
 if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4() { return '550e8400-e29b-41d4-a716-446655440000'; } }
 if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return null; } }
 if (!function_exists('_doing_it_wrong')) { function _doing_it_wrong($function, $message, $version) {} }
-if (!function_exists('delete_option')) { function delete_option($option) { return true; } }
+if (!function_exists('delete_option')) { function delete_option($option) { _track_wp_mock('delete_option'); $r = _call_if_overridden('delete_option', $option); return $r ?? true; } }
 if (!function_exists('switch_to_blog')) { function switch_to_blog($blog_id) {} }
 if (!function_exists('restore_current_blog')) { function restore_current_blog() {} }
 if (!function_exists('get_sites')) { function get_sites($args = []) { return []; } }

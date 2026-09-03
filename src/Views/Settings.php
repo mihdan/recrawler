@@ -551,18 +551,20 @@ class Settings {
 			)
 		);
 
-		$this->wposa->add_tab(
+		$this->wposa->add_section(
 			array(
 				'id'    => 'logs',
+				'tab'   => 'general',
 				'title' => __( 'Logs', 'recrawler' ),
 				'desc'  => __( 'Module for logging incoming request from search engine and outgoing request from site.', 'recrawler' ),
 			)
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'enable',
+				'section' => 'logs',
 				'type'    => 'switch',
 				'name'    => __( 'Enable', 'recrawler' ),
 				'default' => 'on',
@@ -570,9 +572,10 @@ class Settings {
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'key_logging',
+				'section' => 'logs',
 				'type'    => 'switch',
 				'name'    => __( 'Key logging', 'recrawler' ),
 				'default' => 'on',
@@ -580,9 +583,10 @@ class Settings {
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'outgoing_requests',
+				'section' => 'logs',
 				'type'    => 'switch',
 				'name'    => __( 'Outgoing requests', 'recrawler' ),
 				'default' => 'on',
@@ -590,9 +594,10 @@ class Settings {
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'cron_events',
+				'section' => 'logs',
 				'type'    => 'switch',
 				'name'    => __( 'Cron events', 'recrawler' ),
 				'default' => 'off',
@@ -600,9 +605,10 @@ class Settings {
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'bulk_actions',
+				'section' => 'logs',
 				'type'    => 'switch',
 				'name'    => __( 'Bulk Actions', 'recrawler' ),
 				'default' => 'off',
@@ -610,9 +616,10 @@ class Settings {
 		);
 
 		$this->wposa->add_field(
-			'logs',
+			'general',
 			array(
 				'id'      => 'lifetime',
+				'section' => 'logs',
 				'type'    => 'number',
 				'name'    => __( 'Lifetime', 'recrawler' ),
 				'default' => 1,

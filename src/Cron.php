@@ -64,14 +64,14 @@ class Cron {
 	public function clear_log(): bool {
 		global $wpdb;
 
-		$lifetime   = $this->wposa->get_option( 'lifetime', 'logs', 1 );
+		$lifetime   = $this->wposa->get_option( 'lifetime', 'general', 1 );
 		$table_name = $this->logger->get_logger_table_name();
 
 		$wpdb->query(
 			$wpdb->prepare( "DELETE FROM {$table_name} WHERE DATEDIFF(NOW(), created_at)>=%d", $lifetime )
 		);
 
-		if ( $this->wposa->get_option( 'cron_events', 'logs', 'off' ) === 'on' ) {
+		if ( $this->wposa->get_option( 'cron_events', 'general', 'off' ) === 'on' ) {
 			$data = [
 				'direction' => 'internal',
 			];

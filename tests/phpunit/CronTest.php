@@ -44,8 +44,8 @@ class CronTest extends TestCase {
 
 	public function test_clear_log_executes_query() {
 		$this->wposa->method('get_option')->willReturnMap([
-			['lifetime', 'logs', 1, 7],
-			['cron_events', 'logs', 'off', 'off'],
+			['lifetime', 'general', 1, 7],
+			['cron_events', 'general', 'off', 'off'],
 		]);
 
 		$this->logger->method('get_logger_table_name')->willReturn('wp_recrawler_log');
@@ -75,8 +75,8 @@ class CronTest extends TestCase {
 
 	public function test_clear_log_logs_when_cron_events_enabled() {
 		$this->wposa->method('get_option')->willReturnMap([
-			['lifetime', 'logs', 1, 7],
-			['cron_events', 'logs', 'off', 'on'],
+			['lifetime', 'general', 1, 7],
+			['cron_events', 'general', 'off', 'on'],
 		]);
 
 		$this->logger->method('get_logger_table_name')->willReturn('wp_recrawler_log');

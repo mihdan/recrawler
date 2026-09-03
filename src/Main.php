@@ -373,6 +373,6 @@ class Main {
 	}
 
 	private function is_logging_enabled(): bool {
-		return $this->wposa->get_option( 'enable', 'logs', 'on' ) === 'on';
+		return $this->wposa->get_option( 'enable', 'general', 'on' ) === 'on';
 	}
 }

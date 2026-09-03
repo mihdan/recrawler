@@ -212,7 +212,7 @@ class Log_List_Table extends WP_List_Table {
 				$wpdb->prepare( $query, $log_rows )
 			);
 
-			if ( $this->wposa->get_option( 'bulk_actions', 'logs', 'off' ) === 'on' ) {
+			if ( $this->wposa->get_option( 'bulk_actions', 'general', 'off' ) === 'on' ) {
 
 				$data = [
 					'direction' => 'internal',
