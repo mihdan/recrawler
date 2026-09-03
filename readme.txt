@@ -2,7 +2,7 @@
 Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
-Requires at least: 6.0
+Requires at least: 6.4
 Tested up to: 7.1
 Stable tag: 0.3.4
 Requires PHP: 8.2

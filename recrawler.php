@@ -8,7 +8,7 @@
  * Plugin URI: https://wordpress.org/plugins/recrawler/
  * GitHub Plugin URI: https://github.com/mihdan/recrawler
  * Requires PHP: 8.2
- * Requires at least: 6.0
+ * Requires at least: 6.4
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -36,4 +36,21 @@ if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) && file_exists( __
 	require_once __DIR__ . '/vendor-prefixed/woocommerce/action-scheduler/action-scheduler.php';
 
 	( new Main( new Container() ) )->init();
+} else {
+	// Без собранного vendor-prefixed плагин не выполняет ничего. Состояние
+	// достижимо только из репозитория, поэтому сообщение адресовано
+	// разработчику, а не пользователю.
+	add_action(
+		'admin_notices',
+		static function () {
+			if ( ! current_user_can( 'activate_plugins' ) ) {
+				return;
+			}
+
+			wp_admin_notice(
+				__( 'ReCrawler: dependencies are not built, the plugin is doing nothing. Run "composer prefix-dependencies" in the plugin directory.', 'recrawler' ),
+				[ 'type' => 'error' ]
+			);
+		}
+	);
 }
