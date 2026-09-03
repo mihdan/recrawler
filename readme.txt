@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.0
 Tested up to: 7.1
-Stable tag: 0.3.3
+Stable tag: 0.3.4
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,6 +151,14 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 0.3.4 (03.09.2026) =
+* Исправлено бесконечное перепланирование обновления токена Яндекс.Вебмастер на каждой загрузке админки, из-за которого журнал заполнялся записями и ошибками `expired_token`
+* Первый запуск обновления токена теперь через полный период, а не сразу
+* Дефолтный период обновления токена приведён к значению из настроек (3 месяца)
+* Исправлена фатальная ошибка при получении списка хостов, если API вернул ошибку
+* Сообщения об ошибках API больше не теряются при обрыве связи и некорректном ответе
+* Удалены неиспользуемые крон-расписания WP-Cron
 
 = 0.3.3 (02.09.2026) =
 * Исправлена фатальная ошибка `Cannot redeclare as_enqueue_async_action()` при активации рядом с другими плагинами, поставляющими ActionScheduler (WooCommerce, WPForms, Advanced Ads, отдельный плагин Action Scheduler)

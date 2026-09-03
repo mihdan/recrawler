@@ -239,7 +239,7 @@ class YandexWebmasterTest extends TestCase {
 
 		$provider = new YandexWebmaster($this->logger, $this->wposa);
 		_expect_wp_mock('add_action', 6);
-		_expect_wp_mock('add_filter', 1);
+		_expect_wp_mock('add_filter', 0);
 
 		$provider->setup_hooks();
 	}
