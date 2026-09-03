@@ -37,9 +37,6 @@ if ( file_exists( __DIR__ . '/vendor-prefixed/autoload.php' ) && file_exists( __
 
 	( new Main( new Container() ) )->init();
 } else {
-	// Без собранного vendor-prefixed плагин не выполняет ничего. Состояние
-	// достижимо только из репозитория, поэтому сообщение адресовано
-	// разработчику, а не пользователю.
 	add_action(
 		'admin_notices',
 		static function () {
