@@ -16,6 +16,12 @@ jobs:
           php-version: '8.2'
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
+      # Юнит-тесты гоняются до скоупинга: composer remove-vendor удаляет
+      # vendor/symfony, который нужен Testo в рантайме.
+      - name: Run PHPUnit test suite
+        run: composer test
+      - name: Run Testo test suite
+        run: composer test:testo
       - name: Install php-scoper
         run: composer --working-dir=php-scoper install
       - name: Prefix dependencies into vendor-prefixed
@@ -33,8 +39,6 @@ jobs:
       - name: Copy remaining vendor into vendor-prefixed
         run: |
           cp -R vendor/* vendor-prefixed/
-      - name: Run PHPUnit test suite
-        run: composer test
       - name: Check ActionScheduler coexistence
         run: composer test-action-scheduler
 

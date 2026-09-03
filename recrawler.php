@@ -7,7 +7,7 @@
  * Author URI: https://www.kobzarev.com/
  * Plugin URI: https://wordpress.org/plugins/recrawler/
  * GitHub Plugin URI: https://github.com/mihdan/recrawler
- * Requires PHP: 8.1
+ * Requires PHP: 8.2
  * Requires at least: 6.0
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

@@ -89,8 +89,23 @@ function _call_if_overridden($function_name, ...$args) {
     return null;
 }
 
-if (!class_exists('WP_Post')) { class WP_Post {} }
-if (!class_exists('WP_Comment')) { class WP_Comment {} }
+if (!class_exists('WP_Post')) {
+    class WP_Post {
+        public $ID = 0;
+        public $post_type = 'post';
+        public $post_status = 'publish';
+        public $post_date = '';
+        public $post_name = '';
+        public $post_parent = 0;
+    }
+}
+if (!class_exists('WP_Comment')) {
+    class WP_Comment {
+        public $comment_ID = 0;
+        public $comment_approved = 0;
+        public $comment_post_ID = 0;
+    }
+}
 if (!class_exists('WP_Query')) {
     class WP_Query {
         private $data = [];

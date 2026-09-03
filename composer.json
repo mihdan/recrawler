@@ -21,6 +21,12 @@
       "vendor-prefixed/woocommerce/"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Mihdan\\ReCrawler\\Tests\\Unit\\": "tests/Unit/",
+      "Mihdan\\ReCrawler\\Tests\\": "tests/phpunit/"
+    }
+  },
   "authors": [
     {
       "name": "Mikhail Kobzarev",
@@ -31,39 +37,38 @@
   "prefer-stable": true,
   "config": {
     "platform": {
-      "php": "8.1"
+      "php": "8.2"
     },
     "allow-plugins": {
       "kylekatarnls/update-helper": true
     }
   },
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.2",
     "ext-json": "*",
-    "psr/log": "^1.1 || ^2.0 || ^3.0",
+    "psr/log": "^2.0",
     "google/apiclient": "^2.12.1",
     "woocommerce/action-scheduler": "^3.9"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
-    "10up/wp_mock": "0.2 - 0.4",
-    "lucatume/function-mocker": "dev-master",
-    "lucatume/wp-browser": "^3.0",
-    "codeception/module-db": "^1.1",
-    "codeception/module-webdriver": "^1.4",
-    "codeception/module-phpbrowser": "^1.0",
-    "phpunit/phpunit": "5.7 - 9.5",
+    "lucatume/wp-browser": "^4.7",
+    "codeception/module-db": "^3.0",
+    "codeception/module-webdriver": "^4.0",
+    "codeception/module-phpbrowser": "^3.0",
+    "phpunit/phpunit": "^10.5",
     "squizlabs/php_codesniffer": "^3.6",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpcompatibility/phpcompatibility-wp": "^2.1",
     "wp-coding-standards/wpcs": "^2.3",
     "php-coveralls/php-coveralls": "^v2.4",
-    "vimeo/psalm": "^4.20",
-    "humanmade/psalm-plugin-wordpress": "^2.0",
-    "brain/monkey": "^2.6"
+    "vimeo/psalm": "^5.26",
+    "humanmade/psalm-plugin-wordpress": "*",
+    "testo/testo": "^0.10"
   },
   "scripts": {
     "test": "php -d memory_limit=512M vendor/bin/phpunit --no-coverage tests/phpunit/",
+    "test:testo": "vendor/bin/testo",
     "test-action-scheduler": "php tests/action-scheduler-coexistence.php",
     "phpcs": "phpcs --standard=./phpcs.xml",
     "phpcbf": "phpcbf --standard=./phpcs.xml",
