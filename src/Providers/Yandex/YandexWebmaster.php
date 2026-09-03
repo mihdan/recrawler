@@ -21,6 +21,8 @@ class YandexWebmaster extends WebmasterAbstract {
 
 	public const ACTION_NAME = 'recrawler/yandex_webmaster/refresh_token';
 
+	private const SCHEDULED_PERIOD_OPTION = 'recrawler_yandex_token_refresh_period';
+
 	public function get_slug(): string {
 		return 'yandex-webmaster';
 	}
@@ -66,7 +68,6 @@ class YandexWebmaster extends WebmasterAbstract {
 		add_action( 'admin_init', [ $this, 'get_api_token' ] );
 		add_action( 'admin_init', [ $this, 'schedule_token_refresh' ] );
 		add_action( 'recrawler/yandex_webmaster/refresh_token', [ $this, 'refresh_token_cron' ] );
-		add_filter( 'cron_schedules', [ $this, 'add_cron_schedules' ] );
 
 		if ( ! $this->is_enabled() ) {
 			return;
@@ -81,19 +82,21 @@ class YandexWebmaster extends WebmasterAbstract {
 	}
 
 	/**
-	 * Add custom cron schedules for token refresh.
+	 * Extract error message from a decoded API response.
 	 *
-	 * @param array $schedules Existing cron schedules.
-	 * @return array
+	 * Yandex uses error_message or error_description depending on the endpoint,
+	 * and a transport failure leaves no body at all.
+	 *
+	 * @param mixed $body Decoded response body.
+	 *
+	 * @return string
 	 */
-	public function add_cron_schedules( $schedules ) {
-		for ( $i = 1; $i <= 6; $i++ ) {
-			$schedules[ 'recrawler_' . $i . 'months' ] = array(
-				'interval' => $i * MONTH_IN_SECONDS,
-				'display'  => sprintf( __( 'Every %d month(s)', 'recrawler' ), $i ),
-			);
+	private function get_error_message( $body ): string {
+		if ( ! is_array( $body ) ) {
+			return __( 'Unknown error', 'recrawler' );
 		}
-		return $schedules;
+
+		return $body['error_message'] ?? $body['error_description'] ?? __( 'Unknown error', 'recrawler' );
 	}
 
 	public function get_api_token() {
@@ -112,7 +115,7 @@ class YandexWebmaster extends WebmasterAbstract {
 			$body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
 			if ( $status_code !== 200 ) {
-				$this->logger->error( $body['error_description'], [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
+				$this->logger->error( $this->get_error_message( $body ), [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
 				return;
 			}
 
@@ -139,6 +142,7 @@ class YandexWebmaster extends WebmasterAbstract {
 					admin_url( 'admin.php' )
 				)
 			);
+			exit;
 		}
 	}
 
@@ -163,7 +167,7 @@ class YandexWebmaster extends WebmasterAbstract {
 		$body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $status_code !== 200 ) {
-			$this->logger->error( $body['error_message'], [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
+			$this->logger->error( $this->get_error_message( $body ), [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
 			return 0;
 		}
 
@@ -192,8 +196,8 @@ class YandexWebmaster extends WebmasterAbstract {
 		$body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $status_code !== 200 ) {
-			$this->logger->error( $body['error_message'], [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
-			return 0;
+			$this->logger->error( $this->get_error_message( $body ), [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ] );
+			return [];
 		}
 
 		return isset( $body['hosts'] )
@@ -283,7 +287,7 @@ class YandexWebmaster extends WebmasterAbstract {
 			$message = sprintf( '<a href="%s" target="_blank">%s</a> - OK', get_permalink( $post_id ), get_the_title( $post_id ) );
 			$this->logger->info( $message, $data );
 		} else {
-			$this->logger->error( $body['error_message'], $data );
+			$this->logger->error( $this->get_error_message( $body ), $data );
 		}
 	}
 
@@ -313,7 +317,7 @@ class YandexWebmaster extends WebmasterAbstract {
 
 			return $body;
 		} else {
-			$this->logger->error( $body['error_message'], $data );
+			$this->logger->error( $this->get_error_message( $body ), $data );
 
 			return [
 				'daily_quota'     => 0,
@@ -331,26 +335,28 @@ class YandexWebmaster extends WebmasterAbstract {
 		if ( ! $refresh_token ) {
 			// Clear scheduled job if no refresh token
 			ActionScheduler::cancel( self::ACTION_NAME );
+			delete_option( self::SCHEDULED_PERIOD_OPTION );
 			return;
 		}
 
-		$refresh_period_months = (int) $this->wposa->get_option( 'token_refresh_period', 'yandex_webmaster', 5 );
-		$interval_in_seconds = $refresh_period_months * MONTH_IN_SECONDS;
+		$refresh_period_months = (int) $this->wposa->get_option( 'token_refresh_period', 'yandex_webmaster', 3 );
+		$interval_in_seconds   = $refresh_period_months * MONTH_IN_SECONDS;
 
-		// Check if we need to reschedule due to period change
-		$next_scheduled = ActionScheduler::next( self::ACTION_NAME );
-
-		if ( $next_scheduled ) {
-			// Unschedule existing event to apply new period
-			ActionScheduler::cancel( self::ACTION_NAME );
+		// Already scheduled with the same period - nothing to do.
+		if ( ActionScheduler::next( self::ACTION_NAME ) && (int) get_option( self::SCHEDULED_PERIOD_OPTION ) === $refresh_period_months ) {
+			return;
 		}
 
-		// Schedule with new period
+		ActionScheduler::cancel( self::ACTION_NAME );
+
+		// First run after one full period, not immediately.
 		ActionScheduler::recurring(
-			time(),
+			time() + $interval_in_seconds,
 			$interval_in_seconds,
 			self::ACTION_NAME
 		);
+
+		update_option( self::SCHEDULED_PERIOD_OPTION, $refresh_period_months, false );
 
 		$this->logger->info(
 			sprintf(
@@ -393,8 +399,7 @@ class YandexWebmaster extends WebmasterAbstract {
 		$log_data = [ 'search_engine' => $this->get_slug(), 'status_code' => $status_code ];
 
 		if ( $status_code !== 200 ) {
-			$message = isset( $body['error_description'] ) ? $body['error_description'] : 'Unknown error';
-			$this->logger->error( $message, $log_data );
+			$this->logger->error( $this->get_error_message( $body ), $log_data );
 			return;
 		}
 
