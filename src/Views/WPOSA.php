@@ -338,10 +338,33 @@ class WPOSA {
 
 		$section['id'] = $this->get_prefix() . '_' . $section['id'];
 
+		// A section belongs to a tab and renders inside its form.
+		if ( isset( $section['tab'] ) ) {
+			$section['tab'] = $this->get_prefix() . '_' . $section['tab'];
+		}
+
 		// Assign the section to sections array.
 		$this->sections_array[] = $section;
 
 		return $this;
+	}
+
+	/**
+	 * Get sections registered for a given tab.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return array
+	 */
+	public function get_sections_by_tab( string $tab_id ): array {
+		return array_values(
+			array_filter(
+				$this->sections_array,
+				static function ( $section ) use ( $tab_id ) {
+					return ( $section['tab'] ?? '' ) === $tab_id;
+				}
+			)
+		);
 	}
 
 
@@ -494,6 +517,25 @@ class WPOSA {
 		} // foreach ended.
 
 		/**
+		 * Register sub-sections. Each one renders inside its tab's form,
+		 * below the tab's own fields.
+		 */
+		foreach ( $this->sections_array as $section ) {
+			if ( empty( $section['tab'] ) ) {
+				continue;
+			}
+
+			$section_desc     = $section['desc'] ?? '';
+			$section_callback = $section_desc
+				? function () use ( $section_desc ) {
+					echo '<div class="inside wposa-section-description">' . wp_kses( $section_desc, self::ALLOWED_HTML ) . '</div>';
+				}
+				: null;
+
+			add_settings_section( $section['id'], $section['title'], $section_callback, $section['tab'] );
+		} // foreach ended.
+
+		/**
 		 * Register settings fields.
 		 *
 		 * Fields array is like this:
@@ -593,12 +635,28 @@ class WPOSA {
 				// @param string 	$id
 				$field_id = $section . '[' . $field['id'] . ']';
 
+				// Where the field is rendered may differ from where it is stored:
+				// the first add_field() argument names the option, 'section' the
+				// sub-section it shows up in.
+				$render_section = isset( $field['section'] )
+					? $this->get_prefix() . '_' . $field['section']
+					: $section;
+
+				$page = $render_section;
+
+				foreach ( $this->sections_array as $registered ) {
+					if ( $registered['id'] === $render_section && ! empty( $registered['tab'] ) ) {
+						$page = $registered['tab'];
+						break;
+					}
+				}
+
 				add_settings_field(
 					$field_id,
 					$name,
 					array( $this, 'callback_' . $type ),
-					$section,
-					$section,
+					$page,
+					$render_section,
 					$args
 				);
 			} // foreach ended.

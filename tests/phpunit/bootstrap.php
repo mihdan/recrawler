@@ -46,6 +46,10 @@ $GLOBALS['__wp_overrides'] = [];
 function _reset_wp_mocks() {
     $GLOBALS['__wp_mock_calls'] = [];
     $GLOBALS['__wp_overrides'] = [];
+    $GLOBALS['__wp_settings_sections'] = [];
+    $GLOBALS['__wp_settings_fields'] = [];
+    $GLOBALS['__wp_registered_settings'] = [];
+    $GLOBALS['__wp_submenus'] = [];
 }
 
 function _expect_wp_mock($function_name, $expected_count = 1) {
@@ -125,6 +129,23 @@ if (!function_exists('esc_url')) { function esc_url($url) { return $url; } }
 if (!function_exists('esc_url_raw')) { function esc_url_raw($url) { return $url; } }
 if (!function_exists('wp_kses_post_deep')) { function wp_kses_post_deep($data) { return $data; } }
 if (!function_exists('sanitize_text_field')) { function sanitize_text_field($str) { return $str; } }
+if (!function_exists('sanitize_key')) { function sanitize_key($key) { return strtolower(preg_replace('/[^a-zA-Z0-9_\-]/', '', (string) $key)); } }
+if (!function_exists('add_settings_section')) {
+    function add_settings_section($id, $title, $callback, $page, $args = []) {
+        $GLOBALS['__wp_settings_sections'][] = compact('id', 'title', 'page');
+    }
+}
+if (!function_exists('add_settings_field')) {
+    function add_settings_field($id, $title, $callback, $page, $section = 'default', $args = []) {
+        $GLOBALS['__wp_settings_fields'][] = compact('id', 'title', 'page', 'section') + ['args' => $args];
+    }
+}
+if (!function_exists('register_setting')) {
+    function register_setting($group, $name, $args = []) {
+        $GLOBALS['__wp_registered_settings'][] = compact('group', 'name');
+    }
+}
+if (!function_exists('add_option')) { function add_option($option, $value = '', $deprecated = '', $autoload = true) { return true; } }
 if (!function_exists('wp_unslash')) { function wp_unslash($value) { return $value; } }
 if (!function_exists('wp_parse_args')) {
     function wp_parse_args($args, $defaults = '') {
