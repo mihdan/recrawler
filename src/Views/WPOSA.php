@@ -1118,21 +1118,33 @@ class WPOSA {
 		);
 	}
 
+	/**
+	 * Show the plugin header with logo, name and version.
+	 *
+	 * Kept separate from plugin_page() so other screens — the log page —
+	 * can render the same header.
+	 */
+	public function show_header() {
+		?>
+		<div class="wposa-header">
+			<div class="wposa-header--left">
+				<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/logo.svg' ) ); ?>" width="80" alt="" />
+			</div>
+			<div class="wposa-header--center">
+				<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
+				<div class="wposa-version"><?php esc_html_e( 'Version' ); ?>: <?php echo esc_html( $this->plugin_version ); ?></div>
+			</div>
+			<div class="wposa-header--right">
+				<p><?php esc_html_e( 'ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
+			</div>
+		</div>
+		<?php
+	}
+
 	public function plugin_page() {
 		?>
 		<div class="wposa">
-			<div class="wposa-header">
-				<div class="wposa-header--left">
-					<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/logo.svg' ) ); ?>" width="80" alt="" />
-				</div>
-				<div class="wposa-header--center">
-					<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
-					<div class="wposa-version"><?php esc_html_e( 'Version' ); ?>: <?php echo esc_html( $this->plugin_version )?></div>
-				</div>
-				<div class="wposa-header--right">
-					<p><?php esc_html_e( 'ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
-				</div>
-			</div>
+			<?php $this->show_header(); ?>
 			<?php $this->show_navigation(); ?>
 			<div class="wposa__grid">
 				<div class="wposa__column">

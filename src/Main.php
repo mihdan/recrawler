@@ -331,8 +331,13 @@ class Main {
 	public function render_log_page() {
 		?>
 		<div class="wrap">
-			<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-			<form action="" method="post">
+			<div class="wposa">
+				<?php
+				$this->wposa->show_header();
+				$this->wposa->show_navigation();
+				?>
+			</div>
+			<form action="<?php echo esc_url( admin_url( 'admin.php?page=' . RECRAWLER_SLUG . '-log' ) ); ?>" method="post">
 				<?php
 				/**
 				 * WP_List_table.
