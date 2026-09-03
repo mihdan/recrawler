@@ -214,6 +214,7 @@ class WPOSA {
 
 		// Menu.
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
+		add_filter( 'submenu_file', [ $this, 'highlight_current_submenu' ] );
 
 		// Ajax.
 		add_action( 'wp_ajax_' . Utils::get_plugin_prefix() . '_reset_form', [ $this, 'reset_form' ] );
@@ -299,6 +300,9 @@ class WPOSA {
 	 */
 	public function add_tab( array $tab ) {
 		$tab['id'] = $this->get_prefix() . '_' . $tab['id'];
+
+		// Tabs show up in the admin menu unless they opt out.
+		$tab['show_in_menu'] = $tab['show_in_menu'] ?? true;
 
 		$this->tabs_array[] = $tab;
 
@@ -1116,6 +1120,45 @@ class WPOSA {
 			'data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjYTdhYWFkIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGltYWdlLXJlbmRlcmluZz0ib3B0aW1pemVRdWFsaXR5IiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdGV4dC1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdmlld0JveD0iMCAwIDE2MDAwMCAxNjAwMDAiPgogIDxwYXRoIGQ9Ik03OTc4OCAzNzZjNDM5NzcgMCA3OTYyNyAzNTY1MSA3OTYyNyA3OTYyOHMtMzU2NTAgNzk2MjctNzk2MjcgNzk2MjdTMTYwIDEyMzk4MSAxNjAgODAwMDQgMzU4MTEgMzc2IDc5Nzg4IDM3NnptMCA4NzQwYzM5MTUwIDAgNzA4ODcgMzE3MzcgNzA4ODcgNzA4ODggMCAzOTE1MC0zMTczNyA3MDg4Ny03MDg4NyA3MDg4Ny0zOTE1MSAwLTcwODg4LTMxNzM3LTcwODg4LTcwODg3IDAtMzkxNTEgMzE3MzctNzA4ODggNzA4ODgtNzA4ODh6IiBjbGFzcz0iZmlsMCIvPgoJPHBhdGggZD0iTTEwNTc4MyA0ODY2NmM5MjU0IDAgMTY3NTYgNzc1MiAxNjc1NiAxNzMxNSAwIDQzNjMtMTM2NCA3MTU4LTM5NDIgMTAyMDMtMTIxNCAxNDM0LTQ4NDQgMjE4NC03NjQ2IDMyNTgtMzQ1MCAxMzI0LTY0MTAgMzk3NS04Njk2IDM0NjktNzU2MC0xNjc0LTEzMjI4LTg2MTgtMTMyMjgtMTY5MzAgMC05NTYzIDc1MDEtMTczMTUgMTY3NTYtMTczMTV6bS01MDc1NC04MTJjOTUxNCAwIDE3MjI3IDc5NzAgMTcyMjcgMTc4MDEgMCA0NDg2LTE0MDIgNzM1OS00MDUyIDEwNDg5LTEyNDkgMTQ3NS00OTgwIDIyNDYtNzg2MSAzMzUxLTM1NDggMTM2MC02NTkxIDQwODYtODk0MCAzNTY1LTc3NzMtMTcyMC0xMzYwMC04ODU5LTEzNjAwLTE3NDA1IDAtOTgzMSA3NzEyLTE3ODAxIDE3MjI2LTE3ODAxem00NDE1NyAzNjcwMmMtMTE1MzEgNjEtMTU1NTUgMzA3Mi0yMDQ1NSA3ODE2LTQ5MTYtNDcwNy04OTcxLTc3MDgtMjA1MDQtNzcwOC0xMTU1MSAwLTIyMzM1IDExODY5LTMwODkwIDI3OTUzIDEwOTMwIDc1NjUgMTkzMDQgMTYxMTQgMzA4NTUgMTYxMTQgMTE1MDYgMCAxNTgwMC0zMDIzIDIwNzEwLTc3MTEgNDk1OSA0NjkzIDkwMTkgNzY2MyAyMDU1MiA3NjAyIDExNTY4LTYxIDE5ODgwLTg2NTQgMzA3NzAtMTYyNzctODY0MS0xNjAzOS0xOTQ3MC0yNzg1MC0zMTAzOC0yNzc4OXoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBzdHJva2U9IiNhN2FhYWQiIHN0cm9rZS13aWR0aD0iMjAwIiBkPSJtNjM2NTMgNzI1MzYgMTUyMTUtMTU0MzIgMTU0MzIgMTUyMTUtMTExMSAxNDY0Mi0xNDI4NC0yNDYxOS0xNjA0NyAyNTY2MnoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBkPSJNMTE0NDE5IDYyNjg3YzM3MjMtNDAzNiAxOTIwMC0yMDAwNCAyNDcxMS0xMTY1NCAxMjg2IDE5NDkgMTA5NyAyNzM5LTEyNiA0MjcyLTc2NS03MjMtMTQxMS0xNTI2LTIzNzctMTk0Ni0zMzc5LTE0NjktMTI3NzcgMTMwNTItMTQ1MjYgMTU3MzAtMTc2NyAyMTIxLTQ5MjAgMjQwOC03MDQyIDY0MC0yMTIxLTE3NjgtMjQwOC00OTIxLTY0MC03MDQyeiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0xMTgyNjAgNjU4ODhjMTItMTQgMTQyMjQtMTk0OTUgMTk2MTktMTM2OTIgOTY0IDEwMzggMTEyNSAxNTMxIDExMjUgMzEwOSIgY2xhc3M9ImZpbDIiLz4KCTxwYXRoIGQ9Ik0zNTcwMSA2MzQ1NGMtMjczMi01MzM5LTY1NTQtMTI3OTMtMTI4MDYtMTQ1MTgtMTQzIDE2Ni0zNjAgNDE5LTczMSA4NjUtODY0LTk0OC0yNTQ1LTI4ODktNjE3LTM4NTAgODQxOC00MTk4IDE4MDUzIDY0NDMgMjI2MzkgMTIyMTEgMTQ2MSAyMzQzIDc0NyA1NDI3LTE1OTYgNjg4OC0yMzQzIDE0NjItNTQyNyA3NDctNjg4OS0xNTk2eiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0zOTk0NCA2MDgwOGMtMzQ3OC01NTc2LTEwNjM0LTE0OTM4LTE3NzA4LTEzNDc0LTE5NCA1NTktNzIgMTgxMi03MiAyNDY3IiBjbGFzcz0iZmlsMiIvPgo8L3N2Zz4K'
 			//Utils::get_plugin_asset_url( 'images/icons/icon.svg')
 		);
+
+		foreach ( $this->tabs_array as $tab ) {
+			if ( ! empty( $tab['disabled'] ) || empty( $tab['show_in_menu'] ) ) {
+				continue;
+			}
+
+			add_submenu_page(
+				$this->plugin_slug,
+				$tab['title'],
+				$tab['title'],
+				'manage_options',
+				$this->plugin_slug . '&tab=' . $this->get_tab_slug( $tab['id'] ),
+				array( $this, 'plugin_page' )
+			);
+		}
+
+		// WordPress adds a copy of the parent as the first submenu item; the
+		// first tab is already registered above.
+		remove_submenu_page( $this->plugin_slug, $this->plugin_slug );
+	}
+
+	/**
+	 * Point WordPress at the submenu item matching the active tab.
+	 *
+	 * Submenu slugs carry a query argument, which the core highlighting does
+	 * not account for, so without this every tab lights up the first item.
+	 *
+	 * @param string|null $submenu_file Current submenu file.
+	 *
+	 * @return string|null
+	 */
+	public function highlight_current_submenu( $submenu_file ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! $screen || $screen->id !== 'toplevel_page_' . $this->plugin_slug ) {
+			return $submenu_file;
+		}
+
+		return $this->plugin_slug . '&tab=' . $this->get_tab_slug( $this->get_current_tab() );
 	}
 
 	/**

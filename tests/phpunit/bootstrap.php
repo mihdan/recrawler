@@ -50,6 +50,7 @@ function _reset_wp_mocks() {
     $GLOBALS['__wp_settings_fields'] = [];
     $GLOBALS['__wp_registered_settings'] = [];
     $GLOBALS['__wp_submenus'] = [];
+    $GLOBALS['__wp_menus'] = [];
 }
 
 function _expect_wp_mock($function_name, $expected_count = 1) {
@@ -245,8 +246,32 @@ if (!function_exists('get_post_type')) {
 if (!function_exists('is_wp_error')) { function is_wp_error($thing) { return false; } }
 if (!function_exists('get_the_title')) { function get_the_title($post = 0) { return 'Test Post'; } }
 if (!function_exists('dbDelta')) { function dbDelta($queries, $execute = true) {} }
+if (!function_exists('add_menu_page')) {
+    function add_menu_page($page_title, $menu_title, $capability, $menu_slug, $callback = null, $icon = '', $position = null) {
+        $GLOBALS['__wp_menus'][] = compact('menu_title', 'menu_slug');
+        return 'toplevel_page_' . $menu_slug;
+    }
+}
+if (!function_exists('remove_submenu_page')) {
+    function remove_submenu_page($menu_slug, $submenu_slug) {
+        $GLOBALS['__wp_submenus'] = array_values(array_filter(
+            $GLOBALS['__wp_submenus'] ?? [],
+            static function ($item) use ($submenu_slug) { return $item['menu_slug'] !== $submenu_slug; }
+        ));
+        return false;
+    }
+}
+if (!function_exists('get_current_screen')) {
+    function get_current_screen() {
+        $r = _call_if_overridden('get_current_screen');
+        return $r ?? (object) ['id' => 'toplevel_page_recrawler'];
+    }
+}
 if (!function_exists('add_submenu_page')) {
-    function add_submenu_page($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $callback, $position = null) { return 'recrawler-log'; }
+    function add_submenu_page($parent_slug, $page_title, $menu_title, $capability, $menu_slug, $callback = null, $position = null) {
+        $GLOBALS['__wp_submenus'][] = compact('parent_slug', 'menu_title', 'menu_slug');
+        return $menu_slug === 'recrawler-log' ? 'recrawler-log' : 'recrawler_page_' . $menu_slug;
+    }
 }
 if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4() { return '550e8400-e29b-41d4-a716-446655440000'; } }
 if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return null; } }
