@@ -94,6 +94,31 @@ jQuery( document ).ready( function( $ ) {
 		}
 	);
 
+	// Warn before leaving a settings page with unsaved changes. The browser
+	// picks the wording — a custom message is ignored in every current browser.
+	const $settings_form = $( '.wposa__group form' );
+
+	let leaving_is_intentional = false;
+
+	if ( $settings_form.length ) {
+		const initial_state = $settings_form.serialize();
+
+		$settings_form.on( 'submit', function() {
+			leaving_is_intentional = true;
+		});
+
+		$( window ).on( 'beforeunload', function( evt ) {
+			if ( leaving_is_intentional || $settings_form.serialize() === initial_state ) {
+				return;
+			}
+
+			evt.preventDefault();
+			evt.originalEvent.returnValue = '';
+
+			return '';
+		});
+	}
+
 	$( 'input:button[id$="_reset_form"]' ).on(
 		'click',
 		function() {
@@ -110,6 +135,7 @@ jQuery( document ).ready( function( $ ) {
 					}
 				).always( function ( response ) {
 					if ( response === 'ok' ) {
+						leaving_is_intentional = true;
 						document.location.reload();
 					} else {
 						console.log( response );
