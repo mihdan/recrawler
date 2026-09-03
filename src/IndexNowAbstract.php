@@ -119,7 +119,7 @@ abstract class IndexNowAbstract implements SearchEngineInterface {
 	}
 
 	private function is_key_logging_enabled(): bool {
-		return $this->wposa->get_option( 'key_logging', 'logs', 'on' ) === 'on';
+		return $this->wposa->get_option( 'key_logging', 'general', 'on' ) === 'on';
 	}
 
 	private function get_current_search_engine(): string {

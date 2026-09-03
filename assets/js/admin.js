@@ -1,11 +1,10 @@
 jQuery( document ).ready( function( $ ) {
-	const ACTIVE_TAB = 'recrawler_active_tab';
-
 	const
 		$show_settings_toggler = $('.show-settings'),
 		$help = $('.wpsa-help-tab-toggle'),
 		wp = window.wp;
 
+	// Opens the WordPress contextual help panel on the requested help tab.
 	$help.on(
 		'click',
 		function () {
@@ -23,21 +22,6 @@ jQuery( document ).ready( function( $ ) {
 	//Initiate Color Picker.
 	$('.color-picker').iris();
 
-	// Switches option sections
-	$( '.wposa__group' ).hide();
-
-	let active_tab = '';
-
-	if ( 'undefined' != typeof localStorage ) {
-		active_tab = localStorage.getItem( ACTIVE_TAB );
-	}
-
-	if ( '' !== active_tab && $( active_tab ).length ) {
-		$( active_tab ).fadeIn();
-	} else {
-		$( '.wposa__group:first' ).fadeIn();
-	}
-
 	$( '.wposa__group .collapsed' ).each( function() {
 		$( this )
 			.find( 'input:checked' )
@@ -54,26 +38,6 @@ jQuery( document ).ready( function( $ ) {
 					.filter( '.hidden' )
 					.removeClass( 'hidden' );
 			});
-	});
-
-	if ( '' !== active_tab && $( active_tab + '-tab' ).length ) {
-		$( active_tab + '-tab' ).addClass( 'nav-tab-active' );
-	} else {
-		$( '.wposa .nav-tab-wrapper a:first' ).addClass( 'nav-tab-active' );
-	}
-
-	$( '.wposa .nav-tab-wrapper a' ).click( function( evt ) {
-		$( '.wposa .nav-tab-wrapper a' ).removeClass( 'nav-tab-active' );
-		$( this )
-			.addClass( 'nav-tab-active' )
-			.blur();
-		var clicked_group = $( this ).attr( 'href' );
-		if ( 'undefined' != typeof localStorage ) {
-			localStorage.setItem( ACTIVE_TAB, $( this ).attr( 'href' ) );
-		}
-		$( '.wposa__group' ).hide();
-		$( clicked_group ).fadeIn();
-		evt.preventDefault();
 	});
 
 	$( '.wpsa-browse' ).on( 'click', function( event ) {
@@ -130,6 +94,31 @@ jQuery( document ).ready( function( $ ) {
 		}
 	);
 
+	// Warn before leaving a settings page with unsaved changes. The browser
+	// picks the wording — a custom message is ignored in every current browser.
+	const $settings_form = $( '.wposa__group form' );
+
+	let leaving_is_intentional = false;
+
+	if ( $settings_form.length ) {
+		const initial_state = $settings_form.serialize();
+
+		$settings_form.on( 'submit', function() {
+			leaving_is_intentional = true;
+		});
+
+		$( window ).on( 'beforeunload', function( evt ) {
+			if ( leaving_is_intentional || $settings_form.serialize() === initial_state ) {
+				return;
+			}
+
+			evt.preventDefault();
+			evt.originalEvent.returnValue = '';
+
+			return '';
+		});
+	}
+
 	$( 'input:button[id$="_reset_form"]' ).on(
 		'click',
 		function() {
@@ -146,6 +135,7 @@ jQuery( document ).ready( function( $ ) {
 					}
 				).always( function ( response ) {
 					if ( response === 'ok' ) {
+						leaving_is_intentional = true;
 						document.location.reload();
 					} else {
 						console.log( response );

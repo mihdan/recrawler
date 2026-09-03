@@ -10,7 +10,7 @@ class Logger extends AbstractLogger {
 		return $wpdb->prefix . 'recrawler_log';
 	}
 
-	public function log( $level, $message, array $context = [] ) {
+	public function log( $level, $message, array $context = [] ): void {
 		global $wpdb;
 
 		$defaults = [

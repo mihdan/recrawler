@@ -112,6 +112,30 @@ class Migrations {
 	}
 
 	/**
+	 * Merge the standalone logs option into the general one.
+	 *
+	 * Log settings moved from their own tab into a section of the General tab,
+	 * so their storage follows: recrawler_logs is folded into recrawler_general.
+	 *
+	 * @return bool
+	 */
+	public function migrate_1_0_0(): bool {
+		$logs = get_option( 'recrawler_logs' );
+
+		if ( ! is_array( $logs ) || ! $logs ) {
+			return true;
+		}
+
+		$general = (array) get_option( 'recrawler_general', [] );
+
+		// Old values win: they were set deliberately on the Logs tab.
+		update_option( 'recrawler_general', array_merge( $general, $logs ) );
+		delete_option( 'recrawler_logs' );
+
+		return true;
+	}
+
+	/**
 	 * Determine if migration is allowed.
 	 */
 	public function is_allowed(): bool {

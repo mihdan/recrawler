@@ -171,6 +171,15 @@ class WPOSA {
 	private array $sections_array = array();
 
 	/**
+	 * Navigation links that point at other admin pages of the plugin.
+	 *
+	 * They show up in the tab strip but carry no settings form.
+	 *
+	 * @var array
+	 */
+	private array $nav_links = array();
+
+	/**
 	 * Fields array.
 	 *
 	 * @var   array
@@ -214,6 +223,7 @@ class WPOSA {
 
 		// Menu.
 		add_action( 'admin_menu', [ $this, 'admin_menu' ] );
+		add_filter( 'submenu_file', [ $this, 'highlight_current_submenu' ] );
 
 		// Ajax.
 		add_action( 'wp_ajax_' . Utils::get_plugin_prefix() . '_reset_form', [ $this, 'reset_form' ] );
@@ -300,6 +310,9 @@ class WPOSA {
 	public function add_tab( array $tab ) {
 		$tab['id'] = $this->get_prefix() . '_' . $tab['id'];
 
+		// Tabs show up in the admin menu unless they opt out.
+		$tab['show_in_menu'] = $tab['show_in_menu'] ?? true;
+
 		$this->tabs_array[] = $tab;
 
 		return $this;
@@ -338,10 +351,33 @@ class WPOSA {
 
 		$section['id'] = $this->get_prefix() . '_' . $section['id'];
 
+		// A section belongs to a tab and renders inside its form.
+		if ( isset( $section['tab'] ) ) {
+			$section['tab'] = $this->get_prefix() . '_' . $section['tab'];
+		}
+
 		// Assign the section to sections array.
 		$this->sections_array[] = $section;
 
 		return $this;
+	}
+
+	/**
+	 * Get sections registered for a given tab.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return array
+	 */
+	public function get_sections_by_tab( string $tab_id ): array {
+		return array_values(
+			array_filter(
+				$this->sections_array,
+				static function ( $section ) use ( $tab_id ) {
+					return ( $section['tab'] ?? '' ) === $tab_id;
+				}
+			)
+		);
 	}
 
 
@@ -494,6 +530,25 @@ class WPOSA {
 		} // foreach ended.
 
 		/**
+		 * Register sub-sections. Each one renders inside its tab's form,
+		 * below the tab's own fields.
+		 */
+		foreach ( $this->sections_array as $section ) {
+			if ( empty( $section['tab'] ) ) {
+				continue;
+			}
+
+			$section_desc     = $section['desc'] ?? '';
+			$section_callback = $section_desc
+				? function () use ( $section_desc ) {
+					echo '<div class="inside wposa-section-description">' . wp_kses( $section_desc, self::ALLOWED_HTML ) . '</div>';
+				}
+				: null;
+
+			add_settings_section( $section['id'], $section['title'], $section_callback, $section['tab'] );
+		} // foreach ended.
+
+		/**
 		 * Register settings fields.
 		 *
 		 * Fields array is like this:
@@ -593,12 +648,28 @@ class WPOSA {
 				// @param string 	$id
 				$field_id = $section . '[' . $field['id'] . ']';
 
+				// Where the field is rendered may differ from where it is stored:
+				// the first add_field() argument names the option, 'section' the
+				// sub-section it shows up in.
+				$render_section = isset( $field['section'] )
+					? $this->get_prefix() . '_' . $field['section']
+					: $section;
+
+				$page = $render_section;
+
+				foreach ( $this->sections_array as $registered ) {
+					if ( $registered['id'] === $render_section && ! empty( $registered['tab'] ) ) {
+						$page = $registered['tab'];
+						break;
+					}
+				}
+
 				add_settings_field(
 					$field_id,
 					$name,
 					array( $this, 'callback_' . $type ),
-					$section,
-					$section,
+					$page,
+					$render_section,
 					$args
 				);
 			} // foreach ended.
@@ -1058,23 +1129,74 @@ class WPOSA {
 			'data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjYTdhYWFkIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGltYWdlLXJlbmRlcmluZz0ib3B0aW1pemVRdWFsaXR5IiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdGV4dC1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiIgdmlld0JveD0iMCAwIDE2MDAwMCAxNjAwMDAiPgogIDxwYXRoIGQ9Ik03OTc4OCAzNzZjNDM5NzcgMCA3OTYyNyAzNTY1MSA3OTYyNyA3OTYyOHMtMzU2NTAgNzk2MjctNzk2MjcgNzk2MjdTMTYwIDEyMzk4MSAxNjAgODAwMDQgMzU4MTEgMzc2IDc5Nzg4IDM3NnptMCA4NzQwYzM5MTUwIDAgNzA4ODcgMzE3MzcgNzA4ODcgNzA4ODggMCAzOTE1MC0zMTczNyA3MDg4Ny03MDg4NyA3MDg4Ny0zOTE1MSAwLTcwODg4LTMxNzM3LTcwODg4LTcwODg3IDAtMzkxNTEgMzE3MzctNzA4ODggNzA4ODgtNzA4ODh6IiBjbGFzcz0iZmlsMCIvPgoJPHBhdGggZD0iTTEwNTc4MyA0ODY2NmM5MjU0IDAgMTY3NTYgNzc1MiAxNjc1NiAxNzMxNSAwIDQzNjMtMTM2NCA3MTU4LTM5NDIgMTAyMDMtMTIxNCAxNDM0LTQ4NDQgMjE4NC03NjQ2IDMyNTgtMzQ1MCAxMzI0LTY0MTAgMzk3NS04Njk2IDM0NjktNzU2MC0xNjc0LTEzMjI4LTg2MTgtMTMyMjgtMTY5MzAgMC05NTYzIDc1MDEtMTczMTUgMTY3NTYtMTczMTV6bS01MDc1NC04MTJjOTUxNCAwIDE3MjI3IDc5NzAgMTcyMjcgMTc4MDEgMCA0NDg2LTE0MDIgNzM1OS00MDUyIDEwNDg5LTEyNDkgMTQ3NS00OTgwIDIyNDYtNzg2MSAzMzUxLTM1NDggMTM2MC02NTkxIDQwODYtODk0MCAzNTY1LTc3NzMtMTcyMC0xMzYwMC04ODU5LTEzNjAwLTE3NDA1IDAtOTgzMSA3NzEyLTE3ODAxIDE3MjI2LTE3ODAxem00NDE1NyAzNjcwMmMtMTE1MzEgNjEtMTU1NTUgMzA3Mi0yMDQ1NSA3ODE2LTQ5MTYtNDcwNy04OTcxLTc3MDgtMjA1MDQtNzcwOC0xMTU1MSAwLTIyMzM1IDExODY5LTMwODkwIDI3OTUzIDEwOTMwIDc1NjUgMTkzMDQgMTYxMTQgMzA4NTUgMTYxMTQgMTE1MDYgMCAxNTgwMC0zMDIzIDIwNzEwLTc3MTEgNDk1OSA0NjkzIDkwMTkgNzY2MyAyMDU1MiA3NjAyIDExNTY4LTYxIDE5ODgwLTg2NTQgMzA3NzAtMTYyNzctODY0MS0xNjAzOS0xOTQ3MC0yNzg1MC0zMTAzOC0yNzc4OXoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBzdHJva2U9IiNhN2FhYWQiIHN0cm9rZS13aWR0aD0iMjAwIiBkPSJtNjM2NTMgNzI1MzYgMTUyMTUtMTU0MzIgMTU0MzIgMTUyMTUtMTExMSAxNDY0Mi0xNDI4NC0yNDYxOS0xNjA0NyAyNTY2MnoiIGNsYXNzPSJmaWwwIi8+Cgk8cGF0aCBkPSJNMTE0NDE5IDYyNjg3YzM3MjMtNDAzNiAxOTIwMC0yMDAwNCAyNDcxMS0xMTY1NCAxMjg2IDE5NDkgMTA5NyAyNzM5LTEyNiA0MjcyLTc2NS03MjMtMTQxMS0xNTI2LTIzNzctMTk0Ni0zMzc5LTE0NjktMTI3NzcgMTMwNTItMTQ1MjYgMTU3MzAtMTc2NyAyMTIxLTQ5MjAgMjQwOC03MDQyIDY0MC0yMTIxLTE3NjgtMjQwOC00OTIxLTY0MC03MDQyeiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0xMTgyNjAgNjU4ODhjMTItMTQgMTQyMjQtMTk0OTUgMTk2MTktMTM2OTIgOTY0IDEwMzggMTEyNSAxNTMxIDExMjUgMzEwOSIgY2xhc3M9ImZpbDIiLz4KCTxwYXRoIGQ9Ik0zNTcwMSA2MzQ1NGMtMjczMi01MzM5LTY1NTQtMTI3OTMtMTI4MDYtMTQ1MTgtMTQzIDE2Ni0zNjAgNDE5LTczMSA4NjUtODY0LTk0OC0yNTQ1LTI4ODktNjE3LTM4NTAgODQxOC00MTk4IDE4MDUzIDY0NDMgMjI2MzkgMTIyMTEgMTQ2MSAyMzQzIDc0NyA1NDI3LTE1OTYgNjg4OC0yMzQzIDE0NjItNTQyNyA3NDctNjg4OS0xNTk2eiIgY2xhc3M9ImZpbDEiLz4KCTxwYXRoIGQ9Ik0zOTk0NCA2MDgwOGMtMzQ3OC01NTc2LTEwNjM0LTE0OTM4LTE3NzA4LTEzNDc0LTE5NCA1NTktNzIgMTgxMi03MiAyNDY3IiBjbGFzcz0iZmlsMiIvPgo8L3N2Zz4K'
 			//Utils::get_plugin_asset_url( 'images/icons/icon.svg')
 		);
+
+		foreach ( $this->tabs_array as $tab ) {
+			if ( ! empty( $tab['disabled'] ) || empty( $tab['show_in_menu'] ) ) {
+				continue;
+			}
+
+			add_submenu_page(
+				$this->plugin_slug,
+				$tab['title'],
+				$tab['title'],
+				'manage_options',
+				$this->plugin_slug . '&tab=' . $this->get_tab_slug( $tab['id'] ),
+				array( $this, 'plugin_page' )
+			);
+		}
+
+		// WordPress adds a copy of the parent as the first submenu item; the
+		// first tab is already registered above.
+		remove_submenu_page( $this->plugin_slug, $this->plugin_slug );
+	}
+
+	/**
+	 * Point WordPress at the submenu item matching the active tab.
+	 *
+	 * Submenu slugs carry a query argument, which the core highlighting does
+	 * not account for, so without this every tab lights up the first item.
+	 *
+	 * @param string|null $submenu_file Current submenu file.
+	 *
+	 * @return string|null
+	 */
+	public function highlight_current_submenu( $submenu_file ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! $screen || $screen->id !== 'toplevel_page_' . $this->plugin_slug ) {
+			return $submenu_file;
+		}
+
+		return $this->plugin_slug . '&tab=' . $this->get_tab_slug( $this->get_current_tab() );
+	}
+
+	/**
+	 * Show the plugin header with logo, name and version.
+	 *
+	 * Kept separate from plugin_page() so other screens — the log page —
+	 * can render the same header.
+	 */
+	public function show_header() {
+		?>
+		<div class="wposa-header">
+			<div class="wposa-header--left">
+				<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/logo.svg' ) ); ?>" width="80" alt="" />
+			</div>
+			<div class="wposa-header--center">
+				<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
+				<div class="wposa-version"><?php esc_html_e( 'Version' ); ?>: <?php echo esc_html( $this->plugin_version ); ?></div>
+			</div>
+			<div class="wposa-header--right">
+				<p><?php esc_html_e( 'ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
+			</div>
+		</div>
+		<?php
 	}
 
 	public function plugin_page() {
 		?>
 		<div class="wposa">
-			<div class="wposa-header">
-				<div class="wposa-header--left">
-					<img class="wposa-logo" title="ReCrawler" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/icons/logo.svg' ) ); ?>" width="80" alt="" />
-				</div>
-				<div class="wposa-header--center">
-					<div class="wposa-heading"><?php echo esc_html( $this->plugin_name ); ?></div>
-					<div class="wposa-version"><?php esc_html_e( 'Version' ); ?>: <?php echo esc_html( $this->plugin_version )?></div>
-				</div>
-				<div class="wposa-header--right">
-					<p><?php esc_html_e( 'ReCrawler is a small WordPress Plugin for quickly notifying search engines whenever their website content is created, updated, or deleted.', 'recrawler' ); ?></p>
-				</div>
-			</div>
+			<?php $this->show_header(); ?>
 			<?php $this->show_navigation(); ?>
 			<div class="wposa__grid">
 				<div class="wposa__column">
@@ -1100,11 +1222,99 @@ class WPOSA {
 	}
 
 	/**
+	 * Add a navigation link to a separate admin page of the plugin.
+	 *
+	 * Unlike a tab it holds no fields: the page renders itself and only
+	 * borrows the header and the tab strip.
+	 *
+	 * @param array $link ['page' => admin page slug, 'title' => label].
+	 *
+	 * @return $this
+	 */
+	public function add_nav_link( array $link ) {
+		$this->nav_links[] = $link;
+
+		return $this;
+	}
+
+	/**
+	 * Whether the settings page itself is being displayed.
+	 *
+	 * @return bool
+	 */
+	public function is_settings_page(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		return $page === $this->plugin_slug;
+	}
+
+	/**
+	 * Get the id of the tab being displayed.
+	 *
+	 * Falls back to the first tab when the query holds nothing usable, so a
+	 * bookmark to a removed tab still opens a working page.
+	 *
+	 * @return string Prefixed tab id.
+	 */
+	public function get_current_tab(): string {
+		$first = $this->tabs_array[0]['id'] ?? '';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['tab'] ) ) {
+			return $first;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$requested = $this->get_prefix() . '_' . sanitize_key( wp_unslash( $_GET['tab'] ) );
+
+		foreach ( $this->tabs_array as $tab ) {
+			if ( $tab['id'] === $requested ) {
+				return $requested;
+			}
+		}
+
+		return $first;
+	}
+
+	/**
+	 * Build the admin URL of a tab.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return string
+	 */
+	public function get_tab_url( string $tab_id ): string {
+		return admin_url(
+			sprintf(
+				'admin.php?page=%1$s&tab=%2$s',
+				$this->plugin_slug,
+				$this->get_tab_slug( $tab_id )
+			)
+		);
+	}
+
+	/**
+	 * Strip the prefix off a tab id.
+	 *
+	 * @param string $tab_id Prefixed tab id.
+	 *
+	 * @return string
+	 */
+	public function get_tab_slug( string $tab_id ): string {
+		return str_replace( $this->get_prefix() . '_', '', $tab_id );
+	}
+
+	/**
 	 * Show navigations as tab
 	 *
 	 * Shows all the settings section labels as tab
 	 */
 	function show_navigation() {
+		// Off the settings page none of the tabs is active: a separate page,
+		// such as the log, highlights its own link instead.
+		$current = $this->is_settings_page() ? $this->get_current_tab() : '';
+
 		$html = sprintf(
 			'<nav class="nav-tab-wrapper" aria-label="%s">',
 			esc_html__( 'Secondary Navigation', 'recrawler' )
@@ -1118,8 +1328,27 @@ class WPOSA {
 					$html .= sprintf( '<span class="nav-tab wposa-nav-tab wposa-nav-tab--disabled" id="%1$s-tab">%2$s</span>', $tab['id'], $tab['title'] );
 				}
 			} else {
-				$html .= sprintf( '<a href="#%1$s" class="nav-tab" id="%1$s-tab">%2$s</a>', $tab['id'], $tab['title'] );
+				$html .= sprintf(
+					'<a href="%1$s" class="nav-tab%4$s" id="%2$s-tab">%3$s</a>',
+					esc_url( $this->get_tab_url( $tab['id'] ) ),
+					$tab['id'],
+					$tab['title'],
+					$tab['id'] === $current ? ' nav-tab-active' : ''
+				);
 			}
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		foreach ( $this->nav_links as $link ) {
+			$html .= sprintf(
+				'<a href="%1$s" class="nav-tab%3$s" id="%4$s-tab">%2$s</a>',
+				esc_url( admin_url( 'admin.php?page=' . $link['page'] ) ),
+				$link['title'],
+				$page === $link['page'] ? ' nav-tab-active' : '',
+				$link['page']
+			);
 		}
 
 		$html .= '</nav>';
@@ -1140,9 +1369,13 @@ class WPOSA {
 			'attributes'   => null,
 			'reset_button' => true,
 		);
+
+		// Only the tab named in the query is rendered; the rest are separate URLs.
+		$current = $this->get_current_tab();
 		?>
 		<div class="metabox-holder">
 			<?php foreach ( $this->tabs_array as $form ) : ?>
+				<?php if ( $form['id'] !== $current ) { continue; } ?>
 				<?php
 				$form = wp_parse_args( $form, $default );
 				?>

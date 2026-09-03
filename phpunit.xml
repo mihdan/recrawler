@@ -1,15 +1,8 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 bootstrap="tests/phpunit/bootstrap.php"
-		 colors="true"
-		 convertErrorsToExceptions="true"
-		 convertNoticesToExceptions="true"
-		 convertWarningsToExceptions="true"
-		 beStrictAboutTestsThatDoNotTestAnything="false"
-		 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd">
-	<testsuites>
-		<testsuite name="recrawler-tests">
-			<directory suffix=".php" phpVersion="8.1" phpVersionOperator=">=">./tests/phpunit</directory>
-		</testsuite>
-	</testsuites>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/phpunit/bootstrap.php" colors="true" beStrictAboutTestsThatDoNotTestAnything="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+  <testsuites>
+    <testsuite name="recrawler-tests">
+      <directory suffix=".php" phpVersion="8.1" phpVersionOperator="&gt;=">./tests/phpunit</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

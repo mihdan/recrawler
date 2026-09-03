@@ -317,6 +317,14 @@ class Main {
 			[ $this, 'render_log_page' ]
 		);
 
+		// The log lives on its own page, so it joins the tab strip as a link.
+		$this->wposa->add_nav_link(
+			[
+				'page'  => RECRAWLER_SLUG . '-log',
+				'title' => __( 'Log', 'recrawler' ),
+			]
+		);
+
 		add_action(
 			"load-$hook",
 			function () {
@@ -331,8 +339,13 @@ class Main {
 	public function render_log_page() {
 		?>
 		<div class="wrap">
-			<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-			<form action="" method="post">
+			<div class="wposa">
+				<?php
+				$this->wposa->show_header();
+				$this->wposa->show_navigation();
+				?>
+			</div>
+			<form action="<?php echo esc_url( admin_url( 'admin.php?page=' . RECRAWLER_SLUG . '-log' ) ); ?>" method="post">
 				<?php
 				/**
 				 * WP_List_table.
@@ -368,6 +381,6 @@ class Main {
 	}
 
 	private function is_logging_enabled(): bool {
-		return $this->wposa->get_option( 'enable', 'logs', 'on' ) === 'on';
+		return $this->wposa->get_option( 'enable', 'general', 'on' ) === 'on';
 	}
 }

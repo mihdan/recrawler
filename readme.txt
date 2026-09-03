@@ -2,10 +2,10 @@
 Contributors: mihdan
 Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
-Requires at least: 6.0
+Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 0.3.4
-Requires PHP: 8.1
+Stable tag: 1.0.0
+Requires PHP: 8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -151,6 +151,30 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 1.0.0 (03.09.2026) =
+
+**Ломающие изменения**
+
+* Минимальная версия PHP поднята до 8.2
+* Минимальная версия WordPress поднята до 6.4
+
+**Интерфейс**
+
+* Единая шапка и полоса вкладок на всех страницах плагина, включая «Журнал»
+* У вкладок появились собственные адреса: на них можно ссылаться, работает кнопка «Назад»
+* Все разделы продублированы отдельными пунктами левого меню
+* Настройки уведомлений выделены секцией «Уведомления», настройки журнала — секцией «Журнал» внутри «Общего»
+* Журнал добавлен в полосу вкладок отдельной ссылкой
+* Предупреждение о несохранённых настройках при уходе со страницы
+* Сообщение в админке, если зависимости плагина не собраны — раньше он в этом случае молча ничего не делал
+
+**Внутреннее**
+
+* Тестовый стек обновлён: PHPUnit 10.5, Codeception 5, wp-browser 4.7, Psalm 5.26
+* Добавлен второй раннер тестов — Testo
+* Удалены неиспользуемые dev-зависимости: wp_mock, function-mocker, brain/monkey
+* Сборка и публикация в CI разделены на отдельные джобы
 
 = 0.3.4 (03.09.2026) =
 * Исправлено бесконечное перепланирование обновления токена Яндекс.Вебмастер на каждой загрузке админки, из-за которого журнал заполнялся записями и ошибками `expired_token`
