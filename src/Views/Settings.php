@@ -310,7 +310,7 @@ class Settings {
 				'placeholder' => __( 'Set the API key', 'recrawler' ),
 				'default'     => Utils::generate_key(),
 				'help_tab'    => 'index_now_api_key',
-				'desc'        => sprintf( '<a style="border-bottom: 1px dotted #2271b1; text-decoration: none; margin-left: 10px;" href="#" onclick="document.getElementById(\'recrawler_index_now[api_key]\').value=\'%s\'">%s</a>', esc_attr( Utils::generate_key() ), __( 'Show example', 'recrawler' ) ),
+				'desc'        => sprintf( '<a class="recrawler-example-link" href="#" onclick="document.getElementById(\'recrawler_index_now[api_key]\').value=\'%s\'">%s</a>', esc_attr( Utils::generate_key() ), __( 'Show example', 'recrawler' ) ),
 			)
 		);
 

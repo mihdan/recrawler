@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,6 +151,15 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 1.0.1 (04.09.2026) =
+
+**Интерфейс**
+
+* Ползунок переключателей снова белый — раньше во включённом состоянии он сливался с заливкой
+* Акцентные цвета плагина следуют цветовой схеме админки, выбранной в профиле пользователя
+* Схеме подчиняются и ссылки в интерфейсе плагина — звёзды рейтинга, карточки сайдбара, описания полей
+* У страницы «Журнал» появился заголовок, как на остальных страницах плагина, и одинаковые с ними отступы
 
 = 1.0.0 (03.09.2026) =
 

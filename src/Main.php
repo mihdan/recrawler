@@ -344,18 +344,23 @@ class Main {
 				$this->wposa->show_header();
 				$this->wposa->show_navigation();
 				?>
+				<div class="metabox-holder">
+					<div class="wposa__group">
+						<h2><?php esc_html_e( 'Log', 'recrawler' ); ?></h2>
+						<form action="<?php echo esc_url( admin_url( 'admin.php?page=' . RECRAWLER_SLUG . '-log' ) ); ?>" method="post">
+							<?php
+							/**
+							 * WP_List_table.
+							 *
+							 * @var WP_List_Table $table
+							 */
+							$table = $GLOBALS[ RECRAWLER_PREFIX . '_log' ];
+							$table->display();
+							?>
+						</form>
+					</div>
+				</div>
 			</div>
-			<form action="<?php echo esc_url( admin_url( 'admin.php?page=' . RECRAWLER_SLUG . '-log' ) ); ?>" method="post">
-				<?php
-				/**
-				 * WP_List_table.
-				 *
-				 * @var WP_List_Table $table
-				 */
-				$table = $GLOBALS[ RECRAWLER_PREFIX . '_log' ];
-				$table->display();
-				?>
-			</form>
 		</div>
 		<?php
 	}
