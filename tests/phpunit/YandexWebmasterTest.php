@@ -100,6 +100,21 @@ class YandexWebmasterTest extends TestCase {
 		$this->assertFalse($provider->is_enabled());
 	}
 
+	public function test_get_settings_url_points_at_the_yandex_tab() {
+		$this->wposa->method('get_prefix')->willReturn('recrawler');
+		$this->wposa->expects($this->once())
+			->method('get_tab_url')
+			->with('recrawler_yandex_webmaster')
+			->willReturn('https://example.com/wp-admin/admin.php?page=recrawler&tab=yandex_webmaster');
+
+		$provider = new YandexWebmaster($this->logger, $this->wposa);
+
+		$this->assertSame(
+			'https://example.com/wp-admin/admin.php?page=recrawler&tab=yandex_webmaster',
+			$provider->get_settings_url()
+		);
+	}
+
 	public function test_setup_hooks_registers_actions() {
 		$this->wposa->method('get_option')->willReturn('on');
 
