@@ -4,7 +4,7 @@ Donate link: https://www.kobzarev.com/donate/
 Tags: indexnow, yandex, bing, google, seo
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires PHP: 8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -151,6 +151,11 @@ Yes, when sitemaps are an easy way for webmasters to inform search engines about
 See the documentation available from each search engine for more details about ReCrawler.
 
 == Changelog ==
+
+= 1.0.1 (04.09.2026) =
+
+* Акцентные цвета плагина следуют цветовой схеме админки, выбранной в профиле пользователя
+* После получения токена Yandex API возвращает на вкладку «Yandex API», а не на «General»
 
 = 1.0.0 (03.09.2026) =
 

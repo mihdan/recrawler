@@ -31,6 +31,18 @@ class YandexWebmaster extends WebmasterAbstract {
 		return __( 'Yandex Webmaster', 'recrawler' );
 	}
 
+	/**
+	 * Get the URL of the tab this provider is configured on.
+	 *
+	 * Tabs live on their own URLs, so a redirect back has to name the tab —
+	 * without it the user lands on the first one.
+	 *
+	 * @return string
+	 */
+	public function get_settings_url(): string {
+		return $this->wposa->get_tab_url( $this->wposa->get_prefix() . '_yandex_webmaster' );
+	}
+
 	public function get_token(): string {
 		return $this->wposa->get_option( 'access_token', 'yandex_webmaster' );
 	}
@@ -135,13 +147,7 @@ class YandexWebmaster extends WebmasterAbstract {
 				}
 			}
 
-			wp_safe_redirect(
-				add_query_arg(
-					'page',
-					Utils::get_plugin_slug(),
-					admin_url( 'admin.php' )
-				)
-			);
+			wp_safe_redirect( $this->get_settings_url() );
 			exit;
 		}
 	}
