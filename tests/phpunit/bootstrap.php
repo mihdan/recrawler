@@ -380,6 +380,14 @@ if ( ! function_exists( 'aioseo' ) ) {
                     public function has( $key, $flag = true ) {
                         return null !== _get_seo_stub( 'aioseo_post_type_noindex' );
                     }
+                    public function all() {
+                        $noindex = _get_seo_stub( 'aioseo_post_type_noindex' );
+
+                        return [
+                            'default' => (bool) _get_seo_stub( 'aioseo_post_type_default', false ),
+                            'noindex' => (bool) $noindex,
+                        ];
+                    }
                     public function __call( $name, $args ) {
                         return (bool) _get_seo_stub( 'aioseo_post_type_noindex', false );
                     }

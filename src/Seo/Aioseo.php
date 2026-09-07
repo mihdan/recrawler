@@ -76,6 +76,14 @@ class Aioseo implements SeoPluginInterface {
 			return null;
 		}
 
-		return (bool) $options->robotsMeta->noindex();
+		$robots_meta = $options->robotsMeta->all();
+
+		// A post type set to defaults defers to the plugin's global robots meta,
+		// which has no stable public API — better undetermined than wrong.
+		if ( ! is_array( $robots_meta ) || ! empty( $robots_meta['default'] ) ) {
+			return null;
+		}
+
+		return ! empty( $robots_meta['noindex'] );
 	}
 }

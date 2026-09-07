@@ -52,6 +52,17 @@ final class SeoAioseoTest
         Assert::true((new Aioseo())->is_post_noindex(42));
     }
 
+    public function postTypeOnDefaultsIsUndetermined(): void
+    {
+        _reset_wp_mocks();
+        $this->stubPost();
+        _set_seo_stub('aioseo_meta', (object) ['robots_default' => true, 'robots_noindex' => false]);
+        _set_seo_stub('aioseo_post_type_noindex', true);
+        _set_seo_stub('aioseo_post_type_default', true);
+
+        Assert::null((new Aioseo())->is_post_noindex(42));
+    }
+
     public function treatsMissingMetaAsUndetermined(): void
     {
         _reset_wp_mocks();

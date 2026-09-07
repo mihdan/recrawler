@@ -48,6 +48,14 @@ class AioseoTest extends TestCase {
 		$this->assertTrue( ( new Aioseo() )->is_post_noindex( 42 ) );
 	}
 
+	public function test_post_type_on_defaults_is_undetermined() {
+		_set_seo_stub( 'aioseo_meta', (object) [ 'robots_default' => true, 'robots_noindex' => false ] );
+		_set_seo_stub( 'aioseo_post_type_noindex', true );
+		_set_seo_stub( 'aioseo_post_type_default', true );
+
+		$this->assertNull( ( new Aioseo() )->is_post_noindex( 42 ) );
+	}
+
 	public function test_missing_meta_is_undetermined() {
 		_set_seo_stub( 'aioseo_meta', null );
 
