@@ -357,6 +357,7 @@ $GLOBALS['wpdb'] = new class {
 };
 
 require_once __DIR__ . '/stubs/rank-math.php';
+require_once __DIR__ . '/stubs/the-seo-framework.php';
 
 require_once __DIR__ . '/wp-functions.php';
 
