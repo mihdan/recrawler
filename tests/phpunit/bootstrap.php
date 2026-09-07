@@ -327,6 +327,28 @@ if (!function_exists('function_exists')) {
     // cannot override built-in
 }
 
+if ( ! function_exists( 'YoastSEO' ) ) {
+    function YoastSEO() {
+        return new class {
+            public $meta;
+            public function __construct() {
+                $this->meta = new class {
+                    public function for_post( $post_id ) {
+                        $robots = _get_seo_stub( 'yoast_robots' );
+                        if ( 'throw' === $robots ) {
+                            throw new \RuntimeException( 'Yoast exploded' );
+                        }
+                        if ( null === $robots ) {
+                            return null;
+                        }
+                        return (object) [ 'robots' => $robots ];
+                    }
+                };
+            }
+        };
+    }
+}
+
 $GLOBALS['wpdb'] = new class {
     public $prefix = 'wp_';
     public function prepare($sql, ...$args) { return $sql; }
