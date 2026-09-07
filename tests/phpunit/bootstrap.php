@@ -39,6 +39,7 @@ define('RECRAWLER_URL', 'https://example.com/wp-content/plugins/recrawler/');
 define('ABSPATH', '/tmp/wordpress/');
 define('HOUR_IN_SECONDS', 3600);
 define('WP_DEBUG', false);
+define('OBJECT', 'OBJECT');
 
 $GLOBALS['__wp_mock_calls'] = [];
 $GLOBALS['__wp_overrides'] = [];
@@ -285,7 +286,7 @@ if (!function_exists('add_submenu_page')) {
     }
 }
 if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4() { return '550e8400-e29b-41d4-a716-446655440000'; } }
-if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return null; } }
+if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return _call_if_overridden('get_post', $post, $output, $filter); } }
 if (!function_exists('_doing_it_wrong')) { function _doing_it_wrong($function, $message, $version) {} }
 if (!function_exists('delete_option')) { function delete_option($option) { _track_wp_mock('delete_option'); $r = _call_if_overridden('delete_option', $option); return $r ?? true; } }
 if (!function_exists('switch_to_blog')) { function switch_to_blog($blog_id) {} }
@@ -342,6 +343,45 @@ if ( ! function_exists( 'YoastSEO' ) ) {
                             return null;
                         }
                         return (object) [ 'robots' => $robots ];
+                    }
+                };
+            }
+        };
+    }
+}
+
+if ( ! function_exists( 'aioseo' ) ) {
+    function aioseo() {
+        return new class {
+            public $meta;
+            public $dynamicOptions;
+            public function __construct() {
+                $this->meta = new class {
+                    public $metaData;
+                    public function __construct() {
+                        $this->metaData = new class {
+                            public function getMetaData( $post ) {
+                                $meta = _get_seo_stub( 'aioseo_meta' );
+                                if ( 'throw' === $meta ) {
+                                    throw new \RuntimeException( 'AIOSEO exploded' );
+                                }
+                                return $meta;
+                            }
+                        };
+                    }
+                };
+                $this->dynamicOptions = new class {
+                    public function noConflict( $flag = false ) {
+                        return $this;
+                    }
+                    public function __get( $name ) {
+                        return $this;
+                    }
+                    public function has( $key, $flag = true ) {
+                        return null !== _get_seo_stub( 'aioseo_post_type_noindex' );
+                    }
+                    public function __call( $name, $args ) {
+                        return (bool) _get_seo_stub( 'aioseo_post_type_noindex', false );
                     }
                 };
             }
