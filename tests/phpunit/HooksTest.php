@@ -295,7 +295,11 @@ class HooksTest extends TestCase {
 
 	public function test_post_updated_skips_noindex_post() {
 		$this->setup_defaults();
-		$this->wposa->method( 'get_option' )->willReturn( [ 'post' ] );
+		$this->wposa->method( 'get_option' )->willReturnCallback(
+			function ( $option, $section = '', $default = '' ) {
+				return 'post_types' === $option ? [ 'post' ] : 'on';
+			}
+		);
 
 		$hooks           = new Hooks( $this->wposa, $this->indexability( false ) );
 		$do_action_calls = [];
