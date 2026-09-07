@@ -42,10 +42,20 @@ define('WP_DEBUG', false);
 
 $GLOBALS['__wp_mock_calls'] = [];
 $GLOBALS['__wp_overrides'] = [];
+$GLOBALS['__seo_stubs'] = [];
+
+function _set_seo_stub( $key, $value ) {
+    $GLOBALS['__seo_stubs'][ $key ] = $value;
+}
+
+function _get_seo_stub( $key, $default = null ) {
+    return array_key_exists( $key, $GLOBALS['__seo_stubs'] ) ? $GLOBALS['__seo_stubs'][ $key ] : $default;
+}
 
 function _reset_wp_mocks() {
     $GLOBALS['__wp_mock_calls'] = [];
     $GLOBALS['__wp_overrides'] = [];
+    $GLOBALS['__seo_stubs'] = [];
     $GLOBALS['__wp_settings_sections'] = [];
     $GLOBALS['__wp_settings_fields'] = [];
     $GLOBALS['__wp_registered_settings'] = [];
