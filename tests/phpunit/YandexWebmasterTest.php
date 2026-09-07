@@ -115,6 +115,40 @@ class YandexWebmasterTest extends TestCase {
 		);
 	}
 
+	public function test_schedule_ping_uses_only_the_selected_host() {
+		$this->wposa->method('get_option')->willReturnMap([
+			['host_id', 'yandex_webmaster', '', 'https:www.kobzarev.com:443'],
+			['host_ids', 'yandex_webmaster', '', serialize(['https:kobzarev.com:443', 'https:www.kobzarev.com:443', 'https:example.com:443'])],
+		]);
+
+		$scheduled = [];
+		_set_wp_override('as_enqueue_async_action', static function ($hook, $args = [], $group = '') use (&$scheduled) {
+			$scheduled[] = ['hook' => $hook, 'args' => $args];
+			return 1;
+		});
+
+		(new YandexWebmaster($this->logger, $this->wposa))->schedule_ping(42);
+
+		$this->assertCount(1, $scheduled);
+		$this->assertSame('recrawler/webmaster/ping/yandex-webmaster', $scheduled[0]['hook']);
+		$this->assertSame(42, $scheduled[0]['args']['post_id']);
+		$this->assertSame('https:www.kobzarev.com:443', $scheduled[0]['args']['host_id']);
+	}
+
+	public function test_schedule_ping_does_nothing_without_a_selected_host() {
+		$this->wposa->method('get_option')->willReturn('');
+
+		$scheduled = [];
+		_set_wp_override('as_enqueue_async_action', static function ($hook, $args = [], $group = '') use (&$scheduled) {
+			$scheduled[] = $hook;
+			return 1;
+		});
+
+		(new YandexWebmaster($this->logger, $this->wposa))->schedule_ping(42);
+
+		$this->assertSame([], $scheduled);
+	}
+
 	public function test_setup_hooks_registers_actions() {
 		$this->wposa->method('get_option')->willReturn('on');
 

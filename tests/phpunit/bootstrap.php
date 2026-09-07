@@ -282,6 +282,16 @@ if (!function_exists('switch_to_blog')) { function switch_to_blog($blog_id) {} }
 if (!function_exists('restore_current_blog')) { function restore_current_blog() {} }
 if (!function_exists('get_sites')) { function get_sites($args = []) { return []; } }
 if (!function_exists('wp_list_pluck')) { function wp_list_pluck($list, $field, $index_key = null) { return []; } }
+if (!function_exists('is_serialized')) {
+    function is_serialized($data, $strict = true) {
+        return is_string($data) && preg_match('/^[aOs]:\d+:/', $data) === 1;
+    }
+}
+if (!function_exists('maybe_unserialize')) {
+    function maybe_unserialize($data) {
+        return is_serialized($data) ? @unserialize($data) : $data;
+    }
+}
 if (!function_exists('get_post_types')) { function get_post_types($args = [], $output = 'names', $operator = 'and') { $r = _call_if_overridden('get_post_types', $args, $output, $operator); return $r ?? []; } }
 if (!function_exists('get_taxonomies')) { function get_taxonomies($args = [], $output = 'names', $operator = 'and') { $r = _call_if_overridden('get_taxonomies', $args, $output, $operator); return $r ?? []; } }
 if (!function_exists('add_thickbox')) { function add_thickbox() {} }
