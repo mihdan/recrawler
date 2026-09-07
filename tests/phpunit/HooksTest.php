@@ -25,6 +25,13 @@ class HooksTest extends TestCase {
 		return $comment;
 	}
 
+	private function indexability( bool $indexable ) {
+		$mock = $this->createMock( \Mihdan\ReCrawler\Seo\Indexability::class );
+		$mock->method( 'is_post_indexable' )->willReturn( $indexable );
+
+		return $mock;
+	}
+
 	private function setup_defaults() {
 		_reset_wp_mocks();
 		_set_wp_override('wp_is_post_revision', function () { return false; });
@@ -50,7 +57,7 @@ class HooksTest extends TestCase {
 			->with('ping_delay', 'general', 60)
 			->willReturn(120);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 
 		$ref = new \ReflectionProperty(Hooks::class, 'ping_delay');
 		$ref->setAccessible(true);
@@ -60,7 +67,7 @@ class HooksTest extends TestCase {
 
 	public function test_setup_hooks_registers_all_hooks() {
 		$this->setup_defaults();
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		_expect_wp_mock('add_action', 4);
 
 		$hooks->setup_hooks();
@@ -80,7 +87,7 @@ class HooksTest extends TestCase {
 			['ping_on_post', 'general', 'on', 'on'],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
 			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
@@ -98,7 +105,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
 			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
@@ -115,7 +122,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
 			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
@@ -133,7 +140,7 @@ class HooksTest extends TestCase {
 			['ping_on_post', 'general', 'on', 'on'],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$post = $this->make_post();
 
 		$do_action_calls = [];
@@ -157,7 +164,7 @@ class HooksTest extends TestCase {
 			['ping_on_post_updated', 'general', 'on', 'on'],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$post = $this->make_post();
 
 		$do_action_calls = [];
@@ -181,7 +188,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
 			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
@@ -197,7 +204,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$comment = $this->make_comment();
 
 		$do_action_calls = [];
@@ -215,7 +222,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$comment = $this->make_comment(1, 0, 1);
 
 		$do_action_calls = [];
@@ -233,7 +240,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$comment = $this->make_comment(1, 1, 5);
 
 		$do_action_calls = [];
@@ -254,7 +261,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
@@ -276,7 +283,7 @@ class HooksTest extends TestCase {
 			['ping_delay', 'general', 60, 60],
 		]);
 
-		$hooks = new Hooks($this->wposa);
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
 		$do_action_calls = [];
 		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
 			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
@@ -284,5 +291,34 @@ class HooksTest extends TestCase {
 
 		$hooks->term_updated(10, 20, 'category');
 		$this->assertEmpty($do_action_calls);
+	}
+
+	public function test_post_updated_skips_noindex_post() {
+		$this->setup_defaults();
+		$this->wposa->method( 'get_option' )->willReturn( [ 'post' ] );
+
+		$hooks           = new Hooks( $this->wposa, $this->indexability( false ) );
+		$do_action_calls = [];
+		_set_wp_override( 'do_action', function ( $tag, ...$args ) use ( &$do_action_calls ) {
+			$do_action_calls[] = $tag;
+		} );
+
+		$hooks->post_updated( 'publish', 'draft', $this->make_post() );
+
+		$this->assertEmpty( $do_action_calls );
+	}
+
+	public function test_comment_updated_skips_noindex_post() {
+		$this->setup_defaults();
+
+		$hooks           = new Hooks( $this->wposa, $this->indexability( false ) );
+		$do_action_calls = [];
+		_set_wp_override( 'do_action', function ( $tag, ...$args ) use ( &$do_action_calls ) {
+			$do_action_calls[] = $tag;
+		} );
+
+		$hooks->comment_updated( 'approved', 'hold', $this->make_comment( 1, 1, 7 ) );
+
+		$this->assertEmpty( $do_action_calls );
 	}
 }

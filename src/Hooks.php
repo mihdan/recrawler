@@ -7,6 +7,7 @@
 
 namespace Mihdan\ReCrawler;
 
+use Mihdan\ReCrawler\Seo\Indexability;
 use Mihdan\ReCrawler\Views\WPOSA;
 use WP_Post;
 use WP_Comment;
@@ -30,13 +31,22 @@ class Hooks {
 	private int $ping_delay;
 
 	/**
-	 * Hooks constructor.
+	 * Indexability checker.
 	 *
-	 * @param WPOSA $wposa WPOSA instance.
+	 * @var Indexability $indexability
 	 */
-	public function __construct( WPOSA $wposa ) {
-		$this->wposa      = $wposa;
-		$this->ping_delay = (int) $this->wposa->get_option( 'ping_delay', 'general', 60 );
+	private Indexability $indexability;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param WPOSA        $wposa        WPOSA instance.
+	 * @param Indexability $indexability Indexability checker.
+	 */
+	public function __construct( WPOSA $wposa, Indexability $indexability ) {
+		$this->wposa        = $wposa;
+		$this->indexability = $indexability;
+		$this->ping_delay   = (int) $this->wposa->get_option( 'ping_delay', 'general', 60 );
 	}
 
 	/**
@@ -113,6 +123,10 @@ class Hooks {
 			return;
 		}
 
+		if ( ! $this->indexability->is_post_indexable( $post->ID ) ) {
+			return;
+		}
+
 		if ( ! in_array( $post->post_type, (array) $this->wposa->get_option( 'post_types', 'general', [] ), true ) ) {
 			return;
 		}
@@ -176,6 +190,10 @@ class Hooks {
 		}
 
 		if ( $new_status !== 'approved' ) {
+			return;
+		}
+
+		if ( ! $this->indexability->is_post_indexable( (int) $comment->comment_post_ID ) ) {
 			return;
 		}
 
