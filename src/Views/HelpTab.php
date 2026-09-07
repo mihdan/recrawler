@@ -200,9 +200,7 @@ class HelpTab {
 					<p>On the <b>Create service account</b> screen, enter a name and description for the newly created service account.</p>
 					<p>Select and copy the whole <b>Service Account ID</b> (the one that looks like an email address) because you will need it later. Then, click on the <b>Create</b> button at the bottom:</p>
 					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/indexing-api-service-account-information-2.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>Click Create and Continue to proceed to the next step, where you need to change the role to Owner and, as you might’ve guessed, click continue once again…</p>
-					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/set-service-account-permissions-owner.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>Once you’ve set the role to <b>Owner</b> as shown above, simply click continue to save that change and then click done.</p>
+					<p>Click <b>Create and Continue</b>. The next step offers to grant this service account access to the project — skip it, the Indexing API needs no project roles. Click <b>Continue</b> and then <b>Done</b>.</p>
 					<p>You will then be able to download the file that contains your <b>API key</b>. To do so, simply click the three vertical dots in the <b>Actions</b> column, and then select <b>Manage keys</b> as shown below:</p>
 					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/manage-api-keys-google.jpg' ) ); ?>" width="100%"  alt=""/></p>
 					<p>You will then be taken to the following page when you can click <b>Add Key</b> and then select the <b>Create new key</b> option, as shown below:</p>
@@ -213,15 +211,10 @@ class HelpTab {
 
 					<h3 id="add-the-service-account-as-an-owner-of-your-google-search-console-property">1.3 Add the Service Account as an owner of your Google Search Console Property</h3>
 					<p>To do this, you’ll need to register and verify your website with the Google Search Console (if you haven’t done so already) which is super easy: just follow the <a href="https://support.google.com/webmasters/answer/9008080" target="_blank">recommended steps</a> to verify ownership of your property.</p>
-					<p>After verifying your property, open the <a href="https://search.google.com/search-console" target="_blank">Google Search Console</a>, select your property on the left (if prompted), and then click on <b>Settings</b> near the bottom:</p>
-					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/Open-settings-in-Google-search-console.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>Click on <b>Users and Permissions</b>:</p>
-					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/Choose-Users-and-Permissions-in-Google-Search-Console-settings.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>Click on the three dots next to your account, and then click on <b>Add User</b>.</p>
-					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/Add-User-in-Users-and-Permissions.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>A popup will now appear. Enter the <b>Service account ID</b> (the one you copied out earlier) in the <b>Email address</b> field. Ensure that you’ve provided <b>Owner</b> level <b>Permission</b> and then click <b>Add</b>.</p>
-					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/Add-service-account-ID-as-owner.jpg' ) ); ?>" width="100%"  alt=""/></p>
-					<p>Now in a few moments, you should see the Service account listed as a new Owner.</p>
+					<p>After verifying your property, open the <a href="https://www.google.com/webmasters/verification/home" target="_blank">ownership verification page</a> and click the property you have just verified.</p>
+					<p>In the <b>Verified owner</b> list click <b>Add an owner</b>, paste the <b>Service Account ID</b> you copied earlier and confirm. The service account is now a delegated owner of the property.</p>
+					<p><b>Do not</b> add it through <b>Settings → Users and permissions → Add user</b>: that dialog only accepts Google accounts and rejects a service account address with <b>email not found</b>.</p>
+					<p>Both <b>Domain</b> and <b>URL-prefix</b> properties work for this. Google documents the whole procedure under <a href="https://developers.google.com/search/apis/indexing-api/v3/prereqs" target="_blank">Indexing API prerequisites</a>.</p>
 					<p><img class="wposa-img" src="<?php echo esc_url( Utils::get_plugin_asset_url( 'images/Google-Service-account-added-to-Google-Search-Console-users.jpg' ) ); ?>" width="100%"  alt=""/></p>
 					<p>You can use a single <b>Project</b>, <b>Service Account</b>, and <b>JSON API Key</b> across multiple sites, just make sure that the Service Account is added as Owner for all the sites in the Search Console.</p>
 

@@ -231,6 +231,7 @@ class Settings {
 				'section' => 'notify',
 				'type'    => 'switch',
 				'name'    => __( 'Disable for Bulk Edit', 'recrawler' ),
+				'desc'    => __( 'Skip notifications when posts are edited in bulk from the posts list. Turn this off if you publish drafts in batches and want them submitted too — keep an eye on your API quotas, every post in the batch is sent. Quick Edit, the REST API and programmatic updates are not affected by this setting.', 'recrawler' ),
 				'default' => 'on',
 			)
 		);

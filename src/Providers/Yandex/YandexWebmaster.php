@@ -219,23 +219,19 @@ class YandexWebmaster extends WebmasterAbstract {
 	 * @link https://yandex.com/dev/webmaster/doc/dg/reference/host-recrawl-post.html
 	 */
 	public function schedule_ping( int $post_id ) {
-		$host_ids = $this->wposa->get_option( 'host_ids', 'yandex_webmaster' );
+		$host_id = $this->get_host_id();
 
-		if ( empty( $host_ids ) ) {
+		if ( empty( $host_id ) ) {
 			return;
 		}
 
-		$host_ids_array = maybe_unserialize( $host_ids );
-
-		foreach ( $host_ids_array as $host_id ) {
-			ActionScheduler::async(
-				'recrawler/webmaster/ping/' . $this->get_slug(),
-				[
-					'post_id' => $post_id,
-					'host_id' => $host_id,
-				]
-			);
-		}
+		ActionScheduler::async(
+			'recrawler/webmaster/ping/' . $this->get_slug(),
+			[
+				'post_id' => $post_id,
+				'host_id' => $host_id,
+			]
+		);
 	}
 
 	/**
