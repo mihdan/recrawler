@@ -356,5 +356,7 @@ $GLOBALS['wpdb'] = new class {
     public function insert($table, $data, $format = null) { return true; }
 };
 
+require_once __DIR__ . '/stubs/rank-math.php';
+
 require_once __DIR__ . '/wp-functions.php';
 
