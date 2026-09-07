@@ -34,4 +34,12 @@ final class SeoYoastTest
 
         Assert::null((new Yoast())->is_post_noindex(42));
     }
+
+    public function treatsMissingPresentationAsUndetermined(): void
+    {
+        _reset_wp_mocks();
+        _set_seo_stub('yoast_robots', null);
+
+        Assert::null((new Yoast())->is_post_noindex(42));
+    }
 }
