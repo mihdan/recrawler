@@ -25,6 +25,9 @@ node_modules/
 .phpcs.cache
 
 /vendor/
+/vendor-prefixed/
+/.superpowers/
+/php-scoper/vendor/
 
 # dev-env and such
 /custom/*
@@ -39,3 +42,9 @@ node_modules/
 # PHPUnit caches
 .phpunit.cache/
 .phpunit.result.cache
+
+.idea/
+.yarn/
+.vscode/
+.qwen/
+.serena/
