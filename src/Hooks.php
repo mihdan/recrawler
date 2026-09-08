@@ -7,6 +7,7 @@
 
 namespace Mihdan\ReCrawler;
 
+use Mihdan\ReCrawler\Seo\Indexability;
 use Mihdan\ReCrawler\Views\WPOSA;
 use WP_Post;
 use WP_Comment;
@@ -30,13 +31,22 @@ class Hooks {
 	private int $ping_delay;
 
 	/**
-	 * Hooks constructor.
+	 * Indexability checker.
 	 *
-	 * @param WPOSA $wposa WPOSA instance.
+	 * @var Indexability $indexability
 	 */
-	public function __construct( WPOSA $wposa ) {
-		$this->wposa      = $wposa;
-		$this->ping_delay = (int) $this->wposa->get_option( 'ping_delay', 'general', 60 );
+	private Indexability $indexability;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param WPOSA        $wposa        WPOSA instance.
+	 * @param Indexability $indexability Indexability checker.
+	 */
+	public function __construct( WPOSA $wposa, Indexability $indexability ) {
+		$this->wposa        = $wposa;
+		$this->indexability = $indexability;
+		$this->ping_delay   = (int) $this->wposa->get_option( 'ping_delay', 'general', 60 );
 	}
 
 	/**
@@ -74,6 +84,10 @@ class Hooks {
 		);
 
 		if ( ( current_time( 'timestamp' ) - $last_update ) < $this->ping_delay ) {
+			return;
+		}
+
+		if ( ! $this->indexability->is_post_indexable( (int) $comment->comment_post_ID ) ) {
 			return;
 		}
 
@@ -133,6 +147,10 @@ class Hooks {
 			return;
 		}
 
+		if ( ! $this->indexability->is_post_indexable( $post->ID ) ) {
+			return;
+		}
+
 		if ( $old_status === $new_status ) {
 			// Post updated.
 			if ( $this->wposa->get_option( 'ping_on_post_updated', 'general', 'on' ) === 'on' ) {
@@ -179,6 +197,10 @@ class Hooks {
 			return;
 		}
 
+		if ( ! $this->indexability->is_post_indexable( (int) $comment->comment_post_ID ) ) {
+			return;
+		}
+
 		do_action( 'recrawler/comment_updated', $comment->comment_post_ID, $comment );
 
 		update_comment_meta(
@@ -205,6 +227,10 @@ class Hooks {
 		);
 
 		if ( ( current_time( 'timestamp' ) - $last_update ) < $this->ping_delay ) {
+			return;
+		}
+
+		if ( ! $this->indexability->is_site_public() ) {
 			return;
 		}
 

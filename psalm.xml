@@ -16,4 +16,21 @@
     </projectFiles>
 <plugins>
 	<pluginClass class="PsalmWordPress\Plugin"/></plugins>
+    <issueHandlers>
+        <UndefinedFunction>
+            <errorLevel type="suppress">
+                <directory name="src/Seo"/>
+            </errorLevel>
+        </UndefinedFunction>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <directory name="src/Seo"/>
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <directory name="src/Seo"/>
+            </errorLevel>
+        </UndefinedDocblockClass>
+    </issueHandlers>
 </psalm>

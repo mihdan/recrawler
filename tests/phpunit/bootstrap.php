@@ -39,13 +39,24 @@ define('RECRAWLER_URL', 'https://example.com/wp-content/plugins/recrawler/');
 define('ABSPATH', '/tmp/wordpress/');
 define('HOUR_IN_SECONDS', 3600);
 define('WP_DEBUG', false);
+define('OBJECT', 'OBJECT');
 
 $GLOBALS['__wp_mock_calls'] = [];
 $GLOBALS['__wp_overrides'] = [];
+$GLOBALS['__seo_stubs'] = [];
+
+function _set_seo_stub( $key, $value ) {
+    $GLOBALS['__seo_stubs'][ $key ] = $value;
+}
+
+function _get_seo_stub( $key, $default = null ) {
+    return array_key_exists( $key, $GLOBALS['__seo_stubs'] ) ? $GLOBALS['__seo_stubs'][ $key ] : $default;
+}
 
 function _reset_wp_mocks() {
     $GLOBALS['__wp_mock_calls'] = [];
     $GLOBALS['__wp_overrides'] = [];
+    $GLOBALS['__seo_stubs'] = [];
     $GLOBALS['__wp_settings_sections'] = [];
     $GLOBALS['__wp_settings_fields'] = [];
     $GLOBALS['__wp_registered_settings'] = [];
@@ -275,7 +286,7 @@ if (!function_exists('add_submenu_page')) {
     }
 }
 if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4() { return '550e8400-e29b-41d4-a716-446655440000'; } }
-if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return null; } }
+if (!function_exists('get_post')) { function get_post($post = null, $output = OBJECT, $filter = 'raw') { return _call_if_overridden('get_post', $post, $output, $filter); } }
 if (!function_exists('_doing_it_wrong')) { function _doing_it_wrong($function, $message, $version) {} }
 if (!function_exists('delete_option')) { function delete_option($option) { _track_wp_mock('delete_option'); $r = _call_if_overridden('delete_option', $option); return $r ?? true; } }
 if (!function_exists('switch_to_blog')) { function switch_to_blog($blog_id) {} }
@@ -317,12 +328,84 @@ if (!function_exists('function_exists')) {
     // cannot override built-in
 }
 
+if ( ! function_exists( 'YoastSEO' ) ) {
+    function YoastSEO() {
+        return new class {
+            public $meta;
+            public function __construct() {
+                $this->meta = new class {
+                    public function for_post( $post_id ) {
+                        $robots = _get_seo_stub( 'yoast_robots' );
+                        if ( 'throw' === $robots ) {
+                            throw new \RuntimeException( 'Yoast exploded' );
+                        }
+                        if ( null === $robots ) {
+                            return null;
+                        }
+                        return (object) [ 'robots' => $robots ];
+                    }
+                };
+            }
+        };
+    }
+}
+
+if ( ! function_exists( 'aioseo' ) ) {
+    function aioseo() {
+        return new class {
+            public $meta;
+            public $dynamicOptions;
+            public function __construct() {
+                $this->meta = new class {
+                    public $metaData;
+                    public function __construct() {
+                        $this->metaData = new class {
+                            public function getMetaData( $post ) {
+                                $meta = _get_seo_stub( 'aioseo_meta' );
+                                if ( 'throw' === $meta ) {
+                                    throw new \RuntimeException( 'AIOSEO exploded' );
+                                }
+                                return $meta;
+                            }
+                        };
+                    }
+                };
+                $this->dynamicOptions = new class {
+                    public function noConflict( $flag = false ) {
+                        return $this;
+                    }
+                    public function __get( $name ) {
+                        return $this;
+                    }
+                    public function has( $key, $flag = true ) {
+                        return null !== _get_seo_stub( 'aioseo_post_type_noindex' );
+                    }
+                    public function all() {
+                        $noindex = _get_seo_stub( 'aioseo_post_type_noindex' );
+
+                        return [
+                            'default' => (bool) _get_seo_stub( 'aioseo_post_type_default', false ),
+                            'noindex' => (bool) $noindex,
+                        ];
+                    }
+                    public function __call( $name, $args ) {
+                        return (bool) _get_seo_stub( 'aioseo_post_type_noindex', false );
+                    }
+                };
+            }
+        };
+    }
+}
+
 $GLOBALS['wpdb'] = new class {
     public $prefix = 'wp_';
     public function prepare($sql, ...$args) { return $sql; }
     public function query($sql) { return null; }
     public function insert($table, $data, $format = null) { return true; }
 };
+
+require_once __DIR__ . '/stubs/rank-math.php';
+require_once __DIR__ . '/stubs/the-seo-framework.php';
 
 require_once __DIR__ . '/wp-functions.php';
 
