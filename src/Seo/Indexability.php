@@ -55,7 +55,7 @@ class Indexability {
 		$indexable = true;
 		$reason    = '';
 
-		if ( ! get_option( 'blog_public' ) ) {
+		if ( ! $this->is_site_public() ) {
 			$indexable = false;
 			$reason    = 'blog_public';
 		} else {
@@ -94,5 +94,16 @@ class Indexability {
 		}
 
 		return (bool) apply_filters( 'recrawler/is_post_indexable', $indexable, $post_id );
+	}
+
+	/**
+	 * Whether the whole site is open for search engines.
+	 *
+	 * The `recrawler/is_post_indexable` filter is not applied here — its
+	 * contract is `( bool $indexable, int $post_id )`, and a term has no
+	 * post ID to pass.
+	 */
+	public function is_site_public(): bool {
+		return (bool) get_option( 'blog_public' );
 	}
 }

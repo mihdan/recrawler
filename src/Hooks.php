@@ -87,6 +87,10 @@ class Hooks {
 			return;
 		}
 
+		if ( ! $this->indexability->is_post_indexable( (int) $comment->comment_post_ID ) ) {
+			return;
+		}
+
 		do_action( 'recrawler/comment_updated', $comment->comment_post_ID, $comment );
 
 		update_comment_meta(
@@ -123,10 +127,6 @@ class Hooks {
 			return;
 		}
 
-		if ( ! $this->indexability->is_post_indexable( $post->ID ) ) {
-			return;
-		}
-
 		if ( ! in_array( $post->post_type, (array) $this->wposa->get_option( 'post_types', 'general', [] ), true ) ) {
 			return;
 		}
@@ -144,6 +144,10 @@ class Hooks {
 		);
 
 		if ( ( current_time( 'timestamp' ) - $last_update ) < $this->ping_delay ) {
+			return;
+		}
+
+		if ( ! $this->indexability->is_post_indexable( $post->ID ) ) {
 			return;
 		}
 
@@ -223,6 +227,10 @@ class Hooks {
 		);
 
 		if ( ( current_time( 'timestamp' ) - $last_update ) < $this->ping_delay ) {
+			return;
+		}
+
+		if ( ! $this->indexability->is_site_public() ) {
 			return;
 		}
 

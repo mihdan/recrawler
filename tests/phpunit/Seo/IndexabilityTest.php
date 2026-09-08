@@ -140,4 +140,20 @@ class IndexabilityTest extends TestCase {
 
 		( new Indexability( $this->logger, [ $detector ] ) )->is_post_indexable( 42 );
 	}
+
+	public function test_is_site_public_returns_true_when_blog_public_is_on() {
+		_set_wp_override( 'get_option', function ( $option, $default = false ) {
+			return 'blog_public' === $option ? 1 : $default;
+		} );
+
+		$this->assertTrue( ( new Indexability( $this->logger, [] ) )->is_site_public() );
+	}
+
+	public function test_is_site_public_returns_false_when_blog_public_is_off() {
+		_set_wp_override( 'get_option', function ( $option, $default = false ) {
+			return 'blog_public' === $option ? 0 : $default;
+		} );
+
+		$this->assertFalse( ( new Indexability( $this->logger, [] ) )->is_site_public() );
+	}
 }

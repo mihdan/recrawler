@@ -102,4 +102,19 @@ final class SeoIndexabilityTest
 
         Assert::true((new Indexability(new Logger(), [$this->detector('yoast', true, true)]))->is_post_indexable(42));
     }
+
+    public function siteIsPublicWhenBlogPublicIsOn(): void
+    {
+        $this->publicSite();
+
+        Assert::true((new Indexability(new Logger(), []))->is_site_public());
+    }
+
+    public function siteIsNotPublicWhenBlogPublicIsOff(): void
+    {
+        _reset_wp_mocks();
+        _set_wp_override('get_option', static fn ($option, $default = false) => $option === 'blog_public' ? 0 : $default);
+
+        Assert::false((new Indexability(new Logger(), []))->is_site_public());
+    }
 }

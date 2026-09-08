@@ -25,9 +25,10 @@ class HooksTest extends TestCase {
 		return $comment;
 	}
 
-	private function indexability( bool $indexable ) {
+	private function indexability( bool $indexable, bool $site_public = true ) {
 		$mock = $this->createMock( \Mihdan\ReCrawler\Seo\Indexability::class );
 		$mock->method( 'is_post_indexable' )->willReturn( $indexable );
+		$mock->method( 'is_site_public' )->willReturn( $site_public );
 
 		return $mock;
 	}
@@ -322,6 +323,42 @@ class HooksTest extends TestCase {
 		} );
 
 		$hooks->comment_updated( 'approved', 'hold', $this->make_comment( 1, 1, 7 ) );
+
+		$this->assertEmpty( $do_action_calls );
+	}
+
+	public function test_comment_inserted_skips_noindex_post() {
+		$this->setup_defaults();
+		$this->wposa->method( 'get_option' )->willReturnMap( [
+			[ 'ping_delay', 'general', 60, 60 ],
+		] );
+
+		$hooks           = new Hooks( $this->wposa, $this->indexability( false ) );
+		$comment         = $this->make_comment( 1, 1, 5 );
+		$do_action_calls = [];
+		_set_wp_override( 'do_action', function ( $tag, ...$args ) use ( &$do_action_calls ) {
+			$do_action_calls[] = $tag;
+		} );
+
+		$hooks->comment_inserted( 1, $comment );
+
+		$this->assertEmpty( $do_action_calls );
+	}
+
+	public function test_term_updated_skips_closed_site() {
+		$this->setup_defaults();
+		$this->wposa->method( 'get_option' )->willReturnMap( [
+			[ 'ping_delay', 'general', 60, 60 ],
+		] );
+
+		$hooks = new Hooks( $this->wposa, $this->indexability( true, false ) );
+
+		$do_action_calls = [];
+		_set_wp_override( 'do_action', function ( $tag, ...$args ) use ( &$do_action_calls ) {
+			$do_action_calls[] = $tag;
+		} );
+
+		$hooks->term_updated( 10, 20, 'category' );
 
 		$this->assertEmpty( $do_action_calls );
 	}
