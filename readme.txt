@@ -152,6 +152,12 @@ See the documentation available from each search engine for more details about R
 
 == Changelog ==
 
+= 1.1.0 (08.09.2026) =
+
+* Записи, закрытые от индексации в Yoast SEO, Rank Math, All in One SEO, SEOPress или The SEO Framework, больше не отправляются на переобход
+* Учитывается общесайтовая настройка «Попросить поисковые системы не индексировать сайт» — при её включении пинги не отправляются вовсе
+* Поведение можно переопределить фильтром `recrawler/is_post_indexable`
+
 = 1.0.2 (07.09.2026) =
 
 * Исправлена ошибка пинга Yandex API, которая была видна в Журнале как «Invalid Url»
