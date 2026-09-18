@@ -14,7 +14,7 @@ use Mihdan\ReCrawler\Dependencies\Google\Service\Indexing;
 use Mihdan\ReCrawler\Dependencies\Google\Service\Indexing\UrlNotification;
 use Mihdan\ReCrawler\Dependencies\Google\Client;
 use Mihdan\ReCrawler\Dependencies\Google\Service\Exception as Google_Service_Exception;
-use Exception;
+use Throwable;
 
 class GoogleWebmaster extends WebmasterAbstract {
 	private const URL_UPDATED      = 'URL_UPDATED';
@@ -123,7 +123,7 @@ class GoogleWebmaster extends WebmasterAbstract {
 				}
 			}
 
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			$message     = $e->getMessage();
 			$status_code = 400;
 		}
