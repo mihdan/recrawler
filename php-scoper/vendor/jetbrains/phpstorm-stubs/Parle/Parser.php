@@ -1,4 +1,6 @@
-<?php namespace Parle;
+<?php
+
+namespace Parle;
 
 use JetBrains\PhpStorm\Immutable;
 
@@ -13,14 +15,14 @@ use JetBrains\PhpStorm\Immutable;
 class Parser
 {
     /* Constants */
-    const ACTION_ERROR = 0 ;
-    const ACTION_SHIFT = 1 ;
-    const ACTION_REDUCE = 2 ;
-    const ACTION_GOTO = 3 ;
-    const ACTION_ACCEPT = 4 ;
-    const ERROR_SYNTAX = 0 ;
-    const ERROR_NON_ASSOCIATIVE = 1 ;
-    const ERROR_UNKOWN_TOKEN = 2 ;
+    public const ACTION_ERROR = 0;
+    public const ACTION_SHIFT = 1;
+    public const ACTION_REDUCE = 2;
+    public const ACTION_GOTO = 3;
+    public const ACTION_ACCEPT = 4;
+    public const ERROR_SYNTAX = 0;
+    public const ERROR_NON_ASSOCIATIVE = 1;
+    public const ERROR_UNKNOWN_TOKEN = 2;
 
     /* Properties */
     /**
@@ -40,9 +42,9 @@ class Parser
      * Process next parser rule.
      *
      * @link https://php.net/manual/en/parle-parser.advance.php
-     * @return void
+     * @return void No value is returned.
      */
-    public function advance() : void {}
+    public function advance(): void {}
 
     /**
      * Finalize the grammar rules
@@ -51,9 +53,9 @@ class Parser
      * The rule set becomes readonly and the parser is ready to start.
      *
      * @link https://php.net/manual/en/parle-parser.build.php
-     * @return void
+     * @return void No value is returned.
      */
-    public function build() : void {}
+    public function build(): void {}
 
     /**
      * Consume the data for parsing.
@@ -61,43 +63,43 @@ class Parser
      * @link https://php.net/manual/en/parle-parser.consume.php
      * @param string $data Data to be parsed.
      * @param Lexer $lexer A lexer object containing the lexing rules prepared for the particular grammar.
-     * @return void
+     * @return void No value is returned.
      */
-    public function consume(string $data, Lexer $lexer) : void {}
+    public function consume(string $data, Lexer $lexer): void {}
 
     /**
      * Dump the current grammar to stdout.
      *
      * @link https://php.net/manual/en/parle-parser.dump.php
-     * @return void
+     * @return void No value is returned.
      */
-    public function dump() : void {}
+    public function dump(): void {}
 
     /**
      * Retrieve the error information in case Parle\Parser::action() returned the error action.
      *
      * @link https://php.net/manual/en/parle-parser.errorinfo.php
-     * @return ErrorInfo
+     * @return ErrorInfo Returns an instance of Parle\ErrorInfo.
      */
-    public function errorInfo() : ErrorInfo {}
+    public function errorInfo(): ErrorInfo {}
 
     /**
      * Declare a terminal with left associativity.
      *
      * @link https://php.net/manual/en/parle-parser.left.php
      * @param string $token Token name.
-     * @return void
+     * @return void No value is returned.
      */
-    public function left(string $token) : void {}
+    public function left(string $token): void {}
 
     /**
      * Declare a terminal, that cannot appear more than once in the row.
      *
      * @link https://php.net/manual/en/parle-parser.nonassoc.php
      * @param string $token Token name.
-     * @return void
+     * @return void No value is returned.
      */
-    public function nonassoc(string $token) : void {}
+    public function nonassoc(string $token): void {}
 
     /**
      * Declares a precedence rule for a fictitious terminal symbol.
@@ -105,9 +107,9 @@ class Parser
      *
      * @link https://php.net/manual/en/parle-parser.precedence.php
      * @param string $token
-     * @return void
+     * @return void No value is returned.
      */
-    public function precedence(string $token) : void {}
+    public function precedence(string $token): void {}
 
     /**
      * Push a grammar rule.
@@ -118,25 +120,25 @@ class Parser
      * @param string $rule The rule to be added. The syntax is Bison compatible.
      * @return int Returns integer representing the rule index.
      */
-    public function push(string $name, string $rule) : int {}
+    public function push(string $name, string $rule): int {}
 
     /**
      * Reset parser state using the given token id.
      *
      * @link https://php.net/manual/en/parle-parser.reset.php
      * @param int $tokenId Token id.
-     * @return void
+     * @return void No value is returned.
      */
-    public function reset(int $tokenId) : void {}
+    public function reset(int $tokenId): void {}
 
     /**
      * Declare a token with right-associativity
      *
      * @link https://php.net/manual/en/parle-parser.right.php
      * @param string $token Token name.
-     * @return void
+     * @return void No value is returned.
      */
-    public function right(string $token) : void {}
+    public function right(string $token): void {}
 
     /**
      * Retrieve a part of the match by a rule.
@@ -146,16 +148,16 @@ class Parser
      * @param int $idx Match index, zero based.
      * @return string Returns a string with the matched part.
      */
-    public function sigil(int $idx) : string {}
+    public function sigil(int $idx): string {}
 
     /**
      * Declare a terminal to be used in the grammar.
      *
      * @link https://php.net/manual/en/parle-parser.token.php
      * @param string $token Token name.
-     * @return void
+     * @return void No value is returned.
      */
-    public function token(string $token) : void {}
+    public function token(string $token): void {}
 
     /**
      * Retrieve the id of the named token.
@@ -165,7 +167,7 @@ class Parser
      * @return int Returns integer representing the token id.
      * @see Parser::token()
      */
-    public function tokenId(string $token) : int {}
+    public function tokenId(string $token): int {}
 
     /**
      * Retrieve the current parser operation description.
@@ -174,7 +176,7 @@ class Parser
      * @link https://php.net/manual/en/parle-parser.trace.php
      * @return string Returns a string with the trace information.
      */
-    public function trace() : string {}
+    public function trace(): string {}
 
     /**
      * Validate an input string.
@@ -185,5 +187,5 @@ class Parser
      * @param Lexer $lexer A lexer object containing the lexing rules prepared for the particular grammar.
      * @return bool Returns boolean witnessing whether the input chimes or not with the defined rules.
      */
-    public function validate(string $data, Lexer $lexer) : bool {}
+    public function validate(string $data, Lexer $lexer): bool {}
 }

@@ -1,6 +1,6 @@
 <?php
 
-use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 
 /**
  * <b>Reflector</b> is an interface implemented by all
@@ -15,9 +15,8 @@ interface Reflector extends Stringable
      *
      * @link https://php.net/manual/en/reflector.export.php
      * @return string|null
-     * @removed 8.0
+     * @removed 7.4
      */
-    #[Deprecated(since: '7.4')]
     public static function export();
 
     /**
@@ -28,5 +27,6 @@ interface Reflector extends Stringable
      *
      * @return string
      */
+    #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')]
     public function __toString();
 }

@@ -1,7 +1,10 @@
 <?php
 
 use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\FileReference;
 use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\ReturnTypeContract as TypeContract;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -12,15 +15,15 @@ use JetBrains\PhpStorm\Pure;
  * constant name of the element. The following is a list of constant names
  * for item that may be used and their description.
  * Some of these constants may not be defined or hold no value for certain
- * locales.
- * <table>
+ * locales.</p>
  * nl_langinfo Constants
+ * <table>
  * <tr valign="top">
  * <td>Constant</td>
  * <td>Description</td>
  * </tr>
- * <tr valign="top">
- * LC_TIME Category Constants</td>
+ * <tr colspan="2" valign="top" bgcolor="silver">
+ * <td >LC_TIME Category Constants</td>
  * </tr>
  * <tr valign="top">
  * <td>ABDAY_(1-7)</td>
@@ -82,8 +85,8 @@ use JetBrains\PhpStorm\Pure;
  * <td>ERA_T_FMT</td>
  * <td>Time in alternate era format (string can be used in strftime).</td>
  * </tr>
- * <tr valign="top">
- * LC_MONETARY Category Constants</td>
+ * <tr colspan="2" valign="top" bgcolor="silver">
+ * <td>LC_MONETARY Category Constants</td>
  * </tr>
  * <tr valign="top">
  * <td>INT_CURR_SYMBOL</td>
@@ -143,13 +146,14 @@ use JetBrains\PhpStorm\Pure;
  * </tr>
  * <tr valign="top">
  * <td>P_SIGN_POSN</td>
- * Returns 0 if parentheses surround the quantity and CURRENCY_SYMBOL.
+ * <td>Returns 0 if parentheses surround the quantity and CURRENCY_SYMBOL.</td>
+ * </tr>
+ * </table>
  * @return string|false the element as a string, or false if item
  * is not valid.
  */
-#[Pure]
-function nl_langinfo (int $item): string|false
-{}
+#[Pure(true)]
+function nl_langinfo(int $item): string|false {}
 
 /**
  * Calculate the soundex key of a string
@@ -160,8 +164,7 @@ function nl_langinfo (int $item): string|false
  * @return string the soundex key as a string.
  */
 #[Pure]
-function soundex (string $string): string
-{}
+function soundex(string $string): string {}
 
 /**
  * Calculate Levenshtein distance between two strings
@@ -181,7 +184,7 @@ function soundex (string $string): string
  * @param int $insertion_cost [optional] <p>
  * Defines the cost of insertion.
  * </p>
- * @param int $repetition_cost [optional] <p>
+ * @param int $replacement_cost [optional] <p>
  * Defines the cost of replacement.
  * </p>
  * @param int $deletion_cost [optional] <p>
@@ -191,9 +194,7 @@ function soundex (string $string): string
  * two argument strings or -1, if one of the argument strings
  * is longer than the limit of 255 characters.
  */
-function levenshtein (string $string1, string $string2, int $insertion_cost, int $repetition_cost, int $deletion_cost): int
-{
-}
+function levenshtein(string $string1, string $string2, int $insertion_cost = 1, int $replacement_cost = 1, int $deletion_cost = 1): int {}
 
 /**
  * Generate a single-byte string from a number
@@ -204,8 +205,7 @@ function levenshtein (string $string1, string $string2, int $insertion_cost, int
  * @return string the specified character.
  */
 #[Pure]
-function chr (int $codepoint): string
-{}
+function chr(int $codepoint): string {}
 
 /**
  * Convert the first byte of a string to a value between 0 and 255
@@ -213,11 +213,10 @@ function chr (int $codepoint): string
  * @param string $character <p>
  * A character.
  * </p>
- * @return int the ASCII value as an integer.
+ * @return int<0, 255> the ASCII value as an integer.
  */
 #[Pure]
-function ord (string $character): int
-{}
+function ord(string $character): int {}
 
 /**
  * Parses the string into variables
@@ -225,15 +224,18 @@ function ord (string $character): int
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array &$result [optional] <p>
+ * @param array &$result <p>
  * If the second parameter arr is present,
  * variables are stored in this variable as array elements instead.<br/>
  * Since 7.2.0 this parameter is not optional.
  * </p>
- * @return void
+ * @return void No value is returned.
  */
-function parse_str (string $string, &$result): void
-{}
+function parse_str(
+    string $string,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.4')] &$result = [],
+    #[PhpStormStubsElementAvailable(from: '8.0')] &$result
+): void {}
 
 /**
  * Parse a CSV string into an array
@@ -254,8 +256,7 @@ function parse_str (string $string, &$result): void
  * @return array an indexed array containing the fields read.
  */
 #[Pure]
-function str_getcsv (string $string, string $separator = ",", string $enclosure = '"', string $escape = "\\"): array
-{}
+function str_getcsv(string $string, string $separator = ",", string $enclosure = '"', string $escape = "\\"): array {}
 
 /**
  * Pad a string to a certain length with another string
@@ -283,11 +284,11 @@ function str_getcsv (string $string, string $separator = ",", string $enclosure 
  * @return string the padded string.
  */
 #[Pure]
-function str_pad (string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT): string
-{}
+function str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT): string {}
 
 /**
- * &Alias; <function>rtrim</function>
+ * Alias:
+ * {@see rtrim}
  * @param string $string The input string.
  * @param string $characters [optional]
  * @return string the modified string.
@@ -295,11 +296,11 @@ function str_pad (string $string, int $length, string $pad_string = " ", int $pa
  * @see rtrim()
  */
 #[Pure]
-function chop (string $string, string $characters): string
-{}
+function chop(string $string, #[PhpStormStubsElementAvailable(to: '8.5')] string $characters = " \n\r\t\v\0", #[PhpStormStubsElementAvailable(from: '8.6')] string $characters = " \f\n\r\t\v\0"): string {}
 
 /**
- * &Alias; <function>strstr</function>
+ * Alias:
+ * {@see strstr}
  * @link https://php.net/manual/en/function.strchr.php
  * Note: This function is case-sensitive. For case-insensitive searches, use stristr().
  * Note: If you only want to determine if a particular needle occurs within haystack,
@@ -311,8 +312,7 @@ function chop (string $string, string $characters): string
  * @return string|false Returns the portion of string, or FALSE if needle is not found.
  */
 #[Pure]
-function strchr (string $haystack, string $needle, bool $before_needle = false): string|false
-{}
+function strchr(string $haystack, string $needle, bool $before_needle = false): string|false {}
 
 /**
  * Return a formatted string
@@ -332,15 +332,25 @@ function strchr (string $haystack, string $needle, bool $before_needle = false):
  * An optional sign specifier that forces a sign
  * (- or +) to be used on a number. By default, only the - sign is used
  * on a number if it's negative. This specifier forces positive numbers
- * to have the + sign attached as well, and was added in PHP 4.3.0.
- * @param string|int|float ...$values [optional] <p>
+ * to have the + sign attached as well, and was added in PHP 4.3.0.</p>
+ * @param mixed ...$values <p>
  * </p>
  * @return string a string produced according to the formatting string
  * format.
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead.
+ * @throws \ArgumentCountError As of PHP 8.0.0, a ArgumentCountError is thrown when less arguments
+ * are given than required. Prior to PHP 8.0.0, false was returned and a E_WARNING emitted instead.
  */
 #[Pure]
-function sprintf (string $format, ...$values): string
-{}
+function sprintf(
+    string $format,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '5.6')] $values = null,
+    mixed ...$values
+): string {}
 
 /**
  * Output a formatted string
@@ -352,9 +362,15 @@ function sprintf (string $format, ...$values): string
  * @param string|int|float ...$values [optional] <p>
  * </p>
  * @return int the length of the outputted string.
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead.
+ * @throws \ArgumentCountError As of PHP 8.0.0, a ArgumentCountError is thrown when less arguments
+ * are given than required. Prior to PHP 8.0.0, false was returned and a E_WARNING emitted instead.
  */
-function printf (string $format, ...$values): int
-{}
+function printf(string $format, mixed ...$values): int {}
 
 /**
  * Output a formatted string
@@ -366,9 +382,15 @@ function printf (string $format, ...$values): int
  * @param array $values <p>
  * </p>
  * @return int the length of the outputted string.
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError
+ * is thrown when less arguments are given than required. Prior to PHP 8.0.0, false was returned and
+ * a E_WARNING emitted instead.
  */
-function vprintf (string $format, array $values): int
-{}
+function vprintf(string $format, array $values): int {}
 
 /**
  * Return a formatted string
@@ -382,10 +404,16 @@ function vprintf (string $format, array $values): int
  * @return string Return array values as a formatted string according to
  * format (which is described in the documentation
  * for sprintf).
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError
+ * is thrown when less arguments are given than required. Prior to PHP 8.0.0, false was returned and
+ * a E_WARNING emitted instead.
  */
 #[Pure]
-function vsprintf (string $format, array $values): string
-{}
+function vsprintf(string $format, array $values): string {}
 
 /**
  * Write a formatted string to a stream
@@ -398,9 +426,15 @@ function vsprintf (string $format, array $values): string
  * @param mixed ...$values [optional] <p>
  * </p>
  * @return int the length of the string written.
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead.
+ * @throws \ArgumentCountError As of PHP 8.0.0, a ArgumentCountError is thrown when less arguments
+ * are given than required. Prior to PHP 8.0.0, false was returned and a E_WARNING emitted instead.
  */
-function fprintf ($stream, string $format, ...$values): int
-{}
+function fprintf($stream, string $format, mixed ...$values): int {}
 
 /**
  * Write a formatted string to a stream
@@ -414,9 +448,15 @@ function fprintf ($stream, string $format, ...$values): int
  * @param array $values <p>
  * </p>
  * @return int the length of the outputted string.
+ * @throws \ValueError As of PHP 8.0.0, a ValueError is thrown if the number of arguments is zero.
+ * Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError is thrown if
+ * [width] is less than zero or bigger than PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted
+ * instead. As of PHP 8.0.0, a ValueError is thrown if [precision] is less than zero or bigger than
+ * PHP_INT_MAX. Prior to PHP 8.0.0, a E_WARNING was emitted instead. As of PHP 8.0.0, a ValueError
+ * is thrown when less arguments are given than required. Prior to PHP 8.0.0, false was returned and
+ * a E_WARNING emitted instead.
  */
-function vfprintf ($stream, string $format, array $values): int
-{}
+function vfprintf($stream, string $format, array $values): int {}
 
 /**
  * Parses input from a string according to a format
@@ -435,15 +475,14 @@ function vfprintf ($stream, string $format, array $values): int
  * i stands for integer with base detection.
  * n stands for number of characters processed so far.
  * </p>
- * @param mixed &...$vars
+ * @param mixed &...$vars [optional]
  * @return array|int|null If only
  * two parameters were passed to this function, the values parsed
  * will be returned as an array. Otherwise, if optional parameters are passed,
  * the function will return the number of assigned values. The optional
  * parameters must be passed by reference.
  */
-function sscanf (string $string, string $format, mixed &...$vars): array|int|null
-{}
+function sscanf(string $string, string $format, #[TypeContract(exists: "int|null", notExists: "array|null")] mixed &...$vars): array|int|null {}
 
 /**
  * Parses input from a file according to a format
@@ -459,8 +498,7 @@ function sscanf (string $string, string $format, mixed &...$vars): array|int|nul
  * function will return the number of assigned values. The optional
  * parameters must be passed by reference.
  */
-function fscanf ($stream, string $format, mixed &...$vars): array|int|false|null
-{}
+function fscanf($stream, string $format, #[TypeContract(exists: "int|false|null", notExists: "array|false|null")] mixed &...$vars): array|int|false|null {}
 
 /**
  * Parse a URL and return its components
@@ -490,22 +528,12 @@ function fscanf ($stream, string $format, mixed &...$vars): array|int|false|null
  * fragment - after the hashmark #
  * </p>
  * <p>
- * If the component parameter is specified a
- * string is returned instead of an array.
+ * If the component parameter is specified a string is returned instead of an array.
+ * If the requested component doesn't exist within the given URL, null will be returned.
  */
-#[ArrayShape([
-    "scheme" => "string",
-    "host" => "string",
-    "port" => "int",
-    "user" => "string",
-    "pass" => "string",
-    "query" => "string",
-    "path" => "string",
-    "fragment" => "string",
-])]
+#[ArrayShape(["scheme" => "string", "host" => "string", "port" => "int", "user" => "string", "pass" => "string", "query" => "string", "path" => "string", "fragment" => "string"])]
 #[Pure]
-function parse_url (string $url, int $component = -1)
-{}
+function parse_url(string $url, int $component = -1): array|string|int|false|null {}
 
 /**
  * URL-encodes string
@@ -524,8 +552,7 @@ function parse_url (string $url, int $component = -1)
  * are encoded as plus (+) signs.
  */
 #[Pure]
-function urlencode (string $string): string
-{}
+function urlencode(string $string): string {}
 
 /**
  * Decodes URL-encoded string
@@ -536,8 +563,7 @@ function urlencode (string $string): string
  * @return string the decoded string.
  */
 #[Pure]
-function urldecode (string $string): string
-{}
+function urldecode(string $string): string {}
 
 /**
  * URL-encode according to RFC 3986
@@ -554,8 +580,7 @@ function urldecode (string $string): string
  * media with character conversions (like some email systems).
  */
 #[Pure]
-function rawurlencode (string $string): string
-{}
+function rawurlencode(string $string): string {}
 
 /**
  * Decode URL-encoded strings
@@ -566,8 +591,7 @@ function rawurlencode (string $string): string
  * @return string the decoded URL, as a string.
  */
 #[Pure]
-function rawurldecode (string $string): string
-{}
+function rawurldecode(string $string): string {}
 
 /**
  * Generate URL-encoded query string
@@ -591,7 +615,7 @@ function rawurldecode (string $string): string
  * This is meant to allow for legal variable names when the data is
  * decoded by PHP or another CGI application later on.
  * </p>
- * @param string|null $arg_separator [optional] <p>
+ * @param string|null $arg_separator <p>
  * arg_separator.output
  * is used to separate arguments, unless this parameter is specified,
  * and is then used.
@@ -603,8 +627,7 @@ function rawurldecode (string $string): string
  * @return string a URL-encoded string.
  */
 #[Pure]
-function http_build_query (object|array $data, string $numeric_prefix = "", ?string $arg_separator = "&", int $encoding_type = PHP_QUERY_RFC1738): string
-{}
+function http_build_query(object|array $data, string $numeric_prefix = "", ?string $arg_separator = null, int $encoding_type = PHP_QUERY_RFC1738): string {}
 
 /**
  * Returns the target of a symbolic link
@@ -614,8 +637,8 @@ function http_build_query (object|array $data, string $numeric_prefix = "", ?str
  * </p>
  * @return string|false the contents of the symbolic link path or false on error.
  */
-function readlink (string $path): string|false
-{}
+#[Pure(true)]
+function readlink(#[FileReference] string $path): string|false {}
 
 /**
  * Gets information about a link
@@ -627,9 +650,8 @@ function readlink (string $path): string|false
  * of the Unix C stat structure returned by the lstat
  * system call. Returns 0 or false in case of error.
  */
-#[Pure]
-function linkinfo (string $path): int|false
-{}
+#[Pure(true)]
+function linkinfo(#[FileReference] string $path): int|false {}
 
 /**
  * Creates a symbolic link
@@ -642,8 +664,7 @@ function linkinfo (string $path): int|false
  * </p>
  * @return bool true on success or false on failure.
  */
-function symlink (string $target, string $link): bool
-{}
+function symlink(#[FileReference] string $target, #[FileReference] string $link): bool {}
 
 /**
  * Create a hard link
@@ -652,7 +673,7 @@ function symlink (string $target, string $link): bool
  * @param string $link The link name.
  * @return bool true on success or false on failure.
  */
-function link (string $target , string $link):bool {}
+function link(#[FileReference] string $target, #[FileReference] string $link): bool {}
 
 /**
  * Deletes a file
@@ -660,10 +681,10 @@ function link (string $target , string $link):bool {}
  * @param string $filename <p>
  * Path to the file.
  * </p>
- * @param resource $context [optional] &note.context-support;
+ * @param resource $context [optional]
  * @return bool true on success or false on failure.
  */
-function unlink (string $filename, $context):bool {}
+function unlink(#[FileReference] string $filename, $context = null): bool {}
 
 /**
  * Execute an external program
@@ -682,7 +703,7 @@ function unlink (string $filename, $context):bool {}
  * exec.
  * </p>
  * @param int &$result_code [optional] <p>
- * If the return_var argument is present
+ * If the result_code argument is present
  * along with the output argument, then the
  * return status of the executed command will be written to this
  * variable.
@@ -694,9 +715,10 @@ function unlink (string $filename, $context):bool {}
  * <p>
  * To get the output of the executed command, be sure to set and use the
  * output parameter.
+ * @throws \ValueError Emits an E_WARNING if exec is unable to execute the command. Throws a
+ * ValueError if command is empty or contains null bytes.
  */
-function exec (string $command, &$output, &$result_code): string|false
-{}
+function exec(string $command, &$output = null, &$result_code = null): string|false {}
 
 /**
  * Execute an external program and display the output
@@ -705,15 +727,14 @@ function exec (string $command, &$output, &$result_code): string|false
  * The command that will be executed.
  * </p>
  * @param int &$result_code [optional] <p>
- * If the return_var argument is present, then the
+ * If the result_code argument is present, then the
  * return status of the executed command will be written to this
  * variable.
  * </p>
  * @return string|false the last line of the command output on success, and false
  * on failure.
  */
-function system (string $command, &$result_code): string|false
-{}
+function system(string $command, &$result_code = null): string|false {}
 
 /**
  * Escape shell metacharacters
@@ -724,8 +745,7 @@ function system (string $command, &$result_code): string|false
  * @return string The escaped string.
  */
 #[Pure]
-function escapeshellcmd (string $command): string
-{}
+function escapeshellcmd(string $command): string {}
 
 /**
  * Escape a string to be used as a shell argument
@@ -736,8 +756,7 @@ function escapeshellcmd (string $command): string
  * @return string The escaped string.
  */
 #[Pure]
-function escapeshellarg (string $arg): string
-{}
+function escapeshellarg(string $arg): string {}
 
 /**
  * Execute an external program and display raw output
@@ -746,13 +765,15 @@ function escapeshellarg (string $arg): string
  * The command that will be executed.
  * </p>
  * @param int &$result_code [optional] <p>
- * If the return_var argument is present, the
+ * If the result_code argument is present, the
  * return status of the Unix command will be placed here.
  * </p>
- * @return bool|null
+ * @return bool|null null on success or false on failure.
+ * @throws \ValueError Will emit an E_WARNING if passthru is unable to execute the command. Throws a
+ * ValueError if command is empty or contains null bytes.
  */
-function passthru (string $command, &$result_code): ?bool
-{}
+#[LanguageLevelTypeAware(['8.2' => 'null|false'], default: 'null|bool')]
+function passthru(string $command, &$result_code = null) {}
 
 /**
  * Execute command via shell and return the complete output as a string
@@ -760,10 +781,9 @@ function passthru (string $command, &$result_code): ?bool
  * @param string $command <p>
  * The command that will be executed.
  * </p>
- * @return string|false|null The output from the executed command or NULL if an error occurred or the command produces no output.
+ * @return string|false|null A string containing the output from the executed command, false if the pipe cannot be established or null if an error occurs or the command produces no output.
  */
-function shell_exec (string $command): string|false|null
-{}
+function shell_exec(string $command): string|false|null {}
 
 /**
  * Execute a command and open file pointers for input/output
@@ -834,9 +854,10 @@ function shell_exec (string $command): string|false|null
  * @return resource|false a resource representing the process, which should be freed using
  * proc_close when you are finished with it. On failure
  * returns false.
+ * @throws \ValueError As of PHP 8.3.0, throws a ValueError if command is an array without at least
+ * one non-empty element.
  */
-function proc_open (array|string $command, array $descriptor_spec, &$pipes, ?string $cwd, ?array $env_vars, ?array $options)
-{}
+function proc_open(array|string $command, array $descriptor_spec, &$pipes, ?string $cwd = null, ?array $env_vars = null, ?array $options = null) {}
 
 /**
  * Close a process opened by {@see proc_open} and return the exit code of that process
@@ -847,8 +868,7 @@ function proc_open (array|string $command, array $descriptor_spec, &$pipes, ?str
  * </p>
  * @return int the termination status of the process that was run.
  */
-function proc_close ($process): int
-{}
+function proc_close($process): int {}
 
 /**
  * Kills a process opened by proc_open
@@ -865,8 +885,7 @@ function proc_close ($process): int
  * </p>
  * @return bool the termination status of the process that was run.
  */
-function proc_terminate ($process, int $signal = 15): bool
-{}
+function proc_terminate($process, int $signal = 15): bool {}
 
 /**
  * Get information about a process opened by {@see proc_open}
@@ -943,19 +962,9 @@ function proc_terminate ($process, int $signal = 15): bool
  * </td>
  * </tr>
  */
-#[ArrayShape([
-    "command" => "string",
-    "pid" => "int",
-    "running" => "bool",
-    "signaled" => "bool",
-    "stopped" => "bool",
-    "exitcode" => "int",
-    "termsig" => "int",
-    "stopsig" => "int",
-])]
+#[ArrayShape(["command" => "string", "pid" => "int", "running" => "bool", "signaled" => "bool", "stopped" => "bool", "exitcode" => "int", "termsig" => "int", "stopsig" => "int"])]
 #[LanguageLevelTypeAware(["8.0" => "array"], default: "array|false")]
-function proc_get_status ($process)
-{}
+function proc_get_status($process) {}
 
 /**
  * Change the priority of the current process. <br/>
@@ -968,81 +977,7 @@ function proc_get_status ($process)
  * If an error occurs, like the user lacks permission to change the priority,
  * an error of level E_WARNING is also generated.
  */
-function proc_nice (int $priority): bool
-{}
-
-/**
- * Generate a random integer
- * @link https://php.net/manual/en/function.rand.php
- * @param int $min [optional]
- * @param int $max [optional]
- * @return int A pseudo random value between min
- * (or 0) and max (or getrandmax, inclusive).
- */
-function rand (int $min = 0, int $max): int
-{}
-
-/**
- * Seed the random number generator
- * <p><strong>Note</strong>: As of PHP 7.1.0, {@see srand()} has been made
- * an alias of {@see mt_srand()}.
- * </p>
- * @link https://php.net/manual/en/function.srand.php
- * @param int $seed [optional] <p>
- * Optional seed value
- * </p>
- * @param int $mode [optional] <p>
- * Use one of the following constants to specify the implementation of the algorithm to use.
- * </p>
- * @return void
- */
-function srand (int $seed, int $mode = MT_RAND_MT19937): void {}
-
-/**
- * Show largest possible random value
- * @link https://php.net/manual/en/function.getrandmax.php
- * @return int The largest possible random value returned by rand
- */
-#[Pure]
-function getrandmax (): int
-{}
-
-/**
- * Generate a random value via the Mersenne Twister Random Number Generator
- * @link https://php.net/manual/en/function.mt-rand.php
- * @param int $min [optional] <p>
- * Optional lowest value to be returned (default: 0)
- * </p>
- * @param int $max [optional] <p>
- * Optional highest value to be returned (default: mt_getrandmax())
- * </p>
- * @return int A random integer value between min (or 0)
- * and max (or mt_getrandmax, inclusive)
- */
-function mt_rand (int $min = 0, int $max): int
-{}
-
-/**
- * Seeds the Mersenne Twister Random Number Generator
- * @link https://php.net/manual/en/function.mt-srand.php
- * @param int $seed [optional] <p>
- * An optional seed value
- * </p>
- * @param int $mode [optional] <p>
- * Use one of the following constants to specify the implementation of the algorithm to use.
- * </p>
- * @return void
- */
-function mt_srand (int $seed, int $mode = MT_RAND_MT19937): void {}
-
-/**
- * Show largest possible random value
- * @link https://php.net/manual/en/function.mt-getrandmax.php
- * @return int the maximum random value returned by mt_rand
- */
-#[Pure]
-function mt_getrandmax (): int
-{}
+function proc_nice(int $priority): bool {}
 
 /**
  * Get port number associated with an Internet service and protocol
@@ -1058,8 +993,7 @@ function mt_getrandmax (): int
  * protocol is not found.
  */
 #[Pure]
-function getservbyname (string $service, string $protocol): int|false
-{}
+function getservbyname(string $service, string $protocol): int|false {}
 
 /**
  * Get Internet service which corresponds to port and protocol
@@ -1074,8 +1008,7 @@ function getservbyname (string $service, string $protocol): int|false
  * @return string|false the Internet service name as a string.
  */
 #[Pure]
-function getservbyport (int $port, string $protocol): string|false
-{}
+function getservbyport(int $port, string $protocol): string|false {}
 
 /**
  * Get protocol number associated with protocol name
@@ -1086,8 +1019,7 @@ function getservbyport (int $port, string $protocol): string|false
  * @return int|false the protocol number or -1 if the protocol is not found.
  */
 #[Pure]
-function getprotobyname (string $protocol): int|false
-{}
+function getprotobyname(string $protocol): int|false {}
 
 /**
  * Get protocol name associated with protocol number
@@ -1098,8 +1030,7 @@ function getprotobyname (string $protocol): int|false
  * @return string|false the protocol name as a string.
  */
 #[Pure]
-function getprotobynumber (int $protocol): string|false
-{}
+function getprotobynumber(int $protocol): string|false {}
 
 /**
  * Gets PHP script owner's UID
@@ -1107,8 +1038,7 @@ function getprotobynumber (int $protocol): string|false
  * @return int|false the user ID of the current script, or false on error.
  */
 #[Pure]
-function getmyuid (): int|false
-{}
+function getmyuid(): int|false {}
 
 /**
  * Get PHP script owner's GID
@@ -1116,8 +1046,7 @@ function getmyuid (): int|false
  * @return int|false the group ID of the current script, or false on error.
  */
 #[Pure]
-function getmygid (): int|false
-{}
+function getmygid(): int|false {}
 
 /**
  * Gets PHP's process ID
@@ -1125,8 +1054,7 @@ function getmygid (): int|false
  * @return int|false the current PHP process ID, or false on error.
  */
 #[Pure]
-function getmypid (): int|false
-{}
+function getmypid(): int|false {}
 
 /**
  * Gets the inode of the current script
@@ -1134,5 +1062,4 @@ function getmypid (): int|false
  * @return int|false the current script's inode as an integer, or false on error.
  */
 #[Pure]
-function getmyinode (): int|false
-{}
+function getmyinode(): int|false {}

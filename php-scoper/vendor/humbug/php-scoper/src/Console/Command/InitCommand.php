@@ -14,77 +14,69 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\Console\Command;
 
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\Configuration as CommandConfiguration;
+use Fidry\Console\IO;
 use Symfony\Component\Console\Helper\FormatterHelper;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use function file_exists;
-use function getcwd;
+use function Safe\getcwd;
 use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
-final class InitCommand extends BaseCommand
+/**
+ * @private
+ * @codeCoverageIgnore
+ */
+final readonly class InitCommand implements Command
 {
     private const CONFIG_FILE_OPT = 'config';
-    private const CONFIG_FILE_TEMPLATE = __DIR__.'/../../scoper.inc.php.tpl';
+    private const CONFIG_FILE_TEMPLATE = __DIR__.'/../../../res/scoper.inc.php.tpl';
     private const CONFIG_FILE_DEFAULT = 'scoper.inc.php';
 
-    private $fileSystem;
-
-    public function __construct($name = null)
-    {
-        parent::__construct($name);
-
-        $this->fileSystem = new Filesystem();
+    public function __construct(
+        private Filesystem $fileSystem,
+        private FormatterHelper $formatterHelper,
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function configure(): void
+    public function getConfiguration(): CommandConfiguration
     {
-        parent::configure();
-
-        $this
-            ->setName('init')
-            ->setDescription('Generates a configuration file.')
-            ->addOption(
-                self::CONFIG_FILE_OPT,
-                'c',
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'Configuration file. Will use "%s" if found by default.',
-                    self::CONFIG_FILE_DEFAULT
+        return new CommandConfiguration(
+            'init',
+            'Generates a configuration file.',
+            '',
+            [],
+            [
+                ChangeableDirectory::createOption(),
+                new InputOption(
+                    self::CONFIG_FILE_OPT,
+                    'c',
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'Configuration file. Will use "%s" if found by default.',
+                        self::CONFIG_FILE_DEFAULT,
+                    ),
+                    null,
                 ),
-                null
-            )
-        ;
+            ],
+        );
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function execute(IO $io): int
     {
-        $this->changeWorkingDirectory($input);
+        ChangeableDirectory::changeWorkingDirectory($io);
 
-        $io = new SymfonyStyle($input, $output);
-        $io->writeln('');
-
-        /** @var FormatterHelper $formatter */
-        $formatter = $this->getHelper('formatter');
-
+        $io->newLine();
         $io->writeln(
-            $formatter->formatSection(
+            $this->formatterHelper->formatSection(
                 'PHP-Scoper configuration generate',
-                'Welcome!'
-            )
+                'Welcome!',
+            ),
         );
 
-        $configFile = $this->retrieveConfig($input, $io);
+        $configFile = $this->retrieveConfig($io);
 
         if (null === $configFile) {
             $io->writeln('Skipping configuration file generator.');
@@ -98,7 +90,7 @@ final class InitCommand extends BaseCommand
             '',
             sprintf(
                 'Generated the configuration file "<comment>%s</comment>".',
-                $configFile
+                $configFile,
             ),
             '',
         ]);
@@ -106,27 +98,25 @@ final class InitCommand extends BaseCommand
         return 0;
     }
 
-    private function retrieveConfig(InputInterface $input, OutputStyle $io): ?string
+    private function retrieveConfig(IO $io): ?string
     {
-        /** @var string|null $configFile */
-        $configFile = $input->getOption(self::CONFIG_FILE_OPT);
+        $configFile = $io->getTypedOption(self::CONFIG_FILE_OPT)->asNullableNonEmptyString();
 
         $configFile = (null === $configFile)
             ? $this->makeAbsolutePath(self::CONFIG_FILE_DEFAULT)
-            : $this->makeAbsolutePath($configFile)
-        ;
+            : $this->makeAbsolutePath($configFile);
 
         if (file_exists($configFile)) {
             $canDeleteFile = $io->confirm(
                 sprintf(
                     'The configuration file "<comment>%s</comment>" already exists. Are you sure you want to '
                     .'replace it?',
-                    $configFile
+                    $configFile,
                 ),
-                false
+                false,
             );
 
-            if (false === $canDeleteFile) {
+            if (!$canDeleteFile) {
                 $io->writeln('Skipped file generation.');
 
                 return $configFile;
@@ -136,7 +126,7 @@ final class InitCommand extends BaseCommand
         } else {
             $createConfig = $io->confirm('No configuration file found. Do you want to create one?');
 
-            if (false === $createConfig) {
+            if (!$createConfig) {
                 return null;
             }
         }
@@ -146,7 +136,7 @@ final class InitCommand extends BaseCommand
 
     private function makeAbsolutePath(string $path): string
     {
-        if (false === $this->fileSystem->isAbsolutePath($path)) {
+        if (!$this->fileSystem->isAbsolutePath($path)) {
             $path = getcwd().DIRECTORY_SEPARATOR.$path;
         }
 

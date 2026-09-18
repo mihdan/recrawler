@@ -11,11 +11,11 @@ use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
  * System's id for the shared memory block.
  * Can be passed as a decimal or hex.
  * </p>
- * @param int $mode <p>
+ * @param string $mode <p>
  * The flags that you can use:
  * "a" for access (sets SHM_RDONLY for shmat)
  * use this flag when you need to open an existing shared memory
- * segment for read only
+ * segment for read only</p>
  * @param int $permissions <p>
  * The permissions that you wish to assign to your memory segment, those
  * are the same as permission for a file. Permissions need to be passed
@@ -27,9 +27,11 @@ use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
  * @return resource|false|Shmop On success <b>shmop_open</b> will return an id that you can
  * use to access the shared memory segment you've created. <b>FALSE</b> is
  * returned on failure.
+ * @throws \ValueError If mode is invalid, or size is less than or equal to zero, a ValueError is
+ * thrown. On other failures, E_WARNING is emitted.
  */
-#[LanguageLevelTypeAware(["8.0" => "Shmop|false"], default: "Shmop|false")]
-function shmop_open (int $key, string $mode, int $permissions, int $size) {}
+#[LanguageLevelTypeAware(["8.0" => "Shmop|false"], default: "resource|false")]
+function shmop_open(int $key, string $mode, int $permissions, int $size) {}
 
 /**
  * Read data from shared memory block
@@ -45,8 +47,10 @@ function shmop_open (int $key, string $mode, int $permissions, int $size) {}
  * The number of bytes to read
  * </p>
  * @return string|false the data or <b>FALSE</b> on failure.
+ * @throws \ValueError If offset or size are out of range, a ValueError is thrown.
  */
-function shmop_read (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, int $offset, int $size): string {}
+#[LanguageLevelTypeAware(["8.0" => "string"], default: "string|false")]
+function shmop_read(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, int $offset, int $size) {}
 
 /**
  * Close shared memory block
@@ -58,7 +62,7 @@ function shmop_read (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "reso
  * @return void No value is returned.
  */
 #[Deprecated(since: '8.0')]
-function shmop_close (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): void {}
+function shmop_close(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): void {}
 
 /**
  * Get size of shared memory block
@@ -70,7 +74,7 @@ function shmop_close (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "res
  * @return int an int, which represents the number of bytes the shared memory
  * block occupies.
  */
-function shmop_size (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): int {}
+function shmop_size(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): int {}
 
 /**
  * Write data into shared memory block
@@ -88,8 +92,11 @@ function shmop_size (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "reso
  * </p>
  * @return int|false The size of the written <i>data</i>, or <b>FALSE</b> on
  * failure.
+ * @throws \ValueError If offset is out of range, or a read-only shared memory segment should be
+ * written to, a ValueError is thrown.
  */
-function shmop_write (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, string $data, int $offset): int {}
+#[LanguageLevelTypeAware(["8.0" => "int"], default: "int|false")]
+function shmop_write(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, string $data, int $offset) {}
 
 /**
  * Delete shared memory block
@@ -100,12 +107,13 @@ function shmop_write (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "res
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function shmop_delete (#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): bool {}
+function shmop_delete(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): bool {}
 
 /**
+ * A fully opaque class which replaces shmop resources as of PHP 8.0.0.
+ * @link https://php.net/manual/en/class.shmop.php
  * @since 8.0
  */
-final class Shmop{}
+final class Shmop {}
 
 // End of shmop v.
-?>

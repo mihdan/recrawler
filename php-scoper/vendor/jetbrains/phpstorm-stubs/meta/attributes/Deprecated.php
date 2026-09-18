@@ -4,10 +4,10 @@ namespace JetBrains\PhpStorm;
 
 use Attribute;
 
-
-#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::TARGET_CLASS | Attribute::TARGET_CLASS_CONSTANT | Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
-class Deprecated {
-    const PHP_VERSIONS = [
+#[Attribute(Attribute::TARGET_FUNCTION|Attribute::TARGET_METHOD|Attribute::TARGET_CLASS|Attribute::TARGET_CLASS_CONSTANT|Attribute::TARGET_PROPERTY|Attribute::TARGET_PARAMETER|Attribute::TARGET_CONSTANT)]
+class Deprecated
+{
+    public const PHP_VERSIONS = [
         "5.3",
         "5.4",
         "5.5",
@@ -18,6 +18,12 @@ class Deprecated {
         "7.3",
         "7.4",
         "8.0",
+        "8.1",
+        "8.2",
+        "8.3",
+        "8.4",
+        "8.5",
+        "8.6"
     ];
 
     /**
@@ -37,8 +43,9 @@ class Deprecated {
      * f(1,2) will be replaced with wrappedCall(f(2,1))
      * @param string $since Element is deprecated starting with the provided PHP language level, applicable only for PhpStorm stubs entries
      */
-    public function __construct($reason = "", $replacement = "",
-                                #[ExpectedValues(self::PHP_VERSIONS)] $since = "5.6")
-    {
-    }
+    public function __construct(
+        $reason = "",
+        $replacement = "",
+        #[ExpectedValues(self::PHP_VERSIONS)] $since = "5.6"
+    ) {}
 }

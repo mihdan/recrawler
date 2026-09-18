@@ -2,100 +2,140 @@
 
 // Start of svn v.1.0.1
 
-class Svn  {
-	const NON_RECURSIVE = 1;
-	const DISCOVER_CHANGED_PATHS = 2;
-	const OMIT_MESSAGES = 4;
-	const STOP_ON_COPY = 8;
-	const ALL = 16;
-	const SHOW_UPDATES = 32;
-	const NO_IGNORE = 64;
-	const IGNORE_EXTERNALS = 128;
-	const INITIAL = 1;
-	const HEAD = -1;
-	const BASE = -2;
-	const COMMITTED = -3;
-	const PREV = -4;
-	const UNSPECIFIED = -5;
-
+class Svn
+{
+    public const NON_RECURSIVE = 1;
+    public const DISCOVER_CHANGED_PATHS = 2;
+    public const OMIT_MESSAGES = 4;
+    public const STOP_ON_COPY = 8;
+    public const ALL = 16;
+    public const SHOW_UPDATES = 32;
+    public const NO_IGNORE = 64;
+    public const IGNORE_EXTERNALS = 128;
+    public const INITIAL = 1;
+    public const HEAD = -1;
+    public const BASE = -2;
+    public const COMMITTED = -3;
+    public const PREV = -4;
+    public const UNSPECIFIED = -5;
 
     public static function checkout() {}
+
     public static function cat() {}
+
     public static function ls() {}
+
     public static function log() {}
+
     public static function auth_set_parameter() {}
+
     public static function auth_get_parameter() {}
+
     public static function client_version() {}
+
     public static function config_ensure() {}
+
     public static function diff() {}
+
     public static function cleanup() {}
+
     public static function revert() {}
+
     public static function resolved() {}
+
     public static function commit() {}
+
     public static function lock() {}
+
     public static function unlock() {}
+
     public static function add() {}
+
     public static function status() {}
+
     public static function update() {}
+
     public static function update2() {}
+
     public static function import() {}
+
     public static function info() {}
+
     public static function export() {}
+
     public static function copy() {}
+
     public static function switch() {}
+
     public static function blame() {}
+
     public static function delete() {}
+
     public static function mkdir() {}
+
     public static function move() {}
+
     public static function proplist() {}
+
     public static function propget() {}
+
     public static function propset() {}
+
     public static function prop_delete() {}
+
     public static function revprop_get() {}
+
     public static function revprop_set() {}
+
     public static function revprop_delete() {}
+
     public static function repos_create() {}
+
     public static function repos_recover() {}
+
     public static function repos_hotcopy() {}
+
     public static function repos_open() {}
+
     public static function repos_fs() {}
+
     public static function repos_fs_begin_txn_for_commit() {}
+
     public static function repos_fs_commit_txn() {}
-
 }
 
-class SvnWc  {
-	const NONE = 1;
-	const UNVERSIONED = 2;
-	const NORMAL = 3;
-	const ADDED = 4;
-	const MISSING = 5;
-	const DELETED = 6;
-	const REPLACED = 7;
-	const MODIFIED = 8;
-	const MERGED = 9;
-	const CONFLICTED = 10;
-	const IGNORED = 11;
-	const OBSTRUCTED = 12;
-	const EXTERNAL = 13;
-	const INCOMPLETE = 14;
-
+class SvnWc
+{
+    public const NONE = 1;
+    public const UNVERSIONED = 2;
+    public const NORMAL = 3;
+    public const ADDED = 4;
+    public const MISSING = 5;
+    public const DELETED = 6;
+    public const REPLACED = 7;
+    public const MODIFIED = 8;
+    public const MERGED = 9;
+    public const CONFLICTED = 10;
+    public const IGNORED = 11;
+    public const OBSTRUCTED = 12;
+    public const EXTERNAL = 13;
+    public const INCOMPLETE = 14;
 }
 
-class SvnWcSchedule  {
-	const NORMAL = 0;
-	const ADD = 1;
-	const DELETE = 2;
-	const REPLACE = 3;
-
+class SvnWcSchedule
+{
+    public const NORMAL = 0;
+    public const ADD = 1;
+    public const DELETE = 2;
+    public const REPLACE = 3;
 }
 
-class SvnNode  {
-	const NONE = 0;
-	const FILE = 1;
-	const DIR = 2;
-	const UNKNOWN = 3;
-
+class SvnNode
+{
+    public const NONE = 0;
+    public const FILE = 1;
+    public const DIR = 2;
+    public const UNKNOWN = 3;
 }
 
 /**
@@ -119,7 +159,7 @@ class SvnNode  {
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_checkout ($repos, $targetpath, $revision = SVN_REVISION_HEAD, $flags = 0) {}
+function svn_checkout($repos, $targetpath, $revision = SVN_REVISION_HEAD, $flags = 0) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -135,7 +175,7 @@ function svn_checkout ($repos, $targetpath, $revision = SVN_REVISION_HEAD, $flag
  * @return string the string contents of the item from the repository on
  * success, and <b>FALSE</b> on failure.
  */
-function svn_cat ($repos_url, $revision_no = SVN_REVISION_HEAD) {}
+function svn_cat($repos_url, $revision_no = SVN_REVISION_HEAD) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -164,7 +204,7 @@ function svn_cat ($repos_url, $revision_no = SVN_REVISION_HEAD) {}
  * [1] => ...
  * </pre>
  */
-function svn_ls ($repos_url, $revision_no = SVN_REVISION_HEAD, $recurse = false, $peg = false) {}
+function svn_ls($repos_url, $revision_no = SVN_REVISION_HEAD, $recurse = false, $peg = false) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -248,7 +288,7 @@ function svn_ls ($repos_url, $revision_no = SVN_REVISION_HEAD, $recurse = false,
  * <p>
  * If no changes were made to the item, an empty array is returned.
  */
-function svn_log ($repos_url, $start_revision = null, $end_revision = null, $limit = 0, $flags = SVN_DISCOVER_CHANGED_PATHS | SVN_STOP_ON_COPY) {}
+function svn_log($repos_url, $start_revision = null, $end_revision = null, $limit = 0, $flags = SVN_DISCOVER_CHANGED_PATHS|SVN_STOP_ON_COPY) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -264,7 +304,7 @@ function svn_log ($repos_url, $start_revision = null, $end_revision = null, $lim
  * </p>
  * @return void No value is returned.
  */
-function svn_auth_set_parameter ($key, $value) {}
+function svn_auth_set_parameter($key, $value) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -277,7 +317,7 @@ function svn_auth_set_parameter ($key, $value) {}
  * @return string|null the string value of the parameter at <i>key</i>;
  * returns <b>NULL</b> if parameter does not exist.
  */
-function svn_auth_get_parameter ($key) {}
+function svn_auth_get_parameter($key) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -285,9 +325,9 @@ function svn_auth_get_parameter ($key) {}
  * @link https://php.net/manual/en/function.svn-client-version.php
  * @return string String version number, usually in form of x.y.z.
  */
-function svn_client_version () {}
+function svn_client_version() {}
 
-function svn_config_ensure () {}
+function svn_config_ensure() {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -325,7 +365,7 @@ function svn_config_ensure () {}
  * diff engine may be
  * used depending on Subversion's configuration.
  */
-function svn_diff ($path1, $rev1, $path2, $rev2) {}
+function svn_diff($path1, $rev1, $path2, $rev2) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -337,7 +377,7 @@ function svn_diff ($path1, $rev1, $path2, $rev2) {}
  * Relative paths will be resolved as if the current working directory was the one that contains the PHP binary. To use the calling script&#x00027;s working directory, use <b>realpath</b> or dirname(__FILE__).
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_cleanup ($workingdir) {}
+function svn_cleanup($workingdir) {}
 
 /**
  * (PECL svn &gt;= 0.3.0)<br/>
@@ -351,9 +391,9 @@ function svn_cleanup ($workingdir) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_revert ($path, $recursive = false) {}
+function svn_revert($path, $recursive = false) {}
 
-function svn_resolved () {}
+function svn_resolved() {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -374,7 +414,6 @@ function svn_resolved () {}
  * Default is <b>TRUE</b>.
  * </p>
  * @return array array in form of:
- * </p>
  * <pre>
  * array(
  * 0 => integer revision number of commit
@@ -384,12 +423,13 @@ function svn_resolved () {}
  * </pre>
  * <p>
  * Returns <b>FALSE</b> on failure.
+ * </p>
  */
-function svn_commit ($log, array $targets, $recursive = true) {}
+function svn_commit($log, array $targets, $recursive = true) {}
 
-function svn_lock () {}
+function svn_lock() {}
 
-function svn_unlock () {}
+function svn_unlock() {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -410,7 +450,7 @@ function svn_unlock () {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_add ($path, $recursive = true, $force = false) {}
+function svn_add($path, $recursive = true, $force = false) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -506,7 +546,7 @@ function svn_add ($path, $recursive = true, $force = false) {}
  * cmt_author
  * String author of last commit. (Unaffected by <i>update
  */
-function svn_status ($path, $flags = 0) {}
+function svn_status($path, $flags = 0) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -524,7 +564,7 @@ function svn_status ($path, $flags = 0) {}
  * </p>
  * @return int|false new revision number on success, returns <b>FALSE</b> on failure.
  */
-function svn_update ($path, $revno = SVN_REVISION_HEAD, $recurse = true) {}
+function svn_update($path, $revno = SVN_REVISION_HEAD, $recurse = true) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -542,9 +582,9 @@ function svn_update ($path, $revno = SVN_REVISION_HEAD, $recurse = true) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_import ($path, $url, $nonrecursive) {}
+function svn_import($path, $url, $nonrecursive) {}
 
-function svn_info () {}
+function svn_info() {}
 
 /**
  * (PECL svn &gt;= 0.3.0)<br/>
@@ -562,11 +602,11 @@ function svn_info () {}
  * @param int $revision_no [optional]
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_export ($frompath, $topath, $working_copy = true, $revision_no = -1) {}
+function svn_export($frompath, $topath, $working_copy = true, $revision_no = -1) {}
 
-function svn_copy () {}
+function svn_copy() {}
 
-function svn_switch () {}
+function svn_switch() {}
 
 /**
  * (PECL svn &gt;= 0.3.0)<br/>
@@ -582,7 +622,7 @@ function svn_switch () {}
  * which includes the revision number, line number, line of code,
  * author, and date.
  */
-function svn_blame ($repository_url, $revision_no = SVN_REVISION_HEAD) {}
+function svn_blame($repository_url, $revision_no = SVN_REVISION_HEAD) {}
 
 /**
  * (PECL svn &gt;= 0.4.0)<br/>
@@ -599,7 +639,7 @@ function svn_blame ($repository_url, $revision_no = SVN_REVISION_HEAD) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_delete ($path, $force = false) {}
+function svn_delete($path, $force = false) {}
 
 /**
  * (PECL svn &gt;= 0.4.0)<br/>
@@ -611,7 +651,7 @@ function svn_delete ($path, $force = false) {}
  * @param string $log_message [optional]
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function svn_mkdir ($path, $log_message = null) {}
+function svn_mkdir($path, $log_message = null) {}
 
 /**
  * @link https://php.net/manual/en/ref.svn.php
@@ -620,7 +660,7 @@ function svn_mkdir ($path, $log_message = null) {}
  * @param bool $force [optional]
  * @return mixed
  */
-function svn_move ($src_path, $dst_path,  $force = false) {}
+function svn_move($src_path, $dst_path, $force = false) {}
 
 /**
  * @link https://php.net/manual/en/ref.svn.php
@@ -629,7 +669,7 @@ function svn_move ($src_path, $dst_path,  $force = false) {}
  * @param int $revision [optional]
  * @return mixed
  */
-function svn_proplist ($path, $recurse = false, $revision) {}
+function svn_proplist($path, $recurse = false, $revision) {}
 
 /**
  * @param string $path
@@ -638,7 +678,7 @@ function svn_proplist ($path, $recurse = false, $revision) {}
  * @param int $revision [optional]
  * @return mixed
  */
-function svn_propget ($path, $property_name, $recurse = false, $revision) {}
+function svn_propget($path, $property_name, $recurse = false, $revision) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -647,16 +687,15 @@ function svn_propget ($path, $property_name, $recurse = false, $revision) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @param array $config [optional] <p>
+ * @param null|array $config [optional] <p>
  * Its description
  * </p>
- * @param array $fsconfig [optional] <p>
+ * @param null|array $fsconfig [optional] <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_repos_create ($path, array $config = null, array $fsconfig = null) {}
+function svn_repos_create($path, ?array $config = null, ?array $fsconfig = null) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -665,10 +704,9 @@ function svn_repos_create ($path, array $config = null, array $fsconfig = null) 
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_repos_recover ($path) {}
+function svn_repos_recover($path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -683,10 +721,9 @@ function svn_repos_recover ($path) {}
  * @param bool $cleanlogs <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_repos_hotcopy ($repospath, $destpath, $cleanlogs) {}
+function svn_repos_hotcopy($repospath, $destpath, $cleanlogs) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -695,10 +732,9 @@ function svn_repos_hotcopy ($repospath, $destpath, $cleanlogs) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_repos_open ($path) {}
+function svn_repos_open($path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -707,10 +743,9 @@ function svn_repos_open ($path) {}
  * @param resource $repos <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_repos_fs ($repos) {}
+function svn_repos_fs($repos) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -728,10 +763,9 @@ function svn_repos_fs ($repos) {}
  * @param string $log_msg <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_repos_fs_begin_txn_for_commit ($repos, $rev, $author, $log_msg) {}
+function svn_repos_fs_begin_txn_for_commit($repos, $rev, $author, $log_msg) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -740,10 +774,9 @@ function svn_repos_fs_begin_txn_for_commit ($repos, $rev, $author, $log_msg) {}
  * @param resource $txn <p>
  * Its description
  * </p>
- * @return int What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return int What the function returns, first on success, then on failure.
  */
-function svn_repos_fs_commit_txn ($txn) {}
+function svn_repos_fs_commit_txn($txn) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -755,10 +788,9 @@ function svn_repos_fs_commit_txn ($txn) {}
  * @param int $revnum <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_fs_revision_root ($fs, $revnum) {}
+function svn_fs_revision_root($fs, $revnum) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -770,10 +802,9 @@ function svn_fs_revision_root ($fs, $revnum) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return int What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return int What the function returns, first on success, then on failure.
  */
-function svn_fs_check_path ($fsroot, $path) {}
+function svn_fs_check_path($fsroot, $path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -788,10 +819,9 @@ function svn_fs_check_path ($fsroot, $path) {}
  * @param string $propname <p>
  * Its description
  * </p>
- * @return string What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return string What the function returns, first on success, then on failure.
  */
-function svn_fs_revision_prop ($fs, $revnum, $propname) {}
+function svn_fs_revision_prop($fs, $revnum, $propname) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -803,10 +833,9 @@ function svn_fs_revision_prop ($fs, $revnum, $propname) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return array What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return array What the function returns, first on success, then on failure.
  */
-function svn_fs_dir_entries ($fsroot, $path) {}
+function svn_fs_dir_entries($fsroot, $path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -818,10 +847,9 @@ function svn_fs_dir_entries ($fsroot, $path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return int What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return int What the function returns, first on success, then on failure.
  */
-function svn_fs_node_created_rev ($fsroot, $path) {}
+function svn_fs_node_created_rev($fsroot, $path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -830,10 +858,9 @@ function svn_fs_node_created_rev ($fsroot, $path) {}
  * @param resource $fs <p>
  * Its description
  * </p>
- * @return int What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return int What the function returns, first on success, then on failure.
  */
-function svn_fs_youngest_rev ($fs) {}
+function svn_fs_youngest_rev($fs) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -845,10 +872,9 @@ function svn_fs_youngest_rev ($fs) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_fs_file_contents ($fsroot, $path) {}
+function svn_fs_file_contents($fsroot, $path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -860,10 +886,9 @@ function svn_fs_file_contents ($fsroot, $path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return int What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return int What the function returns, first on success, then on failure.
  */
-function svn_fs_file_length ($fsroot, $path) {}
+function svn_fs_file_length($fsroot, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -872,10 +897,9 @@ function svn_fs_file_length ($fsroot, $path) {}
  * @param resource $txn <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_fs_txn_root ($txn) {}
+function svn_fs_txn_root($txn) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -887,10 +911,9 @@ function svn_fs_txn_root ($txn) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_make_file ($root, $path) {}
+function svn_fs_make_file($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -902,10 +925,9 @@ function svn_fs_make_file ($root, $path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_make_dir ($root, $path) {}
+function svn_fs_make_dir($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -917,10 +939,9 @@ function svn_fs_make_dir ($root, $path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_fs_apply_text ($root, $path) {}
+function svn_fs_apply_text($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -938,10 +959,9 @@ function svn_fs_apply_text ($root, $path) {}
  * @param string $to_path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_copy ($from_root, $from_path, $to_root, $to_path) {}
+function svn_fs_copy($from_root, $from_path, $to_root, $to_path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -953,10 +973,9 @@ function svn_fs_copy ($from_root, $from_path, $to_root, $to_path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_delete ($root, $path) {}
+function svn_fs_delete($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -968,10 +987,9 @@ function svn_fs_delete ($root, $path) {}
  * @param int $rev <p>
  * Its description
  * </p>
- * @return resource What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return resource What the function returns, first on success, then on failure.
  */
-function svn_fs_begin_txn2 ($repos, $rev) {}
+function svn_fs_begin_txn2($repos, $rev) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -983,10 +1001,9 @@ function svn_fs_begin_txn2 ($repos, $rev) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_is_dir ($root, $path) {}
+function svn_fs_is_dir($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -998,10 +1015,9 @@ function svn_fs_is_dir ($root, $path) {}
  * @param string $path <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_is_file ($root, $path) {}
+function svn_fs_is_file($root, $path) {}
 
 /**
  * (PECL svn &gt;= 0.1.0)<br/>
@@ -1016,10 +1032,9 @@ function svn_fs_is_file ($root, $path) {}
  * @param string $propname <p>
  * Its description
  * </p>
- * @return string What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return string What the function returns, first on success, then on failure.
  */
-function svn_fs_node_prop ($fsroot, $path, $propname) {}
+function svn_fs_node_prop($fsroot, $path, $propname) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -1037,10 +1052,9 @@ function svn_fs_node_prop ($fsroot, $path, $propname) {}
  * @param string $value <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_change_node_prop ($root, $path, $name, $value) {}
+function svn_fs_change_node_prop($root, $path, $name, $value) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -1058,10 +1072,9 @@ function svn_fs_change_node_prop ($root, $path, $name, $value) {}
  * @param string $path2 <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_contents_changed ($root1, $path1, $root2, $path2) {}
+function svn_fs_contents_changed($root1, $path1, $root2, $path2) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -1079,10 +1092,9 @@ function svn_fs_contents_changed ($root1, $path1, $root2, $path2) {}
  * @param string $path2 <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_props_changed ($root1, $path1, $root2, $path2) {}
+function svn_fs_props_changed($root1, $path1, $root2, $path2) {}
 
 /**
  * (PECL svn &gt;= 0.2.0)<br/>
@@ -1091,206 +1103,204 @@ function svn_fs_props_changed ($root1, $path1, $root2, $path2) {}
  * @param resource $txn <p>
  * Its description
  * </p>
- * @return bool What the function returns, first on success, then on failure. See
- * also the &#38;#38;return.success; entity
+ * @return bool What the function returns, first on success, then on failure.
  */
-function svn_fs_abort_txn ($txn) {}
-
+function svn_fs_abort_txn($txn) {}
 
 /**
  * Property for default username to use when performing basic authentication
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_AUTH_PARAM_DEFAULT_USERNAME', "svn:auth:username");
+define('SVN_AUTH_PARAM_DEFAULT_USERNAME', "svn:auth:username");
 
 /**
  * Property for default password to use when performing basic authentication
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_AUTH_PARAM_DEFAULT_PASSWORD', "svn:auth:password");
-define ('SVN_AUTH_PARAM_NON_INTERACTIVE', "svn:auth:non-interactive");
-define ('SVN_AUTH_PARAM_DONT_STORE_PASSWORDS', "svn:auth:dont-store-passwords");
-define ('SVN_AUTH_PARAM_NO_AUTH_CACHE', "svn:auth:no-auth-cache");
-define ('SVN_AUTH_PARAM_SSL_SERVER_FAILURES', "svn:auth:ssl:failures");
-define ('SVN_AUTH_PARAM_SSL_SERVER_CERT_INFO', "svn:auth:ssl:cert-info");
-define ('SVN_AUTH_PARAM_CONFIG', "svn:auth:config-category-servers");
-define ('SVN_AUTH_PARAM_SERVER_GROUP', "svn:auth:server-group");
-define ('SVN_AUTH_PARAM_CONFIG_DIR', "svn:auth:config-dir");
+define('SVN_AUTH_PARAM_DEFAULT_PASSWORD', "svn:auth:password");
+define('SVN_AUTH_PARAM_NON_INTERACTIVE', "svn:auth:non-interactive");
+define('SVN_AUTH_PARAM_DONT_STORE_PASSWORDS', "svn:auth:dont-store-passwords");
+define('SVN_AUTH_PARAM_NO_AUTH_CACHE', "svn:auth:no-auth-cache");
+define('SVN_AUTH_PARAM_SSL_SERVER_FAILURES', "svn:auth:ssl:failures");
+define('SVN_AUTH_PARAM_SSL_SERVER_CERT_INFO', "svn:auth:ssl:cert-info");
+define('SVN_AUTH_PARAM_CONFIG', "svn:auth:config-category-servers");
+define('SVN_AUTH_PARAM_SERVER_GROUP', "svn:auth:server-group");
+define('SVN_AUTH_PARAM_CONFIG_DIR', "svn:auth:config-dir");
 
 /**
  * Custom property for ignoring SSL cert verification errors
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('PHP_SVN_AUTH_PARAM_IGNORE_SSL_VERIFY_ERRORS', "php:svn:auth:ignore-ssl-verify-errors");
+define('PHP_SVN_AUTH_PARAM_IGNORE_SSL_VERIFY_ERRORS', "php:svn:auth:ignore-ssl-verify-errors");
 
 /**
  * Configuration key that determines filesystem type
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_FS_CONFIG_FS_TYPE', "fs-type");
+define('SVN_FS_CONFIG_FS_TYPE', "fs-type");
 
 /**
  * Filesystem is Berkeley-DB implementation
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_FS_TYPE_BDB', "bdb");
+define('SVN_FS_TYPE_BDB', "bdb");
 
 /**
  * Filesystem is native-filesystem implementation
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_FS_TYPE_FSFS', "fsfs");
+define('SVN_FS_TYPE_FSFS', "fsfs");
 
 /**
  * svn:date
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_PROP_REVISION_DATE', "svn:date");
+define('SVN_PROP_REVISION_DATE', "svn:date");
 
 /**
  * svn:original-date
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_PROP_REVISION_ORIG_DATE', "svn:original-date");
+define('SVN_PROP_REVISION_ORIG_DATE', "svn:original-date");
 
 /**
  * svn:author
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_PROP_REVISION_AUTHOR', "svn:author");
+define('SVN_PROP_REVISION_AUTHOR', "svn:author");
 
 /**
  * svn:log
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_PROP_REVISION_LOG', "svn:log");
-define ('SVN_REVISION_INITIAL', 1);
+define('SVN_PROP_REVISION_LOG', "svn:log");
+define('SVN_REVISION_INITIAL', 1);
 
 /**
  * Magic number (-1) specifying the HEAD revision
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_REVISION_HEAD', -1);
-define ('SVN_REVISION_BASE', -2);
-define ('SVN_REVISION_COMMITTED', -3);
-define ('SVN_REVISION_PREV', -4);
-define ('SVN_REVISION_UNSPECIFIED', -5);
-define ('SVN_NON_RECURSIVE', 1);
-define ('SVN_DISCOVER_CHANGED_PATHS', 2);
-define ('SVN_OMIT_MESSAGES', 4);
-define ('SVN_STOP_ON_COPY', 8);
-define ('SVN_ALL', 16);
-define ('SVN_SHOW_UPDATES', 32);
-define ('SVN_NO_IGNORE', 64);
+define('SVN_REVISION_HEAD', -1);
+define('SVN_REVISION_BASE', -2);
+define('SVN_REVISION_COMMITTED', -3);
+define('SVN_REVISION_PREV', -4);
+define('SVN_REVISION_UNSPECIFIED', -5);
+define('SVN_NON_RECURSIVE', 1);
+define('SVN_DISCOVER_CHANGED_PATHS', 2);
+define('SVN_OMIT_MESSAGES', 4);
+define('SVN_STOP_ON_COPY', 8);
+define('SVN_ALL', 16);
+define('SVN_SHOW_UPDATES', 32);
+define('SVN_NO_IGNORE', 64);
 
 /**
  * Status does not exist
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_NONE', 1);
+define('SVN_WC_STATUS_NONE', 1);
 
 /**
  * Item is not versioned in working copy
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_UNVERSIONED', 2);
+define('SVN_WC_STATUS_UNVERSIONED', 2);
 
 /**
  * Item exists, nothing else is happening
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_NORMAL', 3);
+define('SVN_WC_STATUS_NORMAL', 3);
 
 /**
  * Item is scheduled for addition
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_ADDED', 4);
+define('SVN_WC_STATUS_ADDED', 4);
 
 /**
  * Item is versioned but missing from the working copy
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_MISSING', 5);
+define('SVN_WC_STATUS_MISSING', 5);
 
 /**
  * Item is scheduled for deletion
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_DELETED', 6);
+define('SVN_WC_STATUS_DELETED', 6);
 
 /**
  * Item was deleted and then re-added
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_REPLACED', 7);
+define('SVN_WC_STATUS_REPLACED', 7);
 
 /**
  * Item (text or properties) was modified
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_MODIFIED', 8);
+define('SVN_WC_STATUS_MODIFIED', 8);
 
 /**
  * Item's local modifications were merged with repository modifications
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_MERGED', 9);
+define('SVN_WC_STATUS_MERGED', 9);
 
 /**
  * Item's local modifications conflicted with repository modifications
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_CONFLICTED', 10);
+define('SVN_WC_STATUS_CONFLICTED', 10);
 
 /**
  * Item is unversioned but configured to be ignored
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_IGNORED', 11);
+define('SVN_WC_STATUS_IGNORED', 11);
 
 /**
  * Unversioned item is in the way of a versioned resource
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_OBSTRUCTED', 12);
+define('SVN_WC_STATUS_OBSTRUCTED', 12);
 
 /**
  * Unversioned path that is populated using svn:externals
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_EXTERNAL', 13);
+define('SVN_WC_STATUS_EXTERNAL', 13);
 
 /**
  * Directory does not contain complete entries list
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_WC_STATUS_INCOMPLETE', 14);
+define('SVN_WC_STATUS_INCOMPLETE', 14);
 
 /**
  * Absent
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_NODE_NONE', 0);
+define('SVN_NODE_NONE', 0);
 
 /**
  * File
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_NODE_FILE', 1);
+define('SVN_NODE_FILE', 1);
 
 /**
  * Directory
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_NODE_DIR', 2);
+define('SVN_NODE_DIR', 2);
 
 /**
  * Something Subversion cannot identify
  * @link https://php.net/manual/en/svn.constants.php
  */
-define ('SVN_NODE_UNKNOWN', 3);
-define ('SVN_WC_SCHEDULE_NORMAL', 0);
-define ('SVN_WC_SCHEDULE_ADD', 1);
-define ('SVN_WC_SCHEDULE_DELETE', 2);
-define ('SVN_WC_SCHEDULE_REPLACE', 3);
+define('SVN_NODE_UNKNOWN', 3);
+define('SVN_WC_SCHEDULE_NORMAL', 0);
+define('SVN_WC_SCHEDULE_ADD', 1);
+define('SVN_WC_SCHEDULE_DELETE', 2);
+define('SVN_WC_SCHEDULE_REPLACE', 3);

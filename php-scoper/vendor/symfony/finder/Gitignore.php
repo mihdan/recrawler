@@ -26,14 +26,29 @@ class Gitignore
      */
     public static function toRegex(string $gitignoreFileContent): string
     {
-        $gitignoreFileContent = preg_replace('~(?<!\\\\)#[^\n\r]*~', '', $gitignoreFileContent);
+        return self::buildRegex($gitignoreFileContent, false);
+    }
+
+    public static function toRegexMatchingNegatedPatterns(string $gitignoreFileContent): string
+    {
+        return self::buildRegex($gitignoreFileContent, true);
+    }
+
+    private static function buildRegex(string $gitignoreFileContent, bool $inverted): string
+    {
         $gitignoreLines = preg_split('~\r\n?|\n~', $gitignoreFileContent);
 
         $res = self::lineToRegex('');
-        foreach ($gitignoreLines as $i => $line) {
-            $line = preg_replace('~(?<!\\\\)[ \t]+$~', '', $line);
+        $alternatives = [];
+        foreach ($gitignoreLines as $line) {
+            // only a line starting with "#" is a comment, and only trailing spaces are stripped
+            if (str_starts_with($line, '#')) {
+                continue;
+            }
 
-            if ('!' === substr($line, 0, 1)) {
+            $line = preg_replace('~(?<!\\\\) +$~', '', $line);
+
+            if (str_starts_with($line, '!')) {
                 $line = substr($line, 1);
                 $isNegative = true;
             } else {
@@ -41,15 +56,33 @@ class Gitignore
             }
 
             if ('' !== $line) {
-                if ($isNegative) {
-                    $res = '(?!'.self::lineToRegex($line).'$)'.$res;
+                if ($isNegative xor $inverted) {
+                    // a negative pattern only cancels the patterns before it, so it opens a new nesting level
+                    $res = '(?!'.self::lineToRegex($line).'$)'.self::alternate($res, $alternatives);
                 } else {
-                    $res = '(?:'.$res.'|'.self::lineToRegex($line).')';
+                    $alternatives[] = self::lineToRegex($line);
                 }
             }
         }
 
-        return '~^(?:'.$res.')~s';
+        return '~^(?:'.self::alternate($res, $alternatives).')~s';
+    }
+
+    /**
+     * Consecutive patterns share a single group, so deep nesting stays proportional to the number of negative patterns.
+     *
+     * @param list<string> $alternatives
+     */
+    private static function alternate(string $res, array &$alternatives): string
+    {
+        if (!$alternatives) {
+            return $res;
+        }
+
+        $regex = '(?:'.$res.'|'.implode('|', $alternatives).')';
+        $alternatives = [];
+
+        return $regex;
     }
 
     private static function lineToRegex(string $gitignoreLine): string
@@ -69,9 +102,7 @@ class Gitignore
         }
 
         $regex = preg_quote(str_replace('\\', '', $gitignoreLine), '~');
-        $regex = preg_replace_callback('~\\\\\[((?:\\\\!)?)([^\[\]]*)\\\\\]~', function (array $matches): string {
-            return '['.('' !== $matches[1] ? '^' : '').str_replace('\\-', '-', $matches[2]).']';
-        }, $regex);
+        $regex = preg_replace_callback('~\\\\\[((?:\\\\!)?)([^\[\]]*)\\\\\]~', static fn (array $matches): string => '['.('' !== $matches[1] ? '^' : '').str_replace('\\-', '-', $matches[2]).']', $regex);
         $regex = preg_replace('~(?:(?:\\\\\*){2,}(/?))+~', '(?:(?:(?!//).(?<!//))+$1)?', $regex);
         $regex = preg_replace('~\\\\\*~', '[^/]*', $regex);
         $regex = preg_replace('~\\\\\?~', '[^/]', $regex);

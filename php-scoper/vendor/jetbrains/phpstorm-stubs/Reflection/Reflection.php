@@ -1,6 +1,8 @@
 <?php
 
 use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\TentativeType;
 
 /**
  * The reflection class.
@@ -14,11 +16,10 @@ class Reflection
      *
      * @link https://php.net/manual/en/reflection.getmodifiernames.php
      * @param int $modifiers Bitfield of the modifiers to get.
-     * @return array An array of modifier names.
+     * @return string[] An array of modifier names.
      */
-    public static function getModifierNames($modifiers)
-    {
-    }
+    #[TentativeType]
+    public static function getModifierNames(#[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $modifiers): array {}
 
     /**
      * Exports
@@ -32,7 +33,5 @@ class Reflection
      * @removed 8.0
      */
     #[Deprecated(since: '7.4')]
-    public static function export(Reflector $reflector, $return = false)
-    {
-    }
+    public static function export(Reflector $reflector, $return = false) {}
 }

@@ -1,6 +1,8 @@
 <?php
 
 // Start of posix v.
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -14,8 +16,7 @@ use JetBrains\PhpStorm\Pure;
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_kill (int $process_id, int $signal): bool
-{}
+function posix_kill(int $process_id, int $signal): bool {}
 
 /**
  * Return the current process identifier
@@ -23,8 +24,7 @@ function posix_kill (int $process_id, int $signal): bool
  * @return int the identifier, as an integer.
  */
 #[Pure]
-function posix_getpid (): int
-{}
+function posix_getpid(): int {}
 
 /**
  * Return the parent process identifier
@@ -32,8 +32,7 @@ function posix_getpid (): int
  * @return int the identifier, as an integer.
  */
 #[Pure]
-function posix_getppid (): int
-{}
+function posix_getppid(): int {}
 
 /**
  * Return the real user ID of the current process
@@ -41,8 +40,7 @@ function posix_getppid (): int
  * @return int the user id, as an integer
  */
 #[Pure]
-function posix_getuid (): int
-{}
+function posix_getuid(): int {}
 
 /**
  * Set the UID of the current process
@@ -52,8 +50,7 @@ function posix_getuid (): int
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_setuid (int $user_id): bool
-{}
+function posix_setuid(int $user_id): bool {}
 
 /**
  * Return the effective user ID of the current process
@@ -61,8 +58,7 @@ function posix_setuid (int $user_id): bool
  * @return int the user id, as an integer
  */
 #[Pure]
-function posix_geteuid (): int
-{}
+function posix_geteuid(): int {}
 
 /**
  * Set the effective UID of the current process
@@ -72,8 +68,7 @@ function posix_geteuid (): int
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_seteuid (int $user_id): bool
-{}
+function posix_seteuid(int $user_id): bool {}
 
 /**
  * Set system resource limits
@@ -88,16 +83,15 @@ function posix_seteuid (int $user_id): bool
  * @return bool Returns TRUE on success or FALSE on failure.
  * @since 7.0
  */
-function posix_setrlimit (int $resource, int $soft_limit, int $hard_limit): bool
-{}
+function posix_setrlimit(int $resource, int $soft_limit, int $hard_limit): bool {}
+
 /**
  * Return the real group ID of the current process
  * @link https://php.net/manual/en/function.posix-getgid.php
  * @return int the real group id, as an integer.
  */
 #[Pure]
-function posix_getgid (): int
-{}
+function posix_getgid(): int {}
 
 /**
  * Set the GID of the current process
@@ -107,8 +101,7 @@ function posix_getgid (): int
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_setgid (int $group_id): bool
-{}
+function posix_setgid(int $group_id): bool {}
 
 /**
  * Return the effective group ID of the current process
@@ -116,8 +109,7 @@ function posix_setgid (int $group_id): bool
  * @return int an integer of the effective group ID.
  */
 #[Pure]
-function posix_getegid (): int
-{}
+function posix_getegid(): int {}
 
 /**
  * Set the effective GID of the current process
@@ -127,8 +119,7 @@ function posix_getegid (): int
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_setegid (int $group_id): bool
-{}
+function posix_setegid(int $group_id): bool {}
 
 /**
  * Return the group set of the current process
@@ -137,8 +128,7 @@ function posix_setegid (int $group_id): bool
  * set of the current process.
  */
 #[Pure]
-function posix_getgroups (): array|false
-{}
+function posix_getgroups(): array|false {}
 
 /**
  * Return login name
@@ -146,8 +136,7 @@ function posix_getgroups (): array|false
  * @return string|false the login name of the user, as a string.
  */
 #[Pure]
-function posix_getlogin (): string|false
-{}
+function posix_getlogin(): string|false {}
 
 /**
  * Return the current process group identifier
@@ -155,16 +144,14 @@ function posix_getlogin (): string|false
  * @return int the identifier, as an integer.
  */
 #[Pure]
-function posix_getpgrp (): int
-{}
+function posix_getpgrp(): int {}
 
 /**
  * Make the current process a session leader
  * @link https://php.net/manual/en/function.posix-setsid.php
  * @return int the session id, or -1 on errors.
  */
-function posix_setsid (): int
-{}
+function posix_setsid(): int {}
 
 /**
  * Set process group id for job control
@@ -177,8 +164,7 @@ function posix_setsid (): int
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_setpgid (int $process_id, int $process_group_id): bool
-{}
+function posix_setpgid(int $process_id, int $process_group_id): bool {}
 
 /**
  * Get process group id for job control
@@ -189,8 +175,7 @@ function posix_setpgid (int $process_id, int $process_group_id): bool
  * @return int|false the identifier, as an integer.
  */
 #[Pure]
-function posix_getpgid (int $process_id): int|false
-{}
+function posix_getpgid(int $process_id): int|false {}
 
 /**
  * Get the current sid of the process
@@ -204,8 +189,7 @@ function posix_getpgid (int $process_id): int|false
  * @return int|false the identifier, as an integer.
  */
 #[Pure]
-function posix_getsid (int $process_id): int|false
-{}
+function posix_getsid(int $process_id): int|false {}
 
 /**
  * Get system name
@@ -226,8 +210,15 @@ function posix_getsid (int $process_id): int|false
  * libc.
  */
 #[Pure]
-function posix_uname (): array|false
-{}
+#[ArrayShape([
+        'sysname' => 'string',
+        'nodename' => 'string',
+        'release' => 'string',
+        'version' => 'string',
+        'machine' => 'string',
+        'domainname' => 'string',
+])]
+function posix_uname(): array|false {}
 
 /**
  * Get process times
@@ -242,8 +233,14 @@ function posix_uname (): array|false
  * cstime - system time used by current process and children.
  */
 #[Pure]
-function posix_times (): array|false
-{}
+#[ArrayShape([
+        'ticks' => 'int',
+        'utime' => 'int',
+        'stime' => 'int',
+        'cutime' => 'int',
+    'cstime' => 'int'
+])]
+function posix_times(): array|false {}
 
 /**
  * Get path name of controlling terminal
@@ -253,26 +250,24 @@ function posix_times (): array|false
  * is set, which can be checked with <b>posix_get_last_error</b>.
  */
 #[Pure]
-function posix_ctermid (): string|false
-{}
+function posix_ctermid(): string|false {}
 
 /**
  * Determine terminal device name
  * @link https://php.net/manual/en/function.posix-ttyname.php
- * @param int $file_descriptor <p>
+ * @param resource|int $file_descriptor <p>
  * The file descriptor.
  * </p>
  * @return string|false On success, returns a string of the absolute path of the
  * <i>fd</i>. On failure, returns <b>FALSE</b>
  */
 #[Pure]
-function posix_ttyname ($file_descriptor): string|false
-{}
+function posix_ttyname($file_descriptor): string|false {}
 
 /**
  * Determine if a file descriptor is an interactive terminal
  * @link https://php.net/manual/en/function.posix-isatty.php
- * @param mixed $file_descriptor <p>
+ * @param resource|int $file_descriptor <p>
  * The file descriptor, which is expected to be either a file resource or an integer.
  * An integer will be assumed to be a file descriptor that can be passed
  * directly to the underlying system call.<br />
@@ -282,8 +277,7 @@ function posix_ttyname ($file_descriptor): string|false
  * to a terminal and <b>FALSE</b> otherwise.
  */
 #[Pure]
-function posix_isatty ($file_descriptor): bool
-{}
+function posix_isatty($file_descriptor): bool {}
 
 /**
  * Pathname of current directory
@@ -292,9 +286,8 @@ function posix_isatty ($file_descriptor): bool
  * On error, returns <b>FALSE</b> and sets errno which can be checked with
  * <b>posix_get_last_error</b>.
  */
-#[Pure]
-function posix_getcwd (): string|false
-{}
+#[Pure(true)]
+function posix_getcwd(): string|false {}
 
 /**
  * Create a fifo special file (a named pipe)
@@ -307,12 +300,11 @@ function posix_getcwd (): string|false
  * octal notation (e.g. 0644). The permission of the newly created
  * FIFO also depends on the setting of the current
  * <b>umask</b>. The permissions of the created file are
- * (mode &#38;#38; ~umask).
+ * (mode & ~umask).
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_mkfifo (string $filename, int $permissions): bool
-{}
+function posix_mkfifo(string $filename, int $permissions): bool {}
 
 /**
  * Create a special or ordinary file (POSIX.1)
@@ -336,8 +328,7 @@ function posix_mkfifo (string $filename, int $permissions): bool
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_mknod (string $filename, int $flags, int $major = 0, int $minor = 0): bool
-{}
+function posix_mknod(string $filename, int $flags, int $major = 0, int $minor = 0): bool {}
 
 /**
  * Determine accessibility of a file
@@ -359,8 +350,7 @@ function posix_mknod (string $filename, int $flags, int $major = 0, int $minor =
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function posix_access (string $filename, int $flags = POSIX_F_OK): bool
-{}
+function posix_access(string $filename, int $flags = POSIX_F_OK): bool {}
 
 /**
  * Return info about a group by name
@@ -407,8 +397,7 @@ function posix_access (string $filename, int $flags = POSIX_F_OK): bool
  * </table>
  */
 #[Pure]
-function posix_getgrnam (string $name): array|false
-{}
+function posix_getgrnam(string $name): array|false {}
 
 /**
  * Return info about a group by group id
@@ -457,8 +446,7 @@ function posix_getgrnam (string $name): array|false
  * </table>
  */
 #[Pure]
-function posix_getgrgid (int $group_id): array|false
-{}
+function posix_getgrgid(int $group_id): array|false {}
 
 /**
  * Return info about a user by username
@@ -535,8 +523,16 @@ function posix_getgrgid (int $group_id): array|false
  * </table>
  */
 #[Pure]
-function posix_getpwnam (string $username): array|false
-{}
+#[ArrayShape([
+        "name" => "string",
+        "passwd" => "string",
+        "uid" => "int",
+        "gid" => "int",
+        "gecos" => "string",
+        "dir" => "string",
+        "shell" => "string",
+])]
+function posix_getpwnam(string $username): array|false {}
 
 /**
  * Return info about a user by user id
@@ -612,8 +608,16 @@ function posix_getpwnam (string $username): array|false
  * </table>
  */
 #[Pure]
-function posix_getpwuid (int $user_id): array|false
-{}
+#[ArrayShape([
+        'name' => 'string',
+        'passwd' => 'string',
+        'uid' => 'int',
+        'gid' => 'int',
+        'gecos' => 'string',
+        'dir' => 'string',
+        'shell' => 'string',
+])]
+function posix_getpwuid(int $user_id): array|false {}
 
 /**
  * Return info about system resource limits
@@ -698,8 +702,7 @@ function posix_getpwuid (int $user_id): array|false
  * </table>
  */
 #[Pure]
-function posix_getrlimit (): array|false
-{}
+function posix_getrlimit(#[PhpStormStubsElementAvailable(from: '8.3')] ?int $resource = null): array|false {}
 
 /**
  * Retrieve the error number set by the last posix function that failed
@@ -707,16 +710,15 @@ function posix_getrlimit (): array|false
  * @return int the errno (error number) set by the last posix function that
  * failed. If no errors exist, 0 is returned.
  */
-#[Pure]
-function posix_get_last_error (): int
-{}
+#[Pure(true)]
+function posix_get_last_error(): int {}
 
 /**
  * Alias of <b>posix_get_last_error</b>
  * @link https://php.net/manual/en/function.posix-errno.php
  */
-#[Pure]
-function posix_errno (): int {}
+#[Pure(true)]
+function posix_errno(): int {}
 
 /**
  * Retrieve the system error message associated with the given errno
@@ -729,8 +731,7 @@ function posix_errno (): int {}
  * @return string the error message, as a string.
  */
 #[Pure]
-function posix_strerror (int $error_code): string
-{}
+function posix_strerror(int $error_code): string {}
 
 /**
  * Calculate the group access list
@@ -744,74 +745,111 @@ function posix_strerror (int $error_code): string
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
 #[Pure]
-function posix_initgroups (string $username, int $group_id): bool
-{}
+function posix_initgroups(string $username, int $group_id): bool {}
 
+/**
+ * Returns system runtime information.
+ * @since 8.3
+ * @link  https://www.php.net/manual/en/function.posix-sysconf.php
+ */
+function posix_sysconf(int $conf_id): int {}
+
+/**
+ * Determine accessibility of a file
+ *
+ * posix_eaccess checks the effective user's permission of a file
+ *
+ * @since 8.3
+ * @link  https://www.php.net/manual/en/function.posix-eaccess.php
+ */
+function posix_eaccess(string $filename, int $flags = 0): bool {}
+
+/**
+ * Returns the value of a configurable limit
+ * @link  https://www.php.net/manual/en/function.posix-fpathconf.php
+ * @since 8.3
+ * @param resource|int $file_descriptor The file descriptor, which is expected to be either a file
+ * resource or an int. An int will be assumed to be a file descriptor that can be passed directly to
+ * the underlying system call.
+ * @param int $name The name of the configurable limit, one of the following. POSIX_PC_LINK_MAX,
+ * POSIX_PC_MAX_CANON, POSIX_PC_MAX_INPUT, POSIX_PC_NAME_MAX, POSIX_PC_PATH_MAX, POSIX_PC_PIPE_BUF,
+ * POSIX_PC_CHOWN_RESTRICTED, POSIX_PC_NO_TRUNC, POSIX_PC_ALLOC_SIZE_MIN, POSIX_PC_SYMLINK_MAX.
+ * @throws \ValueError Throws a ValueError when resource is invalid.
+ */
+function posix_fpathconf($file_descriptor, int $name): int|false {}
+
+/**
+ * Returns the value of a configurable limit from name for a path
+ * @since 8.3
+ * @link  https://www.php.net/manual/en/function.posix-pathconf.php
+ * @throws \ValueError Throws a ValueError when path is empty.
+ */
+function posix_pathconf(string $path, int $name): int|false {}
 
 /**
  * Check whether the file exists.
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_F_OK', 0);
+define('POSIX_F_OK', 0);
 
 /**
  * Check whether the file exists and has execute permissions.
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_X_OK', 1);
+define('POSIX_X_OK', 1);
 
 /**
  * Check whether the file exists and has write permissions.
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_W_OK', 2);
+define('POSIX_W_OK', 2);
 
 /**
  * Check whether the file exists and has read permissions.
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_R_OK', 4);
+define('POSIX_R_OK', 4);
 
 /**
  * Normal file
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_S_IFREG', 32768);
+define('POSIX_S_IFREG', 32768);
 
 /**
  * Character special file
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_S_IFCHR', 8192);
+define('POSIX_S_IFCHR', 8192);
 
 /**
  * Block special file
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_S_IFBLK', 24576);
+define('POSIX_S_IFBLK', 24576);
 
 /**
  * FIFO (named pipe) special file
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_S_IFIFO', 4096);
+define('POSIX_S_IFIFO', 4096);
 
 /**
  * Socket
  * @link https://php.net/manual/en/posix.constants.php
  */
-define ('POSIX_S_IFSOCK', 49152);
+define('POSIX_S_IFSOCK', 49152);
 
 /**
  * The maximum size of the process's address space in bytes. See also PHP's memory_limit configuration directive.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_AS', 5);
+define('POSIX_RLIMIT_AS', 5);
 /**
  * The maximum size of a core file. If the limit is set to 0, no core file will be generated.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_CORE', 4);
+define('POSIX_RLIMIT_CORE', 4);
 
 /**
  * The maximum amount of CPU time that the process can use, in seconds.
@@ -820,7 +858,7 @@ define ('POSIX_RLIMIT_CORE', 4);
  * at which point an uncatchable SIGKILL signal is sent. See also set_time_limit().
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_CPU', 0);
+define('POSIX_RLIMIT_CPU', 0);
 
 /**
  * The maximum size of the process's data segment, in bytes.
@@ -828,13 +866,13 @@ define ('POSIX_RLIMIT_CPU', 0);
  * the execution of PHP unless an extension is in use that calls brk() or sbrk().
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_DATA', 2);
+define('POSIX_RLIMIT_DATA', 2);
 
 /**
  * The maximum size of files that the process can create, in bytes.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_FSIZE', 1);
+define('POSIX_RLIMIT_FSIZE', 1);
 
 /**
  * The maximum number of locks that the process can create.
@@ -880,40 +918,61 @@ define('POSIX_RLIMIT_SIGPENDING', 11);
  * The maximum number of bytes that can be locked into memory.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_MEMLOCK', 6);
+define('POSIX_RLIMIT_MEMLOCK', 6);
 
 /**
  * A value one greater than the maximum file descriptor number that can be opened by this process.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_NOFILE', 8);
+define('POSIX_RLIMIT_NOFILE', 8);
 
 /**
  * The maximum number of processes (and/or threads, on some operating systems)
  * that can be created for the real user ID of the process.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_NPROC', 7);
+define('POSIX_RLIMIT_NPROC', 7);
 
 /**
  * The maximum size of the process's resident set, in pages.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_RSS', 5);
+define('POSIX_RLIMIT_RSS', 5);
 
 /**
  * The maximum size of the process stack, in bytes.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_STACK', 3);
+define('POSIX_RLIMIT_STACK', 3);
 
 /**
  * Used to indicate an infinite value for a resource limit.
  * @link https://php.net/manual/en/posix.constants.setrlimit.php
  */
-define ('POSIX_RLIMIT_INFINITY', 9223372036854775807);
+define('POSIX_RLIMIT_INFINITY', 9223372036854775807);
 
-
+define('POSIX_SC_ARG_MAX', 0);
+define('POSIX_SC_PAGESIZE', 30);
+define('POSIX_SC_NPROCESSORS_CONF', 83);
+define('POSIX_SC_NPROCESSORS_ONLN', 84);
+define('POSIX_PC_LINK_MAX', 0);
+define('POSIX_PC_MAX_CANON', 1);
+define('POSIX_PC_MAX_INPUT', 2);
+define('POSIX_PC_NAME_MAX', 3);
+define('POSIX_PC_PATH_MAX', 4);
+define('POSIX_PC_PIPE_BUF', 5);
+define('POSIX_PC_CHOWN_RESTRICTED', 6);
+define('POSIX_PC_NO_TRUNC', 7);
+define('POSIX_PC_ALLOC_SIZE_MIN', 18);
+define('POSIX_PC_SYMLINK_MAX', 19);
+define('POSIX_SC_OPEN_MAX', 4);
+/**
+ * @since 8.4
+ */
+define('POSIX_SC_CHILD_MAX', 1);
+/**
+ * @since 8.4
+ */
+define('POSIX_SC_CLK_TCK', 2);
 
 // End of posix v.
-?>

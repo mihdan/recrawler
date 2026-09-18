@@ -68,6 +68,7 @@ class Bytes implements \Serializable
      * Re-wraps the binary-string when called by unserialize().
      *
      * @param string $bin_str a PHP binary-string. Called by unserialize().
+     * @return string
      */
     public function unserialize($bin_str) {
         return $this->s = $bin_str;
@@ -88,8 +89,7 @@ class Bytes implements \Serializable
      * @param \Aerospike\Bytes $bytes_wrap
      * @return string
      */
-    public static function unwrap(\Aerospike\Bytes $bytes_wrap) {
+    public static function unwrap(Bytes $bytes_wrap) {
         return $bytes_wrap->s;
     }
-
 }

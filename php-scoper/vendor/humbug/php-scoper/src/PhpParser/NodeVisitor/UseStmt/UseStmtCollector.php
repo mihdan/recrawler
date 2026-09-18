@@ -27,18 +27,12 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class UseStmtCollector extends NodeVisitorAbstract
 {
-    private $namespaceStatements;
-    private $useStatements;
-
-    public function __construct(NamespaceStmtCollection $namespaceStatements, UseStmtCollection $useStatements)
-    {
-        $this->namespaceStatements = $namespaceStatements;
-        $this->useStatements = $useStatements;
+    public function __construct(
+        private readonly NamespaceStmtCollection $namespaceStatements,
+        private readonly UseStmtCollection $useStatements,
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
     public function enterNode(Node $node): Node
     {
         if ($node instanceof Use_) {

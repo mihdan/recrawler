@@ -14,9 +14,9 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\PhpParser\NodeVisitor\UseStmt;
 
-use Humbug\PhpScoper\PhpParser\NodeVisitor\ParentNodeAppender;
-use Humbug\PhpScoper\Reflector;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\AttributeAppender\ParentNodeAppender;
+use Humbug\PhpScoper\PhpParser\UnexpectedParsingScenario;
+use Humbug\PhpScoper\Symbol\EnrichedReflector;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Use_;
@@ -30,30 +30,16 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class UseStmtPrefixer extends NodeVisitorAbstract
 {
-    private $prefix;
-    private $whitelist;
-    private $reflector;
-
-    public function __construct(string $prefix, Whitelist $whitelist, Reflector $reflector)
-    {
-        $this->prefix = $prefix;
-        $this->reflector = $reflector;
-        $this->whitelist = $whitelist;
+    public function __construct(
+        private readonly string $prefix,
+        private readonly EnrichedReflector $enrichedReflector,
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function enterNode(Node $node)
+    public function enterNode(Node $node): Node
     {
         if ($node instanceof UseUse && $this->shouldPrefixUseStmt($node)) {
-            $previousName = $node->name;
-
-            /** @var Name $prefixedName */
-            $prefixedName = Name::concat($this->prefix, $node->name, $node->name->getAttributes());
-            $node->name = $prefixedName;
-
-            UseStmtManipulator::setOriginalName($node, $previousName);
+            self::prefixStmt($node, $this->prefix);
         }
 
         return $node;
@@ -61,40 +47,59 @@ final class UseStmtPrefixer extends NodeVisitorAbstract
 
     private function shouldPrefixUseStmt(UseUse $use): bool
     {
-        $useType = $this->findUseType($use);
+        $useType = self::findUseType($use);
+        $nameString = $use->name->toString();
 
-        // If is already from the prefix namespace
-        if ($this->prefix === $use->name->getFirst()) {
+        $alreadyPrefixed = $this->prefix === $use->name->getFirst();
+
+        if ($alreadyPrefixed) {
             return false;
         }
 
-        // If is whitelisted
-        if ($this->whitelist->belongsToWhitelistedNamespace((string) $use->name)) {
+        if ($this->enrichedReflector->belongsToExcludedNamespace($nameString)) {
             return false;
         }
 
         if (Use_::TYPE_FUNCTION === $useType) {
-            return false === $this->reflector->isFunctionInternal((string) $use->name);
+            return !$this->enrichedReflector->isFunctionInternal($nameString);
         }
 
         if (Use_::TYPE_CONSTANT === $useType) {
-            return
-                false === $this->whitelist->isSymbolWhitelisted((string) $use->name)
-                && false === $this->reflector->isConstantInternal((string) $use->name)
-            ;
+            return !$this->enrichedReflector->isExposedConstant($nameString);
         }
 
-        return Use_::TYPE_NORMAL !== $useType || false === $this->reflector->isClassInternal((string) $use->name);
+        return Use_::TYPE_NORMAL !== $useType
+            || !$this->enrichedReflector->isClassInternal($nameString);
+    }
+
+    private static function prefixStmt(UseUse $use, string $prefix): void
+    {
+        $previousName = $use->name;
+
+        $prefixedName = Name::concat(
+            $prefix,
+            $use->name,
+            $use->name->getAttributes(),
+        );
+
+        if (null === $prefixedName) {
+            throw UnexpectedParsingScenario::create();
+        }
+
+        // Unlike the new (prefixed name), the previous name will not be
+        // traversed hence we need to manually set its parent attribute
+        ParentNodeAppender::setParent($previousName, $use);
+        UseStmtManipulator::setOriginalName($use, $previousName);
+
+        $use->name = $prefixedName;
     }
 
     /**
      * Finds the type of the use statement.
      *
-     * @param UseUse $use
-     *
      * @return int See \PhpParser\Node\Stmt\Use_ type constants.
      */
-    private function findUseType(UseUse $use): int
+    private static function findUseType(UseUse $use): int
     {
         if (Use_::TYPE_UNKNOWN === $use->type) {
             /** @var Use_ $parentNode */

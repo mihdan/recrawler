@@ -2,6 +2,9 @@
 
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Immutable;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\TentativeType;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -16,6 +19,7 @@ class ReflectionParameter implements Reflector
      * @var string Name of the parameter, same as calling the {@see ReflectionParameter::getName()} method
      */
     #[Immutable]
+    #[LanguageLevelTypeAware(['8.1' => 'string'], default: '')]
     public $name;
 
     /**
@@ -25,11 +29,9 @@ class ReflectionParameter implements Reflector
      * @param callable $function The function to reflect parameters from.
      * @param string|int $param Either an integer specifying the position
      * of the parameter (starting with zero), or a the parameter name as string.
-     * @throws \ReflectionException if the function or parameter does not exist.
+     * @throws ReflectionException if the function or parameter does not exist.
      */
-    public function __construct(callable $function, $param)
-    {
-    }
+    public function __construct($function, #[LanguageLevelTypeAware(['8.0' => 'string|int'], default: '')] $param) {}
 
     /**
      * Exports
@@ -44,19 +46,16 @@ class ReflectionParameter implements Reflector
      * @removed 8.0
      */
     #[Deprecated(since: '7.4')]
-    public static function export($function, $parameter, $return = false)
-    {
-    }
+    public static function export($function, $parameter, $return = false) {}
 
     /**
      * Returns the string representation of the ReflectionParameter object.
      *
      * @link https://php.net/manual/en/reflectionparameter.tostring.php
-     * @return string
+     * @return string The string.
      */
-    public function __toString()
-    {
-    }
+    #[LanguageLevelTypeAware(['7.0' => 'string'], default: '')]
+    public function __toString() {}
 
     /**
      * Gets parameter name
@@ -65,9 +64,8 @@ class ReflectionParameter implements Reflector
      * @return string The name of the reflected parameter.
      */
     #[Pure]
-	public function getName()
-    {
-    }
+    #[TentativeType]
+    public function getName(): string {}
 
     /**
      * Checks if passed by reference
@@ -76,33 +74,30 @@ class ReflectionParameter implements Reflector
      * @return bool {@see true} if the parameter is passed in by reference, otherwise {@see false}
      */
     #[Pure]
-	public function isPassedByReference()
-    {
-    }
+    #[TentativeType]
+    public function isPassedByReference(): bool {}
 
     /**
      * Returns whether this parameter can be passed by value
      *
      * @link https://php.net/manual/en/reflectionparameter.canbepassedbyvalue.php
-     * @return bool|null {@see true} if the parameter can be passed by value, {@see false} otherwise.
-     * Returns {@see null} in case of an error.
+     * @return bool {@see true} if the parameter can be passed by value, {@see false} otherwise.
+     * Prior to PHP 8.1, {@see null} was returned in case of an error.
      * @since 5.4
      */
-    public function canBePassedByValue()
-    {
-    }
+    #[TentativeType]
+    public function canBePassedByValue(): bool {}
 
     /**
      * Gets declaring function
      *
      * @link https://php.net/manual/en/reflectionparameter.getdeclaringfunction.php
      * @return ReflectionFunctionAbstract A {@see ReflectionFunctionAbstract} object.
-     * @since 5.2.3
+     * @since 5.2
      */
     #[Pure]
-	public function getDeclaringFunction()
-    {
-    }
+    #[TentativeType]
+    public function getDeclaringFunction(): ReflectionFunctionAbstract {}
 
     /**
      * Gets declaring class
@@ -112,9 +107,8 @@ class ReflectionParameter implements Reflector
      * called on function.
      */
     #[Pure]
-	public function getDeclaringClass()
-    {
-    }
+    #[TentativeType]
+    public function getDeclaringClass(): ?ReflectionClass {}
 
     /**
      * Gets the class type hinted for the parameter as a ReflectionClass object.
@@ -125,9 +119,8 @@ class ReflectionParameter implements Reflector
      */
     #[Deprecated(reason: "Use ReflectionParameter::getType() and the ReflectionType APIs should be used instead.", since: "8.0")]
     #[Pure]
-	public function getClass()
-    {
-    }
+    #[TentativeType]
+    public function getClass(): ?ReflectionClass {}
 
     /**
      * Checks if the parameter has a type associated with it.
@@ -136,9 +129,8 @@ class ReflectionParameter implements Reflector
      * @return bool {@see true} if a type is specified, {@see false} otherwise.
      * @since 7.0
      */
-    public function hasType()
-    {
-    }
+    #[TentativeType]
+    public function hasType(): bool {}
 
     /**
      * Gets a parameter's type
@@ -149,9 +141,16 @@ class ReflectionParameter implements Reflector
      * @since 7.0
      */
     #[Pure]
-	public function getType()
-    {
-    }
+    #[LanguageLevelTypeAware(
+        [
+            '7.1' => 'ReflectionNamedType|null',
+            '8.0' => 'ReflectionNamedType|ReflectionUnionType|null',
+            '8.1' => 'ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null'
+        ],
+        default: 'ReflectionType|null'
+    )]
+    #[TentativeType]
+    public function getType(): ?ReflectionType {}
 
     /**
      * Checks if parameter expects an array
@@ -162,24 +161,22 @@ class ReflectionParameter implements Reflector
      */
     #[Deprecated(reason: "Use ReflectionParameter::getType() and the ReflectionType APIs should be used instead.", since: "8.0")]
     #[Pure]
-	public function isArray()
-    {
-    }
+    #[TentativeType]
+    public function isArray(): bool {}
 
     /**
      * Returns whether parameter MUST be callable
      *
      * @link https://php.net/manual/en/reflectionparameter.iscallable.php
-     * @return bool|null Returns {@see true} if the parameter is callable, {@see false}
-     * if it is not or {@see null} on failure.
+     * @return bool Returns {@see true} if the parameter is callable, {@see false} if it is not.
+     * Prior to PHP 8.1, {@see null} was returned on failure.
      * @since 5.4
      * @see ReflectionParameter::getType()
      */
     #[Deprecated(reason: "Use ReflectionParameter::getType() and the ReflectionType APIs should be used instead.", since: "8.0")]
     #[Pure]
-	public function isCallable()
-    {
-    }
+    #[TentativeType]
+    public function isCallable(): bool {}
 
     /**
      * Checks if null is allowed
@@ -188,83 +185,76 @@ class ReflectionParameter implements Reflector
      * @return bool Returns {@see true} if {@see null} is allowed,
      * otherwise {@see false}
      */
-    public function allowsNull()
-    {
-    }
+    #[TentativeType]
+    public function allowsNull(): bool {}
 
     /**
      * Gets parameter position
      *
      * @link https://php.net/manual/en/reflectionparameter.getposition.php
      * @return int The position of the parameter, left to right, starting at position #0.
-     * @since 5.2.3
+     * @since 5.2
      */
     #[Pure]
-	public function getPosition()
-    {
-    }
+    #[TentativeType]
+    public function getPosition(): int {}
 
     /**
      * Checks if optional
      *
      * @link https://php.net/manual/en/reflectionparameter.isoptional.php
      * @return bool Returns {@see true} if the parameter is optional, otherwise {@see false}
-     * @since 5.0.3
+     * @since 5.0
      */
     #[Pure]
-	public function isOptional()
-    {
-    }
+    #[TentativeType]
+    public function isOptional(): bool {}
 
     /**
      * Checks if a default value is available
      *
      * @link https://php.net/manual/en/reflectionparameter.isdefaultvalueavailable.php
      * @return bool Returns {@see true} if a default value is available, otherwise {@see false}
-     * @since 5.0.3
+     * @since 5.0
      */
     #[Pure]
-	public function isDefaultValueAvailable()
-    {
-    }
+    #[TentativeType]
+    public function isDefaultValueAvailable(): bool {}
 
     /**
      * Gets default parameter value
      *
      * @link https://php.net/manual/en/reflectionparameter.getdefaultvalue.php
      * @return mixed The parameters default value.
-     * @throws \ReflectionException if the parameter is not optional
-     * @since 5.0.3
+     * @throws ReflectionException if the parameter is not optional
+     * @since 5.0
      */
     #[Pure]
-	public function getDefaultValue()
-    {
-    }
+    #[TentativeType]
+    public function getDefaultValue(): mixed {}
 
     /**
      * Returns whether the default value of this parameter is constant
      *
      * @link https://php.net/manual/en/reflectionparameter.isdefaultvalueconstant.php
      * @return bool Returns {@see true} if the default value is constant, and {@see false} otherwise.
-     * @since 5.4.6
+     * @since 5.4
      */
     #[Pure]
-	public function isDefaultValueConstant()
-    {
-    }
+    #[TentativeType]
+    public function isDefaultValueConstant(): bool {}
 
     /**
      * Returns the default value's constant name if default value is constant or null
      *
      * @link https://php.net/manual/en/reflectionparameter.getdefaultvalueconstantname.php
      * @return string|null Returns string on success or {@see null} on failure.
-     * @throws \ReflectionException if the parameter is not optional
-     * @since 5.4.6
+     * @throws ReflectionException if the parameter is not optional
+     * @since 5.4
      */
     #[Pure]
-	public function getDefaultValueConstantName()
-    {
-    }
+    #[TentativeType]
+    public function getDefaultValueConstantName(): ?string {}
 
     /**
      * Returns whether this function is variadic
@@ -274,33 +264,36 @@ class ReflectionParameter implements Reflector
      * @since 5.6
      */
     #[Pure]
-	public function isVariadic()
-    {
-    }
+    #[TentativeType]
+    public function isVariadic(): bool {}
 
     /**
      * Returns information about whether the parameter is a promoted.
      *
+     * @link https://php.net/manual/en/reflectionparameter.ispromoted.php
      * @return bool Returns {@see true} if the parameter promoted or {@see false} instead
      * @since 8.0
      */
     #[Pure]
-	public function isPromoted()
-    {
-    }
+    public function isPromoted(): bool {}
 
     /**
+     * Gets Attributes
+     *
+     * Returns all attributes declared on this parameter as an array of ReflectionAttribute.
+     *
+     * @link https://php.net/manual/en/reflectionparameter.getattributes.php
+     * @template T
+     *
      * Returns an array of parameter attributes.
      *
-     * @param string|null $name Name of an attribute class
+     * @param class-string<T>|null $name Name of an attribute class
      * @param int $flags Сriteria by which the attribute is searched.
-     * @return ReflectionAttribute[]
+     * @return ReflectionAttribute<T>[] Array of attributes, as a ReflectionAttribute object.
      * @since 8.0
      */
     #[Pure]
-	public function getAttributes($name = null, $flags = 0)
-    {
-    }
+    public function getAttributes(?string $name = null, int $flags = 0): array {}
 
     /**
      * Clone
@@ -308,7 +301,21 @@ class ReflectionParameter implements Reflector
      * @link https://php.net/manual/en/reflectionparameter.clone.php
      * @return void
      */
-    final private function __clone()
-    {
-    }
+    #[PhpStormStubsElementAvailable(from: "5.4", to: "8.0")]
+    final private function __clone(): void {}
+
+    /**
+     * Clone
+     *
+     * @link https://php.net/manual/en/reflectionparameter.clone.php
+     * @return void
+     */
+    #[PhpStormStubsElementAvailable(from: "8.1")]
+    private function __clone(): void {}
+
+    /**
+     * @return string|false
+     * @since 8.6
+     */
+    public function getDocComment(): string|false {}
 }

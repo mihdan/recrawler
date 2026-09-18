@@ -7,12 +7,12 @@ namespace RdKafka;
  */
 class TopicConf
 {
+    public function __construct() {}
+
     /**
      * @return array
      */
-    public function dump()
-    {
-    }
+    public function dump() {}
 
     /**
      * @param string $name
@@ -20,16 +20,12 @@ class TopicConf
      *
      * @return void
      */
-    public function set($name, $value)
-    {
-    }
+    public function set($name, $value) {}
 
     /**
      * @param int $partitioner
      *
      * @return void
      */
-    public function setPartitioner($partitioner)
-    {
-    }
+    public function setPartitioner($partitioner) {}
 }

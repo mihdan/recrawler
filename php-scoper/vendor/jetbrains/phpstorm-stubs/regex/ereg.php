@@ -5,14 +5,14 @@ use JetBrains\PhpStorm\Deprecated;
 
 /**
  * Regular expression match
- * @link https://php.net/manual/en/function.ereg.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.ereg
  * @param string $pattern <p>
  * Case sensitive regular expression.
  * </p>
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array &$regs [optional] <p>
+ * @param null|array &$regs [optional] <p>
  * If matches are found for parenthesized substrings of
  * <i>pattern</i> and the function is called with the
  * third argument <i>regs</i>, the matches will be stored
@@ -36,11 +36,11 @@ use JetBrains\PhpStorm\Deprecated;
  * @see preg_match()
  */
 #[Deprecated(reason: "Use preg_match() instead", since: "5.3")]
-function ereg ($pattern, $string, array &$regs = null) {}
+function ereg($pattern, $string, ?array &$regs = null) {}
 
 /**
  * Replace regular expression
- * @link https://php.net/manual/en/function.ereg-replace.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.ereg-replace
  * @param string $pattern <p>
  * A POSIX extended regular expression.
  * </p>
@@ -62,18 +62,18 @@ function ereg ($pattern, $string, array &$regs = null) {}
  * @see preg_replace()
  */
 #[Deprecated(reason: "Use preg_replace() instead", since: "5.3")]
-function ereg_replace ($pattern, $replacement, $string) {}
+function ereg_replace($pattern, $replacement, $string) {}
 
 /**
  * Case insensitive regular expression match
- * @link https://php.net/manual/en/function.eregi.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.eregi
  * @param string $pattern <p>
  * Case insensitive regular expression.
  * </p>
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array &$regs [optional] <p>
+ * @param null|array &$regs [optional] <p>
  * If matches are found for parenthesized substrings of
  * <i>pattern</i> and the function is called with the
  * third argument <i>regs</i>, the matches will be stored
@@ -96,11 +96,11 @@ function ereg_replace ($pattern, $replacement, $string) {}
  * @see preg_match()
  */
 #[Deprecated(reason: "Use preg_match() instead", since: "5.3")]
-function eregi ($pattern, $string, array &$regs = null) {}
+function eregi($pattern, $string, array &$regs = null) {}
 
 /**
  * Replace regular expression case insensitive
- * @link https://php.net/manual/en/function.eregi-replace.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.eregi-replace
  * @param string $pattern <p>
  * A POSIX extended regular expression.
  * </p>
@@ -122,11 +122,11 @@ function eregi ($pattern, $string, array &$regs = null) {}
  * @see preg_replace()
  */
 #[Deprecated(reason: "Use preg_replace() instead", since: "5.3")]
-function eregi_replace ($pattern, $replacement, $string) {}
+function eregi_replace($pattern, $replacement, $string) {}
 
 /**
  * Split string into array by regular expression
- * @link https://php.net/manual/en/function.split.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.split
  * @param string $pattern <p>
  * Case sensitive regular expression.
  * </p>
@@ -165,11 +165,11 @@ function eregi_replace ($pattern, $replacement, $string) {}
  * @see preg_split()
  */
 #[Deprecated(reason: "Use preg_split() instead", since: "5.3")]
-function split ($pattern, $string, $limit = -1) {}
+function split($pattern, $string, $limit = -1) {}
 
 /**
  * Split string into array by regular expression case insensitive
- * @link https://php.net/manual/en/function.spliti.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.spliti
  * @param string $pattern <p>
  * Case insensitive regular expression.
  * </p>
@@ -208,11 +208,11 @@ function split ($pattern, $string, $limit = -1) {}
  * @see preg_split()
  */
 #[Deprecated(reason: "Use preg_split() instead", since: "5.3")]
-function spliti ($pattern, $string, $limit = -1) {}
+function spliti($pattern, $string, $limit = -1) {}
 
 /**
  * Make regular expression for case insensitive match
- * @link https://php.net/manual/en/function.sql-regcase.php
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.sql-regcase
  * @param string $string <p>
  * The input string.
  * </p>
@@ -224,7 +224,6 @@ function spliti ($pattern, $string, $limit = -1) {}
  * @removed 7.0
  */
 #[Deprecated(since: '5.3')]
-function sql_regcase ($string) {}
+function sql_regcase($string) {}
 
 // End of ereg v.
-?>

@@ -1,4 +1,8 @@
 <?php
+
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\TentativeType;
+
 /**
  * <b>SessionHandlerInterface</b> is an interface which defines
  * a prototype for creating a custom session handler.
@@ -8,105 +12,121 @@
  * @link https://php.net/manual/en/class.sessionhandlerinterface.php
  * @since 5.4
  */
-interface SessionHandlerInterface {
+interface SessionHandlerInterface
+{
+    /**
+     * Close the session
+     * @link https://php.net/manual/en/sessionhandlerinterface.close.php
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function close(): bool;
 
-	/**
-	 * Close the session
-	 * @link https://php.net/manual/en/sessionhandlerinterface.close.php
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function close();
+    /**
+     * Destroy a session
+     * @link https://php.net/manual/en/sessionhandlerinterface.destroy.php
+     * @param string $id The session ID being destroyed.
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function destroy(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id): bool;
 
-	/**
-	 * Destroy a session
-	 * @link https://php.net/manual/en/sessionhandlerinterface.destroy.php
-	 * @param string $session_id The session ID being destroyed.
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function destroy($session_id);
+    /**
+     * Cleanup old sessions
+     * @link https://php.net/manual/en/sessionhandlerinterface.gc.php
+     * @param int $max_lifetime <p>
+     * Sessions that have not updated for
+     * the last maxlifetime seconds will be removed.
+     * </p>
+     * @return int|false <p>
+     * Returns the number of deleted sessions on success, or false on failure. Prior to PHP version 7.1, the function returned true on success.
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[LanguageLevelTypeAware(['7.1' => 'int|false'], default: 'bool')]
+    #[TentativeType]
+    public function gc(#[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $max_lifetime);
 
-	/**
-	 * Cleanup old sessions
-	 * @link https://php.net/manual/en/sessionhandlerinterface.gc.php
-	 * @param int $maxlifetime <p>
-	 * Sessions that have not updated for
-	 * the last maxlifetime seconds will be removed.
-	 * </p>
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function gc($maxlifetime);
+    /**
+     * Initialize session
+     * @link https://php.net/manual/en/sessionhandlerinterface.open.php
+     * @param string $path The path where to store/retrieve the session.
+     * @param string $name The session name.
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function open(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $path,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $name
+    ): bool;
 
-	/**
-	 * Initialize session
-	 * @link https://php.net/manual/en/sessionhandlerinterface.open.php
-	 * @param string $save_path The path where to store/retrieve the session.
-	 * @param string $name The session name.
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function open($save_path, $name);
+    /**
+     * Read session data
+     * @link https://php.net/manual/en/sessionhandlerinterface.read.php
+     * @param string $id The session id to read data for.
+     * @return string|false <p>
+     * Returns an encoded string of the read data.
+     * If nothing was read, it must return false.
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function read(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id): string|false;
 
-
-	/**
-	 * Read session data
-	 * @link https://php.net/manual/en/sessionhandlerinterface.read.php
-	 * @param string $session_id The session id to read data for.
-	 * @return string <p>
-	 * Returns an encoded string of the read data.
-	 * If nothing was read, it must return an empty string.
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function read($session_id);
-
-	/**
-	 * Write session data
-	 * @link https://php.net/manual/en/sessionhandlerinterface.write.php
-	 * @param string $session_id The session id.
-	 * @param string $session_data <p>
-	 * The encoded session data. This data is the
-	 * result of the PHP internally encoding
-	 * the $_SESSION superglobal to a serialized
-	 * string and passing it as this parameter.
-	 * Please note sessions use an alternative serialization method.
-	 * </p>
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function write($session_id, $session_data);
+    /**
+     * Write session data
+     * @link https://php.net/manual/en/sessionhandlerinterface.write.php
+     * @param string $id The session id.
+     * @param string $data <p>
+     * The encoded session data. This data is the
+     * result of the PHP internally encoding
+     * the $_SESSION superglobal to a serialized
+     * string and passing it as this parameter.
+     * Please note sessions use an alternative serialization method.
+     * </p>
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function write(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $data
+    ): bool;
 }
 
 /**
  * <b>SessionIdInterface</b>
  * @link https://php.net/manual/en/class.sessionidinterface.php
- * @since 5.5.1
+ * @since 5.5
  */
-interface SessionIdInterface {
+interface SessionIdInterface
+{
     /**
      * Create session ID
      * @link https://php.net/manual/en/sessionidinterface.create-sid.php
-     * @return string
+     * @return string <p>
+     * The new session ID. Note that this value is returned internally to PHP for processing.
+     * </p>
      */
-    public function create_sid();
+    #[TentativeType]
+    public function create_sid(): string;
 }
 
 /**
@@ -114,33 +134,38 @@ interface SessionIdInterface {
  * defines a prototype for updating the life time of an existing session.
  * In order to use the lazy_write option must be enabled and a custom session
  * handler must implement this interface.
+ * @link https://php.net/manual/en/class.sessionupdatetimestamphandlerinterface.php
  * @since 7.0
  */
-interface SessionUpdateTimestampHandlerInterface {
-
+interface SessionUpdateTimestampHandlerInterface
+{
     /**
      * Validate session id
-     * @param string $session_id The session id
+     * @link https://www.php.net/manual/sessionupdatetimestamphandlerinterface.validateid
+     * @param string $id The session id
      * @return bool <p>
      * Note this value is returned internally to PHP for processing.
      * </p>
      */
-    public function validateId($session_id);
+    #[TentativeType]
+    public function validateId(string $id): bool;
 
     /**
      * Update timestamp of a session
-     * @param string $session_id The session id
-     * @param string $session_data <p>
+     * @link https://www.php.net/manual/sessionupdatetimestamphandlerinterface.updatetimestamp.php
+     * @param string $id The session id
+     * @param string $data <p>
      * The encoded session data. This data is the
      * result of the PHP internally encoding
      * the $_SESSION superglobal to a serialized
      * string and passing it as this parameter.
      * Please note sessions use an alternative serialization method.
      * </p>
-     * @return bool
+     * @return bool Returns true if the timestamp was updated, false otherwise. Note that this value
+     * is returned internally to PHP for processing.
      */
-    public function updateTimestamp($session_id, $session_data);
-
+    #[TentativeType]
+    public function updateTimestamp(string $id, string $data): bool;
 }
 
 /**
@@ -160,120 +185,107 @@ interface SessionUpdateTimestampHandlerInterface {
  */
 class SessionHandler implements SessionHandlerInterface, SessionIdInterface
 {
-
-	/**
-	 * Close the session
-	 * @link https://php.net/manual/en/sessionhandler.close.php
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function close() { }
+    /**
+     * Close the session
+     * @link https://php.net/manual/en/sessionhandler.close.php
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function close(): bool {}
 
     /**
      * Return a new session ID
      * @link https://php.net/manual/en/sessionhandler.create-sid.php
      * @return string <p>A session ID valid for the default session handler.</p>
-     * @since 5.5.1
+     * @since 5.5
      */
-	public function create_sid() {}
-
-	/**
-	 * Destroy a session
-	 * @link https://php.net/manual/en/sessionhandler.destroy.php
-	 * @param string $id The session ID being destroyed.
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function destroy($id) { }
-
-	/**
-	 * Cleanup old sessions
-	 * @link https://php.net/manual/en/sessionhandler.gc.php
-	 * @param int $max_lifetime <p>
-	 * Sessions that have not updated for
-	 * the last maxlifetime seconds will be removed.
-	 * </p>
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function gc($max_lifetime) { }
-
-	/**
-	 * Initialize session
-	 * @link https://php.net/manual/en/sessionhandler.open.php
-	 * @param string $path The path where to store/retrieve the session.
-	 * @param string $name The session name.
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function open($path, $name) { }
-
-
-	/**
-	 * Read session data
-	 * @link https://php.net/manual/en/sessionhandler.read.php
-	 * @param string $id The session id to read data for.
-	 * @return string <p>
-	 * Returns an encoded string of the read data.
-	 * If nothing was read, it must return an empty string.
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function read($id) { }
-
-	/**
-	 * Write session data
-	 * @link https://php.net/manual/en/sessionhandler.write.php
-	 * @param string $session_id The session id.
-	 * @param string $session_data <p>
-	 * The encoded session data. This data is the
-	 * result of the PHP internally encoding
-	 * the $_SESSION superglobal to a serialized
-	 * string and passing it as this parameter.
-	 * Please note sessions use an alternative serialization method.
-	 * </p>
-	 * @return bool <p>
-	 * The return value (usually TRUE on success, FALSE on failure).
-	 * Note this value is returned internally to PHP for processing.
-	 * </p>
-	 * @since 5.4
-	 */
-	public function write($id, $data) { }
+    #[TentativeType]
+    public function create_sid(): string {}
 
     /**
-     * Validate session id
-     * @param string $session_id The session id
+     * Destroy a session
+     * @link https://php.net/manual/en/sessionhandler.destroy.php
+     * @param string $id The session ID being destroyed.
      * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
      * Note this value is returned internally to PHP for processing.
      * </p>
+     * @since 5.4
      */
-    public function validateId($session_id) { }
+    #[TentativeType]
+    public function destroy(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id): bool {}
 
     /**
-     * Update timestamp of a session
-     * @param string $session_id The session id
-     * @param string $session_data <p>
+     * Cleanup old sessions
+     * @link https://php.net/manual/en/sessionhandler.gc.php
+     * @param int $max_lifetime <p>
+     * Sessions that have not updated for
+     * the last maxlifetime seconds will be removed.
+     * </p>
+     * @return int|bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function gc(#[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $max_lifetime): int|false {}
+
+    /**
+     * Initialize session
+     * @link https://php.net/manual/en/sessionhandler.open.php
+     * @param string $path The path where to store/retrieve the session.
+     * @param string $name The session name.
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function open(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $path,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $name
+    ): bool {}
+
+    /**
+     * Read session data
+     * @link https://php.net/manual/en/sessionhandler.read.php
+     * @param string $id The session id to read data for.
+     * @return string|false <p>
+     * Returns an encoded string of the read data.
+     * If nothing was read, it must return an empty string.
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function read(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id): string|false {}
+
+    /**
+     * Write session data
+     * @link https://php.net/manual/en/sessionhandler.write.php
+     * @param string $id The session id.
+     * @param string $data <p>
      * The encoded session data. This data is the
      * result of the PHP internally encoding
      * the $_SESSION superglobal to a serialized
      * string and passing it as this parameter.
      * Please note sessions use an alternative serialization method.
      * </p>
-     * @return bool
+     * @return bool <p>
+     * The return value (usually TRUE on success, FALSE on failure).
+     * Note this value is returned internally to PHP for processing.
+     * </p>
+     * @since 5.4
      */
-    public function updateTimestamp($session_id, $session_data) { }
-
+    #[TentativeType]
+    public function write(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $id,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $data
+    ): bool {}
 }

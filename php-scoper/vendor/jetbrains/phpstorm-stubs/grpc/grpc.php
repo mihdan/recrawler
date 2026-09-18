@@ -9,8 +9,9 @@
  * @see https://grpc.io
  * @see https://github.com/grpc/grpc/tree/master/src/php/ext/grpc
  */
-namespace Grpc
-{
+
+namespace Grpc;
+
     /**
      * Register call error constants
      */
@@ -92,7 +93,7 @@ namespace Grpc
      */
     const CALL_ERROR_PAYLOAD_TYPE_MISMATCH = 14;
 
-    /**
+    /*
      * Register write flags
      */
 
@@ -109,7 +110,7 @@ namespace Grpc
      */
     const WRITE_NO_COMPRESS = 2;
 
-    /**
+    /*
      * Register status constants
      */
 
@@ -259,7 +260,7 @@ namespace Grpc
      */
     const STATUS_DATA_LOSS = 15;
 
-    /**
+    /*
      * Register op type constants
      */
 
@@ -328,7 +329,7 @@ namespace Grpc
      */
     const OP_RECV_CLOSE_ON_SERVER = 7;
 
-    /**
+    /*
      * Register connectivity state constants
      */
 
@@ -443,7 +444,7 @@ namespace Grpc
          *
          * @throws \InvalidArgumentException
          */
-        public function __construct($target, $args = array()) {}
+        public function __construct($target, $args = []) {}
 
         /**
          * Get the endpoint this call/stream is connected to
@@ -505,17 +506,17 @@ namespace Grpc
         /**
          * Create SSL credentials.
          *
-         * @param string $pem_root_certs  PEM encoding of the server root certificates
-         * @param string $pem_private_key PEM encoding of the client's private key
-         * @param string $pem_cert_chain  PEM encoding of the client's certificate chain
+         * @param string|null $pem_root_certs  PEM encoding of the server root certificates
+         * @param string|null $pem_private_key PEM encoding of the client's private key
+         * @param string|null $pem_cert_chain  PEM encoding of the client's certificate chain
          *
          * @return ChannelCredentials The new SSL credentials object
          * @throws \InvalidArgumentException
          */
         public static function createSsl(
-            $pem_root_certs = '',
-            $pem_private_key = '',
-            $pem_cert_chain = ''
+            ?string $pem_root_certs = null,
+            ?string $pem_private_key = null,
+            ?string $pem_cert_chain = null
         ) {}
 
         /**
@@ -553,6 +554,7 @@ namespace Grpc
          *                                   Must not be closed.
          * @param string  $method            The method to call
          * @param Timeval $absolute_deadline The deadline for completing the call
+         * @param null|string $host_override The host is set by user (optional)
          *
          * @throws \InvalidArgumentException
          */
@@ -722,4 +724,3 @@ namespace Grpc
          */
         public static function zero() {}
     }
-}

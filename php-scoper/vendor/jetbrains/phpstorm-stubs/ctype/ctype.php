@@ -1,5 +1,6 @@
 <?php
 
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -12,8 +13,7 @@ use JetBrains\PhpStorm\Pure;
  * a letter or a digit, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_alnum (mixed $text): bool
-{}
+function ctype_alnum(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for alphabetic character(s)
@@ -25,8 +25,7 @@ function ctype_alnum (mixed $text): bool
  * a letter from the current locale, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_alpha (mixed $text): bool
-{}
+function ctype_alpha(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for control character(s)
@@ -38,8 +37,7 @@ function ctype_alpha (mixed $text): bool
  * a control character from the current locale, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_cntrl (mixed $text): bool
-{}
+function ctype_cntrl(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for numeric character(s)
@@ -51,8 +49,7 @@ function ctype_cntrl (mixed $text): bool
  * <i>text</i> is a decimal digit, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_digit (mixed $text): bool
-{}
+function ctype_digit(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for lowercase character(s)
@@ -64,8 +61,7 @@ function ctype_digit (mixed $text): bool
  * a lowercase letter in the current locale.
  */
 #[Pure]
-function ctype_lower (mixed $text): bool
-{}
+function ctype_lower(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for any printable character(s) except space
@@ -78,8 +74,7 @@ function ctype_lower (mixed $text): bool
  * otherwise.
  */
 #[Pure]
-function ctype_graph (mixed $text): bool
-{}
+function ctype_graph(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for printable character(s)
@@ -93,8 +88,7 @@ function ctype_graph (mixed $text): bool
  * that do not have any output or control function at all.
  */
 #[Pure]
-function ctype_print (mixed $text): bool
-{}
+function ctype_print(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for any printable character which is not whitespace or an
@@ -107,8 +101,7 @@ function ctype_print (mixed $text): bool
  * is printable, but neither letter, digit or blank, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_punct (mixed $text): bool
-{}
+function ctype_punct(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for whitespace character(s)
@@ -122,8 +115,7 @@ function ctype_punct (mixed $text): bool
  * carriage return and form feed characters.
  */
 #[Pure]
-function ctype_space (mixed $text): bool
-{}
+function ctype_space(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for uppercase character(s)
@@ -135,8 +127,7 @@ function ctype_space (mixed $text): bool
  * an uppercase letter in the current locale.
  */
 #[Pure]
-function ctype_upper (mixed $text): bool
-{}
+function ctype_upper(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for character(s) representing a hexadecimal digit
@@ -149,5 +140,4 @@ function ctype_upper (mixed $text): bool
  * [A-Fa-f] , <b>FALSE</b> otherwise.
  */
 #[Pure]
-function ctype_xdigit (mixed $text): bool
-{}
+function ctype_xdigit(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}

@@ -17,8 +17,8 @@ $google_services = implode(
 );
 
 return array(
-	'prefix'                     => 'Mihdan\\ReCrawler\\Dependencies',
-	'finders'                    => array(
+	'prefix'                   => 'Mihdan\\ReCrawler\\Dependencies',
+	'finders'                  => array(
 
 		// General dependencies, except Google API services.
 		Finder::create()
@@ -83,12 +83,12 @@ return array(
 		      ->depth( '== 0' )
 		      ->in( 'vendor/google/apiclient-services' ),
 	),
-	'files-whitelist'            => array(
+	'exclude-files'            => array(
 
 		// This dependency is a global function which should remain global.
 		'vendor/ralouphie/getallheaders/src/getallheaders.php',
 	),
-	'patchers'                   => array(
+	'patchers'                 => array(
 		function( $file_path, $prefix, $contents ) {
 			if ( preg_match( '#google/apiclient/src/Google/Http/REST\.php$#', $file_path ) ) {
 				$contents = str_replace( "\\$prefix\\intVal", '\\intval', $contents );
@@ -113,8 +113,15 @@ return array(
 			return $contents;
 		},
 	),
-	'whitelist'                  => array(),
-	'whitelist-global-constants' => false,
-	'whitelist-global-classes'   => false,
-	'whitelist-global-functions' => false,
+	'exclude-namespaces'       => array(),
+	'exclude-classes'          => array(),
+	'exclude-functions'        => array(),
+	'exclude-constants'        => array(),
+	'expose-global-constants' => false,
+	'expose-global-classes'   => false,
+	'expose-global-functions' => false,
+	'expose-namespaces'       => array(),
+	'expose-classes'          => array(),
+	'expose-functions'        => array(),
+	'expose-constants'        => array(),
 );

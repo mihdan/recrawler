@@ -2,14 +2,16 @@
 
 // Start of Core v.5.3.6-13ubuntu3.2
 use JetBrains\PhpStorm\ExpectedValues;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\TentativeType;
 use JetBrains\PhpStorm\Pure;
 
 /**
  * Created by typecasting to object.
  * @link https://php.net/manual/en/reserved.classes.php
  */
-class stdClass {
-}
+class stdClass {}
 
 /**
  * @link https://wiki.php.net/rfc/iterable
@@ -22,53 +24,66 @@ interface iterable {}
  * Instead it must be implemented by either {@see IteratorAggregate} or {@see Iterator}.
  *
  * @link https://php.net/manual/en/class.traversable.php
+ * @template TKey
+ * @template-covariant TValue
+ *
+ * @template-extends iterable<TKey, TValue>
  */
-interface Traversable extends iterable {
-}
+interface Traversable extends iterable {}
 
 /**
  * Interface to create an external Iterator.
  * @link https://php.net/manual/en/class.iteratoraggregate.php
+ * @template TKey
+ * @template-covariant TValue
+ * @template-extends Traversable<TKey, TValue>
  */
-interface IteratorAggregate extends Traversable {
-
+interface IteratorAggregate extends Traversable
+{
     /**
      * Retrieve an external iterator
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return Traversable<TKey, TValue>|TValue[] An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      * @throws Exception on failure.
      */
-    public function getIterator();
+    #[TentativeType]
+    public function getIterator(): Traversable;
 }
 
 /**
  * Interface for external iterators or objects that can be iterated
  * themselves internally.
  * @link https://php.net/manual/en/class.iterator.php
+ * @template TKey
+ * @template-covariant TValue
+ * @template-extends Traversable<TKey, TValue>
  */
-interface Iterator extends Traversable {
-
+interface Iterator extends Traversable
+{
     /**
      * Return the current element
      * @link https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return TValue Can return any type.
      */
-    public function current();
+    #[TentativeType]
+    public function current(): mixed;
 
     /**
      * Move forward to next element
      * @link https://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      */
-    public function next();
+    #[TentativeType]
+    public function next(): void;
 
     /**
      * Return the key of the current element
      * @link https://php.net/manual/en/iterator.key.php
-     * @return string|float|int|bool|null scalar on success, or null on failure.
+     * @return TKey|null TKey on success, or null on failure.
      */
-    public function key();
+    #[TentativeType]
+    public function key(): mixed;
 
     /**
      * Checks if current position is valid
@@ -76,26 +91,30 @@ interface Iterator extends Traversable {
      * @return bool The return value will be casted to boolean and then evaluated.
      * Returns true on success or false on failure.
      */
-    public function valid();
+    #[TentativeType]
+    public function valid(): bool;
 
     /**
      * Rewind the Iterator to the first element
      * @link https://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      */
-    public function rewind();
+    #[TentativeType]
+    public function rewind(): void;
 }
 
 /**
  * Interface to provide accessing objects as arrays.
  * @link https://php.net/manual/en/class.arrayaccess.php
+ * @template TKey
+ * @template TValue
  */
-interface ArrayAccess {
-
+interface ArrayAccess
+{
     /**
      * Whether a offset exists
      * @link https://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
+     * @param TKey $offset <p>
      * An offset to check for.
      * </p>
      * @return bool true on success or false on failure.
@@ -103,48 +122,57 @@ interface ArrayAccess {
      * <p>
      * The return value will be casted to boolean if non-boolean was returned.
      */
-    public function offsetExists($offset);
+    #[TentativeType]
+    public function offsetExists(#[LanguageLevelTypeAware(['8.0' => 'mixed'], default: '')] $offset): bool;
 
     /**
      * Offset to retrieve
      * @link https://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
+     * @param TKey $offset <p>
      * The offset to retrieve.
      * </p>
-     * @return mixed Can return all value types.
+     * @return TValue Can return all value types.
      */
-    public function offsetGet($offset);
+    #[TentativeType]
+    public function offsetGet(#[LanguageLevelTypeAware(['8.0' => 'mixed'], default: '')] $offset): mixed;
 
     /**
      * Offset to set
      * @link https://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
+     * @param TKey $offset <p>
      * The offset to assign the value to.
      * </p>
-     * @param mixed $value <p>
+     * @param TValue $value <p>
      * The value to set.
      * </p>
-     * @return void
+     * @return void No value is returned.
      */
-    public function offsetSet($offset, $value);
+    #[TentativeType]
+    public function offsetSet(
+        #[LanguageLevelTypeAware(['8.0' => 'mixed'], default: '')] $offset,
+        #[LanguageLevelTypeAware(['8.0' => 'mixed'], default: '')] $value
+    ): void;
 
     /**
      * Offset to unset
      * @link https://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
+     * @param TKey $offset <p>
      * The offset to unset.
      * </p>
-     * @return void
+     * @return void No value is returned.
      */
-    public function offsetUnset($offset);
+    #[TentativeType]
+    public function offsetUnset(#[LanguageLevelTypeAware(['8.0' => 'mixed'], default: '')] $offset): void;
 }
 
 /**
- * Interface for customized serializing.
+ * Interface for customized serializing.<br>
+ * As of PHP 8.1.0, a class which implements Serializable without also implementing `__serialize()` and `__unserialize()`
+ * will generate a deprecation warning.
  * @link https://php.net/manual/en/class.serializable.php
  */
-interface Serializable {
-
+interface Serializable
+{
     /**
      * String representation of object.
      * @link https://php.net/manual/en/serializable.serialize.php
@@ -156,12 +184,11 @@ interface Serializable {
     /**
      * Constructs the object.
      * @link https://php.net/manual/en/serializable.unserialize.php
-     * @param string $serialized The string representation of the object.
-     * @return void
+     * @param string $data The string representation of the object.
+     * @return void The return value from this method is ignored.
      */
-    public function unserialize($serialized);
+    public function unserialize(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $data);
 }
-
 
 /**
  * Throwable is the base interface for any object that can be thrown via a throw statement in PHP 7,
@@ -171,14 +198,13 @@ interface Serializable {
  */
 interface Throwable extends Stringable
 {
-
     /**
      * Gets the message
      * @link https://php.net/manual/en/throwable.getmessage.php
-     * @return string
+     * @return string Returns the message associated with the thrown object.
      * @since 7.0
      */
-    public function getMessage();
+    public function getMessage(): string;
 
     /**
      * Gets the exception code
@@ -199,7 +225,7 @@ interface Throwable extends Stringable
      * @return string Returns the name of the file from which the object was thrown.
      * @since 7.0
      */
-    public function getFile();
+    public function getFile(): string;
 
     /**
      * Gets the line on which the object was instantiated
@@ -207,7 +233,7 @@ interface Throwable extends Stringable
      * @return int Returns the line number where the thrown object was instantiated.
      * @since 7.0
      */
-    public function getLine();
+    public function getLine(): int;
 
     /**
      * Gets the stack trace
@@ -218,7 +244,7 @@ interface Throwable extends Stringable
      * </p>
      * @since 7.0
      */
-    public function getTrace();
+    public function getTrace(): array;
 
     /**
      * Gets the stack trace as a string
@@ -226,14 +252,15 @@ interface Throwable extends Stringable
      * @return string Returns the stack trace as a string.
      * @since 7.0
      */
-    public function getTraceAsString();
+    public function getTraceAsString(): string;
 
     /**
      * Returns the previous Throwable
      * @link https://php.net/manual/en/throwable.getprevious.php
-     * @return Throwable Returns the previous {@see Throwable} if available, or <b>NULL</b> otherwise.
+     * @return null|Throwable Returns the previous {@see Throwable} if available, or <b>NULL</b> otherwise.
      * @since 7.0
      */
+    #[LanguageLevelTypeAware(['8.0' => 'Throwable|null'], default: '')]
     public function getPrevious();
 
     /**
@@ -242,23 +269,42 @@ interface Throwable extends Stringable
      * @return string <p>Returns the string representation of the thrown object.</p>
      * @since 7.0
      */
+    #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')]
     public function __toString();
 }
+
 /**
  * Exception is the base class for
  * all Exceptions.
  * @link https://php.net/manual/en/class.exception.php
  */
-class Exception implements Throwable {
-    /** The error message */
+class Exception implements Throwable
+{
+    /**
+     * The error message
+     * @var string
+     */
     protected $message;
+
     /** The error code */
     protected $code;
+
     /** The filename where the error happened  */
+    #[LanguageLevelTypeAware(['8.1' => 'string'], default: '')]
     protected $file;
+
     /** The line where the error happened */
+    #[LanguageLevelTypeAware(['8.1' => 'int'], default: '')]
     protected $line;
 
+    /** Cached string representation of the exception (used by __toString) */
+    private string $string = '';
+
+    /** Internal storage for the exception stack trace */
+    private array $trace = [];
+
+    /** The previous throwable used for exception chaining */
+    private ?Throwable $previous = null;
 
     /**
      * Clone the exception
@@ -266,17 +312,31 @@ class Exception implements Throwable {
      * @link https://php.net/manual/en/exception.clone.php
      * @return void
      */
-    final private function __clone() { }
+    #[PhpStormStubsElementAvailable(from: "5.4", to: "8.0")]
+    final private function __clone(): void {}
+
+    /**
+     * Clone the exception
+     * Tries to clone the Exception, which results in Fatal error.
+     * @link https://php.net/manual/en/exception.clone.php
+     * @return void No value is returned.
+     */
+    #[PhpStormStubsElementAvailable("8.1")]
+    private function __clone(): void {}
 
     /**
      * Construct the exception. Note: The message is NOT binary safe.
      * @link https://php.net/manual/en/exception.construct.php
      * @param string $message [optional] The Exception message to throw.
      * @param int $code [optional] The Exception code.
-     * @param Throwable $previous [optional] The previous throwable used for the exception chaining.
+     * @param null|Throwable $previous [optional] The previous throwable used for the exception chaining.
      */
     #[Pure]
-    public function __construct($message = "", $code = 0, Throwable $previous = null) { }
+    public function __construct(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $message = "",
+        #[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $code = 0,
+        #[LanguageLevelTypeAware(['8.0' => 'Throwable|null'], default: 'Throwable')] $previous = null
+    ) {}
 
     /**
      * Gets the Exception message
@@ -284,7 +344,7 @@ class Exception implements Throwable {
      * @return string the Exception message as a string.
      */
     #[Pure]
-    final public function getMessage() { }
+    final public function getMessage(): string {}
 
     /**
      * Gets the Exception code
@@ -295,7 +355,7 @@ class Exception implements Throwable {
      * string in <b>PDOException</b>).
      */
     #[Pure]
-    final public function getCode() { }
+    final public function getCode() {}
 
     /**
      * Gets the file in which the exception occurred
@@ -303,7 +363,7 @@ class Exception implements Throwable {
      * @return string the filename in which the exception was created.
      */
     #[Pure]
-    final public function getFile() { }
+    final public function getFile(): string {}
 
     /**
      * Gets the line in which the exception occurred
@@ -311,7 +371,7 @@ class Exception implements Throwable {
      * @return int the line number where the exception was created.
      */
     #[Pure]
-    final public function getLine() { }
+    final public function getLine(): int {}
 
     /**
      * Gets the stack trace
@@ -319,16 +379,16 @@ class Exception implements Throwable {
      * @return array the Exception stack trace as an array.
      */
     #[Pure]
-    final public function getTrace() { }
+    final public function getTrace(): array {}
 
     /**
      * Returns previous Exception
      * @link https://php.net/manual/en/exception.getprevious.php
-     * @return Exception the previous <b>Exception</b> if available
+     * @return null|Throwable Returns the previous {@see Throwable} if available, or <b>NULL</b> otherwise.
      * or null otherwise.
      */
     #[Pure]
-    final public function getPrevious() { }
+    final public function getPrevious(): ?Throwable {}
 
     /**
      * Gets the stack trace as a string
@@ -336,16 +396,18 @@ class Exception implements Throwable {
      * @return string the Exception stack trace as a string.
      */
     #[Pure]
-    final public function getTraceAsString() { }
+    final public function getTraceAsString(): string {}
 
     /**
      * String representation of the exception
      * @link https://php.net/manual/en/exception.tostring.php
      * @return string the string representation of the exception.
      */
-    public function __toString() { }
+    #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')]
+    public function __toString() {}
 
-    public function __wakeup() { }
+    #[TentativeType]
+    public function __wakeup(): void {}
 }
 
 /**
@@ -353,37 +415,52 @@ class Exception implements Throwable {
  * @link https://php.net/manual/en/class.error.php
  * @since 7.0
  */
-class Error implements Throwable {
-
+class Error implements Throwable
+{
     /** The error message */
     protected $message;
+
     /** The error code */
     protected $code;
+
     /** The filename where the error happened  */
+    #[LanguageLevelTypeAware(['8.1' => 'string'], default: '')]
     protected $file;
+
     /** The line where the error happened */
+    #[LanguageLevelTypeAware(['8.1' => 'int'], default: '')]
     protected $line;
+
+    /** Cached string representation of the error (used by __toString) */
+    private string $string = '';
+
+    /** Internal storage for the error stack trace */
+    private array $trace = [];
+
+    /** The previous throwable used for error chaining */
+    private ?Throwable $previous = null;
 
     /**
      * Construct the error object.
      * @link https://php.net/manual/en/error.construct.php
      * @param string $message [optional] The Error message to throw.
      * @param int $code [optional] The Error code.
-     * @param Throwable $previous [optional] The previous throwable used for the exception chaining.
+     * @param null|Throwable $previous [optional] The previous throwable used for the exception chaining.
      */
-    public function __construct($message = "", $code = 0, Throwable $previous = null)
-    {
-    }
+    #[Pure]
+    public function __construct(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $message = "",
+        #[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $code = 0,
+        #[LanguageLevelTypeAware(['8.0' => 'Throwable|null'], default: 'Throwable')] $previous = null
+    ) {}
 
-    /***
+    /**
      * Gets the message
      * @link https://php.net/manual/en/throwable.getmessage.php
-     * @return string
+     * @return string Returns the error message as a string.
      * @since 7.0
      */
-    public final function getMessage()
-    {
-    }
+    final public function getMessage(): string {}
 
     /**
      * Gets the exception code
@@ -396,8 +473,7 @@ class Error implements Throwable {
      * </p>
      * @since 7.0
      */
-    public final function getCode(){}
-
+    final public function getCode() {}
 
     /**
      * Gets the file in which the exception occurred
@@ -405,8 +481,7 @@ class Error implements Throwable {
      * @return string Returns the name of the file from which the object was thrown.
      * @since 7.0
      */
-    public final function getFile(){}
-
+    final public function getFile(): string {}
 
     /**
      * Gets the line on which the object was instantiated
@@ -414,8 +489,7 @@ class Error implements Throwable {
      * @return int Returns the line number where the thrown object was instantiated.
      * @since 7.0
      */
-    public final function getLine(){}
-
+    final public function getLine(): int {}
 
     /**
      * Gets the stack trace
@@ -426,7 +500,7 @@ class Error implements Throwable {
      * </p>
      * @since 7.0
      */
-    public final function getTrace(){}
+    final public function getTrace(): array {}
 
     /**
      * Gets the stack trace as a string
@@ -434,22 +508,23 @@ class Error implements Throwable {
      * @return string Returns the stack trace as a string.
      * @since 7.0
      */
-    public final function getTraceAsString(){}
+    final public function getTraceAsString(): string {}
 
     /**
      * Returns the previous Throwable
      * @link https://php.net/manual/en/throwable.getprevious.php
-     * @return Throwable Returns the previous {@see Throwable} if available, or <b>NULL</b> otherwise.
+     * @return null|Throwable Returns the previous {@see Throwable} if available, or <b>NULL</b> otherwise.
      * @since 7.0
      */
-    public final function getPrevious(){}
+    final public function getPrevious(): ?Throwable {}
+
     /**
      * Gets a string representation of the thrown object
      * @link https://php.net/manual/en/throwable.tostring.php
      * @return string <p>Returns the string representation of the thrown object.</p>
      * @since 7.0
      */
-    public function __toString(){}
+    public function __toString(): string {}
 
     /**
      * Clone the error
@@ -457,11 +532,28 @@ class Error implements Throwable {
      * @return void
      * @link https://php.net/manual/en/error.clone.php
      */
-    private final function __clone(){}
+    #[PhpStormStubsElementAvailable(from: "7.0", to: "8.0")]
+    final private function __clone(): void {}
 
-    public function __wakeup(){}
+    /**
+     * Clone the error
+     * Error can not be clone, so this method results in fatal error.
+     * @return void No value is returned.
+     * @link https://php.net/manual/en/error.clone.php
+     */
+    #[PhpStormStubsElementAvailable('8.1')]
+    private function __clone(): void {}
+
+    #[TentativeType]
+    public function __wakeup(): void {}
 }
 
+/**
+ * Is thrown when the type of an argument is correct but the value of it is incorrect. For example, passing a negative
+ * integer when the function expects a positive one, or passing an empty string/array when the function expects it to not be empty.
+ * @link https://www.php.net/manual/en/class.valueerror.php
+ * @since 8.0
+ */
 class ValueError extends Error {}
 
 /**
@@ -472,18 +564,14 @@ class ValueError extends Error {}
  * @link https://php.net/manual/en/class.typeerror.php
  * @since 7.0
  */
-class TypeError extends Error {
-
-}
+class TypeError extends Error {}
 
 /**
  * ParseError is thrown when an error occurs while parsing PHP code, such as when {@see eval()} is called.
  * @link https://php.net/manual/en/class.parseerror.php
  * @since 7.0
  */
-class ParseError extends CompileError {
-
-}
+class ParseError extends CompileError {}
 
 /**
  * ArgumentCountError is thrown when too few arguments are passed to a user
@@ -501,27 +589,21 @@ class ArgumentCountError extends TypeError {}
  * @link https://php.net/manual/en/class.arithmeticerror.php
  * @since 7.0
  */
-class ArithmeticError extends Error {
-
-}
+class ArithmeticError extends Error {}
 
 /**
  * Class CompileError
- * @link https://secure.php.net/manual/en/class.compileerror.php
+ * @link https://php.net/manual/en/class.compileerror.php
  * @since 7.3
  */
-class CompileError extends Error {
-
-}
+class CompileError extends Error {}
 
 /**
  * DivisionByZeroError is thrown when an attempt is made to divide a number by zero.
  * @link https://php.net/manual/en/class.divisionbyzeroerror.php
  * @since 7.0
  */
-class DivisionByZeroError extends ArithmeticError {
-
-}
+class DivisionByZeroError extends ArithmeticError {}
 
 /**
  * @since 8.0
@@ -529,13 +611,18 @@ class DivisionByZeroError extends ArithmeticError {
 class UnhandledMatchError extends Error {}
 
 /**
+ * @since 8.4
+ */
+class RequestParseBodyException extends Exception {}
+
+/**
  * An Error Exception.
  * @link https://php.net/manual/en/class.errorexception.php
  */
-class ErrorException extends Exception {
-
+class ErrorException extends Exception
+{
+    #[LanguageLevelTypeAware(['8.1' => 'int'], default: '')]
     protected $severity;
-
 
     /**
      * Constructs the exception
@@ -545,17 +632,24 @@ class ErrorException extends Exception {
      * @param int $severity [optional] The severity level of the exception.
      * @param string $filename [optional] The filename where the exception is thrown.
      * @param int $line [optional] The line number where the exception is thrown.
-     * @param Exception $previous [optional] The previous exception used for the exception chaining.
+     * @param Throwable $previous [optional] The previous exception used for the exception chaining.
      */
-    #[\JetBrains\PhpStorm\Pure]
-    public function __construct($message = "", $code = 0, $severity = 1, $filename = __FILE__, $line = __LINE__, $previous = null) { }
+    #[Pure]
+    public function __construct(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $message = "",
+        #[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $code = 0,
+        #[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $severity = 1,
+        #[LanguageLevelTypeAware(['8.0' => 'string|null'], default: '')] $filename = null,
+        #[LanguageLevelTypeAware(['8.0' => 'int|null'], default: '')] $line = null,
+        #[LanguageLevelTypeAware(['8.0' => 'Throwable|null'], default: 'Throwable')] $previous = null
+    ) {}
 
     /**
      * Gets the exception severity
      * @link https://php.net/manual/en/errorexception.getseverity.php
      * @return int the severity level of the exception.
      */
-    final public function getSeverity() { }
+    final public function getSeverity(): int {}
 }
 
 /**
@@ -565,66 +659,89 @@ class ErrorException extends Exception {
  * Starting with PHP 5.4, this class has methods that allow further control of the anonymous function after it has been created.
  * <p>Besides the methods listed here, this class also has an __invoke method.
  * This is for consistency with other classes that implement calling magic, as this method is not used for calling the function.
- * @link https://secure.php.net/manual/en/class.closure.php
+ * @link https://php.net/manual/en/class.closure.php
  */
-final class Closure {
-
+final class Closure
+{
     /**
      * This method exists only to disallow instantiation of the Closure class.
      * Objects of this class are created in the fashion described on the anonymous functions page.
-     * @link https://secure.php.net/manual/en/closure.construct.php
+     * @link https://php.net/manual/en/closure.construct.php
      */
-    private function __construct() { }
+    private function __construct() {}
 
     /**
      * This is for consistency with other classes that implement calling magic,
      * as this method is not used for calling the function.
      * @param mixed ...$_ [optional]
      * @return mixed
-     * @link https://secure.php.net/manual/en/class.closure.php
+     * @link https://php.net/manual/en/class.closure.php
      */
-    public function __invoke(...$_) { }
+    public function __invoke(...$_) {}
 
     /**
      * Duplicates the closure with a new bound object and class scope
-     * @link https://secure.php.net/manual/en/closure.bindto.php
+     * @link https://php.net/manual/en/closure.bindto.php
      * @param object|null $newThis The object to which the given anonymous function should be bound, or NULL for the closure to be unbound.
-     * @param mixed $newScope The class scope to which associate the closure is to be associated, or 'static' to keep the current one.
+     * @param object|class-string|null $newScope The class scope to which associate the closure is to be associated, or 'static' to keep the current one.
      * If an object is given, the type of the object will be used instead.
      * This determines the visibility of protected and private methods of the bound object.
-     * @return Closure|false Returns the newly created Closure object or FALSE on failure
+     * @return Closure|null Returns the newly created Closure object or null on failure
      */
-    function bindTo($newThis, $newScope = 'static') { }
+    #[Pure]
+    public function bindTo(?object $newThis, object|string|null $newScope = 'static'): ?Closure {}
 
     /**
      * This method is a static version of Closure::bindTo().
      * See the documentation of that method for more information.
-     * @link https://secure.php.net/manual/en/closure.bind.php
+     * @link https://php.net/manual/en/closure.bind.php
      * @param Closure $closure The anonymous functions to bind.
      * @param object|null $newThis The object to which the given anonymous function should be bound, or NULL for the closure to be unbound.
-     * @param mixed $newScope The class scope to which associate the closure is to be associated, or 'static' to keep the current one.
+     * @param object|class-string|null $newScope The class scope to which associate the closure is to be associated, or 'static' to keep the current one.
      * If an object is given, the type of the object will be used instead.
      * This determines the visibility of protected and private methods of the bound object.
-     * @return Closure|false Returns the newly created Closure object or FALSE on failure
+     * @return Closure|null Returns the newly created Closure object or null on failure
      */
-    static function bind(Closure $closure, $newThis, $newScope = 'static') { }
+    #[Pure]
+    public static function bind(Closure $closure, ?object $newThis, object|string|null $newScope = 'static'): ?Closure {}
 
     /**
      * Temporarily binds the closure to newthis, and calls it with any given parameters.
      * @link https://php.net/manual/en/closure.call.php
      * @param object $newThis The object to bind the closure to for the duration of the call.
      * @param mixed $args [optional] Zero or more parameters, which will be given as parameters to the closure.
-     * @return mixed
+     * @return mixed Returns the return value of the closure.
      * @since 7.0
      */
-    function call ($newThis, ...$args) {}
+    public function call(object $newThis, mixed ...$args): mixed {}
 
     /**
-     * @param callable $callback
-     * @return Closure
+     * Converts a callable into a closure
+     *
+     * Create and return a new anonymous function from given callback using the current scope. This
+     * method checks if the callback is callable in the current scope and throws a TypeError if it
+     * is not.
+     *
+     * @link https://php.net/manual/en/closure.fromcallable.php
+     * @param callable $callback The callable to convert.
+     * @return Closure Returns the newly created Closure or throws a TypeError if the callback is
+     * not callable in the current scope.
      * @since 7.1
      */
-    public static function fromCallable (callable $callback) {}
+    public static function fromCallable(callable $callback): Closure {}
+
+    /**
+     * Returns the currently executing closure
+     *
+     * Returns the currently executing closure. This method is primarily useful for implementing
+     * recursive closures without needing to capture a reference to the closure variable using the
+     * use keyword.
+     *
+     * @link https://php.net/manual/en/closure.getcurrent.php
+     * @since 8.5
+     * @throws \Error Throws an Error if called outside of a closure context.
+     */
+    public static function getCurrent(): Closure {}
 }
 
 /**
@@ -632,50 +749,58 @@ final class Closure {
  * <b>count</b> function.
  * @link https://php.net/manual/en/class.countable.php
  */
-interface Countable {
-
+interface Countable
+{
     /**
      * Count elements of an object
      * @link https://php.net/manual/en/countable.count.php
-     * @return int The custom count as an integer.
-     * </p>
+     * @return int<0,max> The custom count as an integer.
      * <p>
      * The return value is cast to an integer.
+     * </p>
      */
-    public function count();
+    #[TentativeType]
+    public function count(): int;
 }
 
 /**
  * Weak references allow the programmer to retain a reference to an
  * object which does not prevent the object from being destroyed.
  * They are useful for implementing cache like structures.
+ * @template T of object
  * @link https://www.php.net/manual/en/class.weakreference.php
+ * @since 7.4
  */
-class WeakReference {
+final class WeakReference
+{
     /**
      * This method exists only to disallow instantiation of the WeakReference
      * class. Weak references are to be instantiated with the factory method
      * <b>WeakReference::create()</b>.
+     * @link https://php.net/manual/en/weakreference.construct.php
      */
     public function __construct() {}
 
     /**
      * Create a new weak reference.
      * @link https://www.php.net/manual/en/weakreference.create.php
-     * @param object $referent The object to be weakly referenced.
-     * @return WeakReference the freshly instantiated object.
+     * @template TIn of object
+     * @param TIn $object Any object.
+     * @return WeakReference<TIn> The freshly instantiated object.
      * @since 7.4
      */
-    public static function create($referent) {}
+    #[Pure]
+    public static function create(object $object): WeakReference {}
 
     /**
      * Gets a weakly referenced object. If the object has already been
      * destroyed, NULL is returned.
      * @link https://www.php.net/manual/en/weakreference.get.php
-     * @return object|null
+     * @return T|null Returns the referenced object, or null if the object has been destroyed.
      * @since 7.4
      */
-    public function get() {}
+    #[Pure]
+    public function get(): ?object {}
 }
 
 /**
@@ -684,243 +809,695 @@ class WeakReference {
  * as keys from being garbage collected. If an object key is garbage collected,
  * it will simply be removed from the map.
  *
+ * @link https://php.net/manual/en/class.weakmap.php
  * @since 8.0
+ *
+ * @template TKey of object
+ * @template TValue
+ * @template-implements IteratorAggregate<TKey, TValue>
+ * @template-implements ArrayAccess<TKey, TValue>
  */
-final class WeakMap implements \ArrayAccess, \Countable, \IteratorAggregate {
+final class WeakMap implements ArrayAccess, Countable, IteratorAggregate
+{
     /**
      * Returns {@see true} if the value for the object is contained in
      * the {@see WeakMap} and {@see false} instead.
      *
-     * @param object $object Any object
-     * @return bool
+     * @link https://php.net/manual/en/weakmap.offsetexists.php
+     * @param TKey $object Any object
+     * @return bool Returns true if the object is contained in the map, false otherwise.
      */
-    public function offsetExists($object) {}
+    #[Pure]
+    public function offsetExists($object): bool {}
 
     /**
      * Returns the existsing value by an object.
      *
-     * @param object $object Any object
-     * @return mixed Value associated with the key object
+     * @link https://php.net/manual/en/weakmap.offsetget.php
+     * @param TKey $object Any object
+     * @return TValue Value associated with the key object
+     * @throws \Error Throws an Error on failure.
      */
-    public function offsetGet($object)
-    {
-    }
+    #[Pure]
+    public function offsetGet($object): mixed {}
 
     /**
      * Sets a new value for an object.
      *
-     * @param object $object Any object
-     * @param mixed $value Any value
-     * @return void
+     * @link https://php.net/manual/en/weakmap.offsetset.php
+     * @param TKey $object Any object
+     * @param TValue $value Any value
+     * @return void No value is returned.
      */
-    public function offsetSet($object, $value)
-    {
-    }
+    public function offsetSet($object, mixed $value): void {}
 
     /**
      * Force removes an object value from the {@see WeakMap} instance.
      *
-     * @param object $object Any object
-     * @return void
+     * @link https://php.net/manual/en/weakmap.offsetunset.php
+     * @param TKey $object Any object
+     * @return void No value is returned.
      */
-    public function offsetUnset($object)
-    {
-    }
+    public function offsetUnset($object): void {}
 
     /**
      * Returns an iterator in the "[object => mixed]" format.
      *
-     * @return Traversable
+     * @link https://php.net/manual/en/weakmap.getiterator.php
+     * @return Iterator<TKey, TValue> An instance of an object implementing Iterator or Traversable
+     * @throws \Exception Throws an Exception on failure.
      */
-    public function getIterator()
-    {
-    }
+    #[Pure]
+    public function getIterator(): Iterator {}
 
     /**
      * Returns the number of items in the {@see WeakMap} instance.
      *
-     * @return int
+     * @link https://php.net/manual/en/weakmap.count.php
+     * @return int<0,max> Returns the number of live entries in the map.
      */
-    public function count()
-    {
-    }
+    #[Pure]
+    public function count(): int {}
 }
 
 /**
- * Stringable interface marks classes as available for serialization
- * in a string.
+ * Stringable interface denotes a class as having a __toString() method.
  *
+ * @link https://php.net/manual/en/class.stringable.php
  * @since 8.0
  */
-interface Stringable {
+interface Stringable
+{
     /**
-     * Magic method {@see https://www.php.net/manual/en/language.oop5.magic.php}
-     * called during serialization to string.
+     * Magic method {@see https://www.php.net/manual/en/language.oop5.magic.php#object.tostring}
+     * allows a class to decide how it will react when it is treated like a string.
      *
+     * @link https://php.net/manual/en/stringable.tostring.php
      * @return string Returns string representation of the object that
      * implements this interface (and/or "__toString" magic method).
      */
-    public function __toString();
+    public function __toString(): string;
 }
 
 /**
+ * Attributes offer the ability to add structured, machine-readable metadata information on
+ * declarations in code: Classes, methods, functions, parameters, properties and class constants can
+ * be the target of an attribute. The metadata defined by attributes can then be inspected at
+ * runtime using the Reflection APIs. Attributes could therefore be thought of as a configuration
+ * language embedded directly into code.
+ * @link https://php.net/manual/en/class.attribute.php
  * @since 8.0
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-final class Attribute {
+final class Attribute
+{
     public int $flags;
+
     /**
      * Marks that attribute declaration is allowed only in classes.
      */
-    const TARGET_CLASS = 1;
+    public const TARGET_CLASS = 1;
 
     /**
      * Marks that attribute declaration is allowed only in functions.
      */
-    const TARGET_FUNCTION = 1 << 1;
+    public const TARGET_FUNCTION = 2;
 
     /**
      * Marks that attribute declaration is allowed only in class methods.
      */
-    const TARGET_METHOD = 1 << 2;
+    public const TARGET_METHOD = 4;
 
     /**
      * Marks that attribute declaration is allowed only in class properties.
      */
-    const TARGET_PROPERTY = 1 << 3;
+    public const TARGET_PROPERTY = 8;
 
     /**
      * Marks that attribute declaration is allowed only in class constants.
      */
-    const TARGET_CLASS_CONSTANT = 1 << 4;
+    public const TARGET_CLASS_CONSTANT = 16;
 
     /**
      * Marks that attribute declaration is allowed only in function or method parameters.
      */
-    const TARGET_PARAMETER = 1 << 5;
+    public const TARGET_PARAMETER = 32;
+
+    /**
+     * Marks that attribute declaration is allowed only in constants.
+     * @since 8.5
+     */
+    public const TARGET_CONSTANT = 64;
 
     /**
      * Marks that attribute declaration is allowed anywhere.
      */
-    const TARGET_ALL = (1 << 6) - 1;
+    public const TARGET_ALL = 127;
 
     /**
      * Notes that an attribute declaration in the same place is
      * allowed multiple times.
      */
-    const IS_REPEATABLE = 1 << 10;
+    public const IS_REPEATABLE = 128;
 
     /**
+     * Construct a new Attribute instance
+     *
+     * Constructs a new Attribute instance.
+     *
+     * @link https://php.net/manual/en/attribute.construct.php
      * @param int $flags A value in the form of a bitmask indicating the places
      * where attributes can be defined.
      */
-    public function __construct(#[ExpectedValues(flagsFromClass: Attribute::class)] $flags = self::TARGET_ALL)
-    {
-    }
+    public function __construct(#[ExpectedValues(flagsFromClass: Attribute::class)] int $flags = Attribute::TARGET_ALL) {}
 }
 
 /**
- * A class for working with PHP tokens, which is an alternative to
- * the {@see token_get_all()} function.
+ * Class to ease implementing IteratorAggregate for internal classes.
+ * @link https://php.net/manual/en/class.internaliterator.php
+ * @since 8.0
+ */
+final class InternalIterator implements Iterator
+{
+    /**
+     * Private constructor to disallow direct instantiation
+     * @link https://php.net/manual/en/internaliterator.construct.php
+     */
+    private function __construct() {}
+
+    /**
+     * Return the current element
+     *
+     * Returns the current element.
+     *
+     * @link https://php.net/manual/en/internaliterator.current.php
+     * @return mixed Returns the current element.
+     */
+    public function current(): mixed {}
+
+    /**
+     * Move forward to next element
+     *
+     * Moves the current position to the next element.
+     *
+     * @link https://php.net/manual/en/internaliterator.next.php
+     * @return void No value is returned.
+     */
+    public function next(): void {}
+
+    /**
+     * Return the key of the current element
+     *
+     * Returns the key of the current element.
+     *
+     * @link https://php.net/manual/en/internaliterator.key.php
+     * @return mixed Returns the key of the current element.
+     */
+    public function key(): mixed {}
+
+    /**
+     * Check if current position is valid
+     *
+     * Checks if current position is valid.
+     *
+     * @link https://php.net/manual/en/internaliterator.valid.php
+     * @return bool Returns whether the current position is valid.
+     */
+    public function valid(): bool {}
+
+    /**
+     * Rewind the Iterator to the first element
+     *
+     * Rewinds back to the first element of the Iterator.
+     *
+     * @link https://php.net/manual/en/internaliterator.rewind.php
+     * @return void No value is returned.
+     */
+    public function rewind(): void {}
+}
+
+/**
+ * The UnitEnum interface is automatically applied to all enumerations by the engine. It may not be
+ * implemented by user-defined classes. Enumerations may not override its methods, as default
+ * implementations are provided by the engine. It is available only for type checks.
+ * @link https://php.net/manual/en/class.unitenum.php
+ * @since 8.1
+ */
+interface UnitEnum
+{
+    public readonly string $name;
+
+    /**
+     * Generates a list of cases on an enum
+     *
+     * This method will return a packed array of all cases in an enumeration, in order of
+     * declaration.
+     *
+     * @link https://php.net/manual/en/unitenum.cases.php
+     * @return static[] An array of all defined cases of this enumeration, in order of declaration.
+     */
+    #[Pure]
+    public static function cases(): array;
+}
+
+/**
+ * The BackedEnum interface is automatically applied to backed enumerations by the engine. It may
+ * not be implemented by user-defined classes. Enumerations may not override its methods, as default
+ * implementations are provided by the engine. It is available only for type checks.
+ * @link https://php.net/manual/en/class.backedenum.php
+ * @since 8.1
+ */
+interface BackedEnum extends UnitEnum
+{
+    public readonly int|string $value;
+
+    /**
+     * Translates a string or int into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will throw a
+     * <code>ValueError</code>.
+     * @param int|string $value The scalar value to map to an enum case.
+     * @throws ValueError if there is no matching case defined
+     * @throws TypeError
+     * @return static A case instance of this enumeration.
+     * @link https://www.php.net/manual/en/backedenum.from.php
+     */
+    #[Pure]
+    public static function from(int|string $value): static;
+
+    /**
+     * Translates a string or int into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will return null.
+     * @param int|string $value The scalar value to map to an enum case.
+     * @return static|null A case instance of this enumeration, or null if not
+     * found.
+     * @link https://www.php.net/manual/en/backedenum.tryfrom.php
+     */
+    #[Pure]
+    public static function tryFrom(int|string $value): ?static;
+}
+
+/**
+ * @since 8.1
+ * @internal
  *
- * @since 8.0
+ * Internal interface to ensure precise type inference
  */
-class PhpToken implements Stringable {
-    /**
-     * One of the T_* constants, or an integer < 256 representing a
-     * single-char token.
-     */
-    public int $id;
+interface IntBackedEnum extends BackedEnum
+{
+    public readonly int $value;
 
     /**
-     * The textual content of the token.
+     * Translates an int into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will throw a
+     * <code>ValueError</code>.
+     * @param int $value
+     * @return static
+     * @throws ValueError if there is no matching case defined
+     * @link https://www.php.net/manual/en/backedenum.from.php
      */
-    public string $text;
+    #[Pure]
+    public static function from(int $value): static;
 
     /**
-     * The starting line number (1-based) of the token.
+     * Translates an int into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will return null.
+     * @param int $value
+     * @return static|null
+     * @link https://www.php.net/manual/en/backedenum.tryfrom.php
      */
-    public int $line;
-
-    /**
-     * The starting position (0-based) in the tokenized string.
-     */
-    public int $pos;
-
-    /**
-     * Same as {@see token_get_all()}, but returning array of {@see PhpToken}
-     * or an instance of a child class.
-     *
-     * @param string $code An a PHP source code
-     * @param int $flags
-     * @return static[]
-     */
-    public static function getAll($code, $flags = 0)
-    {
-    }
-
-    /**
-     * @param int $id An integer identifier
-     * @param string $text Textual content
-     * @param int $line Strating line
-     * @param int $pos Straring position (line offset)
-     */
-    final public function __construct($id, $text, $line = -1, $pos = -1)
-    {
-    }
-
-    /**
-     * Get the name of the token.
-     *
-     * @return string|null
-     */
-    public function getTokenName()
-    {
-    }
-
-    /** @return static[] */
-    public static function tokenize(string $code, int $flags = 0): array {}
-
-    /**
-     * Whether the token has the given ID, the given text, or has an ID/text
-     * part of the given array.
-     *
-     * @param int|string|array $kind
-     * @return bool
-     */
-    public function is($kind)
-    {
-    }
-
-    /**
-     * Whether this token would be ignored by the PHP parser.
-     *
-     * @return bool
-     */
-    public function isIgnorable()
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-    }
+    #[Pure]
+    public static function tryFrom(int $value): ?static;
 }
 
 /**
- * @since 8.0
+ * @since 8.1
+ * @internal
+ *
+ * Internal interface to ensure precise type inference
  */
-final class InternalIterator implements Iterator{
-    private function __construct(){}
-    public function current(){}
+interface StringBackedEnum extends BackedEnum
+{
+    public readonly string $value;
 
-    public function next(){}
+    /**
+     * Translates a string into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will throw a
+     * <code>ValueError</code>.
+     * @param string $value
+     * @return static
+     * @throws ValueError if there is no matching case defined
+     * @link https://www.php.net/manual/en/backedenum.from.php
+     */
+    #[Pure]
+    public static function from(string $value): static;
 
-    public function key(){}
-
-    public function valid(){}
-
-    public function rewind(){}
+    /**
+     * Translates a string or int into the corresponding <code>Enum</code>
+     * case, if any. If there is no matching case defined, it will return null.
+     * @param string $value
+     * @return static|null
+     * @link https://www.php.net/manual/en/backedenum.tryfrom.php
+     */
+    #[Pure]
+    public static function tryFrom(string $value): ?static;
 }
+
+/**
+ * Fibers represent full-stack, interruptible functions. Fibers may be suspended from anywhere in
+ * the call-stack, pausing execution within the fiber until the fiber is resumed at a later time.
+ * @link https://php.net/manual/en/class.fiber.php
+ * @since 8.1
+ *
+ * @template TStart
+ * @template TResume
+ * @template TReturn
+ * @template TSuspend
+ */
+final class Fiber
+{
+    /**
+     * Creates a new Fiber instance
+     * @link https://php.net/manual/en/fiber.construct.php
+     * @param callable $callback Function to invoke when starting the fiber.
+     */
+    public function __construct(callable $callback) {}
+
+    /**
+     * Starts execution of the fiber. Returns when the fiber suspends or terminates.
+     *
+     * @link https://php.net/manual/en/fiber.start.php
+     * @param TStart ...$args Arguments passed to fiber function.
+     *
+     * @return TSuspend|null Value from the first suspension point or NULL if the fiber returns.
+     *
+     * @throws FiberError If the fiber has already been started.
+     * @throws Throwable If the fiber callable throws an uncaught exception.
+     */
+    public function start(mixed ...$args): mixed {}
+
+    /**
+     * Resumes the fiber, returning the given value from {@see Fiber::suspend()}.
+     * Returns when the fiber suspends or terminates.
+     *
+     * @link https://php.net/manual/en/fiber.resume.php
+     * @param TResume $value The value to resume the fiber. This value will be the return value of
+     * the current Fiber::suspend call.
+     *
+     * @return TSuspend|null Value from the next suspension point or NULL if the fiber returns.
+     *
+     * @throws FiberError If the fiber has not started, is running, or has terminated.
+     * @throws Throwable If the fiber callable throws an uncaught exception.
+     */
+    public function resume(mixed $value = null): mixed {}
+
+    /**
+     * Throws the given exception into the fiber from {@see Fiber::suspend()}.
+     * Returns when the fiber suspends or terminates.
+     *
+     * @link https://php.net/manual/en/fiber.throw.php
+     * @param Throwable $exception The exception to throw into the fiber from the current
+     * Fiber::suspend call.
+     *
+     * @return TSuspend|null Value from the next suspension point or NULL if the fiber returns.
+     *
+     * @throws FiberError If the fiber has not started, is running, or has terminated.
+     * @throws Throwable If the fiber callable throws an uncaught exception.
+     */
+    public function throw(Throwable $exception): mixed {}
+
+    /**
+     * Determines if the fiber has started
+     * @link https://php.net/manual/en/fiber.isstarted.php
+     * @return bool True if the fiber has been started.
+     */
+    public function isStarted(): bool {}
+
+    /**
+     * Determines if the fiber is suspended
+     * @link https://php.net/manual/en/fiber.issuspended.php
+     * @return bool True if the fiber is suspended.
+     */
+    public function isSuspended(): bool {}
+
+    /**
+     * Determines if the fiber is running
+     * @link https://php.net/manual/en/fiber.isrunning.php
+     * @return bool True if the fiber is currently running.
+     */
+    public function isRunning(): bool {}
+
+    /**
+     * Determines if the fiber has terminated
+     * @link https://php.net/manual/en/fiber.isterminated.php
+     * @return bool True if the fiber has completed execution (returned or threw).
+     */
+    public function isTerminated(): bool {}
+
+    /**
+     * Gets the value returned by the Fiber
+     * @link https://php.net/manual/en/fiber.getreturn.php
+     * @return TReturn Return value of the fiber callback. NULL is returned if the fiber does not have a return statement.
+     *
+     * @throws FiberError If the fiber has not terminated or the fiber threw an exception.
+     */
+    public function getReturn(): mixed {}
+
+    /**
+     * Gets the currently executing Fiber instance
+     * @link https://php.net/manual/en/fiber.getcurrent.php
+     * @return Fiber|null Returns the currently executing fiber instance or NULL if in {main}.
+     */
+    public static function getCurrent(): ?Fiber {}
+
+    /**
+     * Suspend execution of the fiber. The fiber may be resumed with {@see Fiber::resume()} or {@see Fiber::throw()}.
+     *
+     * Cannot be called from {main}.
+     *
+     * @link https://php.net/manual/en/fiber.suspend.php
+     * @param TSuspend $value Value to return from {@see Fiber::resume()} or {@see Fiber::throw()}.
+     *
+     * @return TResume Value provided to {@see Fiber::resume()}.
+     *
+     * @throws FiberError Thrown if not within a fiber (i.e., if called from {main}).
+     * @throws Throwable Exception provided to {@see Fiber::throw()}.
+     */
+    public static function suspend(mixed $value = null): mixed {}
+}
+
+/**
+ * @since 8.1
+ */
+final class FiberError extends Error
+{
+    /**
+     * Constructor to disallow direct instantiation
+     * @link https://php.net/manual/en/fibererror.construct.php
+     * @throws \Error Throws an Error exception when called.
+     */
+    public function __construct() {}
+}
+
+/**
+ * As of PHP 8.1.0, a tentative phase of transitioning to return type declarations for internal
+ * class methods began.
+ *
+ * Most non-final internal methods now require overriding methods to declare a compatible return
+ * type. Otherwise, a deprecation notice is emitted during inheritance validation warning that the
+ * signature violates covariance rules. In a future PHP version, method signature checking will
+ * become strict, and mismatches will cause a fatal error. In case the return type cannot be
+ * declared for an overriding method due to PHP cross-version compatibility concerns, or the
+ * overriding method declares an incompatible return type, a #[\ReturnTypeWillChange] attribute can
+ * be added to silence the deprecation notice.
+ *
+ * @link https://php.net/manual/en/class.returntypewillchange.php
+ * @since 8.1
+ */
+#[Attribute(Attribute::TARGET_METHOD)]
+final class ReturnTypeWillChange
+{
+    /**
+     * Construct a new ReturnTypeWillChange attribute instance
+     *
+     * Constructs a new ReturnTypeWillChange instance.
+     *
+     * @link https://php.net/manual/en/returntypewillchange.construct.php
+     */
+    public function __construct() {}
+}
+
+/**
+ * This attribute is used to mark classes that allow dynamic properties.
+ * @link https://php.net/manual/en/class.allowdynamicproperties.php
+ * @since 8.2
+ */
+#[Attribute(Attribute::TARGET_CLASS)]
+final class AllowDynamicProperties
+{
+    /**
+     * Construct a new AllowDynamicProperties attribute instance
+     *
+     * Constructs a new AllowDynamicProperties instance.
+     *
+     * @link https://php.net/manual/en/allowdynamicproperties.construct.php
+     */
+    public function __construct() {}
+}
+
+/**
+ * This attribute is used to mark a parameter that is sensitive and should have its value redacted
+ * if present in a stack trace.
+ * @link https://php.net/manual/en/class.sensitiveparameter.php
+ * @since 8.2
+ */
+#[Attribute(Attribute::TARGET_PARAMETER)]
+final class SensitiveParameter
+{
+    /**
+     * Construct a new SensitiveParameter attribute instance
+     *
+     * Constructs a new SensitiveParameter instance.
+     *
+     * @link https://php.net/manual/en/sensitiveparameter.construct.php
+     */
+    public function __construct() {}
+}
+
+/**
+ * The SensitiveParameterValue class allows wrapping sensitive values to protect them against
+ * accidental exposure.
+ *
+ * Values of parameters having the SensitiveParameter attribute will automatically be wrapped inside
+ * of a SensitiveParameterValue object within stack traces.
+ *
+ * @link https://php.net/manual/en/class.sensitiveparametervalue.php
+ * @since 8.2
+ */
+final class SensitiveParameterValue
+{
+    private readonly mixed $value;
+
+    /**
+     * Constructs a new SensitiveParameterValue object
+     *
+     * Construct a SensitiveParameterValue holding a sensitive value.
+     *
+     * @link https://php.net/manual/en/sensitiveparametervalue.construct.php
+     * @param mixed $value An arbitrary value that should be stored inside the
+     * SensitiveParameterValue object.
+     */
+    public function __construct(mixed $value) {}
+
+    /**
+     * Returns the sensitive value
+     *
+     * Get the sensitive value.
+     *
+     * @link https://php.net/manual/en/sensitiveparametervalue.getvalue.php
+     * @return mixed The sensitive value.
+     */
+    public function getValue(): mixed {}
+
+    /**
+     * Protects the sensitive value against accidental exposure
+     *
+     * Returns an empty array to protect the sensitive value against accidental exposure when using
+     * var_dump.
+     *
+     * @link https://php.net/manual/en/sensitiveparametervalue.debuginfo.php
+     * @return array An empty array.
+     */
+    public function __debugInfo(): array {}
+}
+
+/**
+ * This attribute is used to indicate that a method or a property is intended to override a method
+ * or a property of a parent class or that it implements a method or a property defined in an
+ * interface.
+ *
+ * If no method or property with the same name exists in a parent class or in an implemented
+ * interface a compile-time error will be emitted. The attribute cannot be used on the __construct()
+ * method, which is exempt from signature checks.
+ *
+ * @link https://php.net/manual/en/class.override.php
+ * @since 8.3
+ */
+#[Attribute(Attribute::TARGET_METHOD|Attribute::TARGET_PROPERTY|Attribute::TARGET_CLASS_CONSTANT)]
+final class Override
+{
+    /**
+     * Construct a new Override attribute instance
+     *
+     * Constructs a new Override instance.
+     *
+     * @link https://php.net/manual/en/override.construct.php
+     */
+    public function __construct() {}
+}
+
+/**
+ * This attribute is used to mark functionality as deprecated. Using deprecated functionality will
+ * cause an E_USER_DEPRECATED error to be emitted.
+ * @link https://php.net/manual/en/class.deprecated.php
+ * @since 8.4
+ */
+#[Attribute(Attribute::TARGET_METHOD|Attribute::TARGET_FUNCTION|Attribute::TARGET_CLASS_CONSTANT|Attribute::TARGET_CONSTANT|Attribute::TARGET_CLASS)]
+final class Deprecated
+{
+    public readonly ?string $message;
+    public readonly ?string $since;
+
+    /**
+     * Construct a new Deprecated attribute instance
+     *
+     * Constructs a new Deprecated instance.
+     *
+     * @link https://php.net/manual/en/deprecated.construct.php
+     * @param string|null $message The value of the message property.
+     * @param string|null $since The value of the since property.
+     */
+    public function __construct(?string $message = null, ?string $since = null) {}
+}
+
+/**
+ * This attribute can be used to indicate that the return value of a function or a method should not
+ * be discarded. If the return value is not used in any way, a warning will be emitted.
+ *
+ * This is useful for functions where not checking the return value is likely to be a bug. To
+ * intentionally discard the return value of such a function, use (void) cast to suppress the
+ * warning.
+ *
+ * @link https://php.net/manual/en/class.nodiscard.php
+ * @since 8.5
+ */
+#[Attribute(Attribute::TARGET_METHOD|Attribute::TARGET_FUNCTION)]
+final class NoDiscard
+{
+    public readonly ?string $message;
+
+    /**
+     * Construct a new NoDiscard attribute instance
+     *
+     * Constructs a new NoDiscard instance.
+     *
+     * @link https://php.net/manual/en/nodiscard.construct.php
+     * @param string|null $message The value of the message property.
+     */
+    public function __construct(?string $message = null) {}
+}
+
+/**
+ * This attribute delays target validation errors for internal attributes from compile time to when
+ * the attribute is instantiated via the Reflection API.
+ *
+ * When applied to a declaration, any invalid usage of internal attributes on the same target will
+ * not trigger a compile time error. Instead, the validation is deferred and performed when the
+ * attribute is instantiated via ReflectionAttribute::newInstance(). This is primarily intended for
+ * forward compatibility, allowing code to use attributes that may gain additional valid targets in
+ * future PHP versions without breaking on older versions.
+ *
+ * @link https://php.net/manual/en/class.delayedtargetvalidation.php
+ * @since 8.5
+ */
+#[Attribute(Attribute::TARGET_ALL)]
+final class DelayedTargetValidation {}

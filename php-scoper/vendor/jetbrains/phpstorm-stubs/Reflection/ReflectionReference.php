@@ -1,5 +1,6 @@
 <?php
 
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -10,14 +11,13 @@ use JetBrains\PhpStorm\Pure;
  * @link https://www.php.net/manual/en/class.reflectionreference.php
  * @since 7.4
  */
-class ReflectionReference
+final class ReflectionReference
 {
     /**
      * ReflectionReference cannot be created explicitly.
+     * @link https://php.net/manual/en/reflectionreference.construct.php
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Returns ReflectionReference if array element is a reference, {@see null} otherwise
@@ -25,11 +25,16 @@ class ReflectionReference
      * @link https://php.net/manual/en/reflectionreference.fromarrayelement.php
      * @param array $array The array which contains the potential reference.
      * @param int|string $key The key; either an integer or a string.
-     * @return self|null
+     * @return ReflectionReference|null Returns a ReflectionReference instance if $array[$key] is a
+     * reference, or null otherwise.
+     * @throws \TypeError If array is not an array, or key is not an integer or string, a TypeError
+     * is thrown.
+     * @throws \ReflectionException If $array[$key] does not exist, a ReflectionException is thrown.
      */
-    public static function fromArrayElement(array $array, $key)
-    {
-    }
+    public static function fromArrayElement(
+        array $array,
+        #[LanguageLevelTypeAware(['8.0' => 'string|int'], default: '')] $key
+    ): ?ReflectionReference {}
 
     /**
      * Returns unique identifier for the reference. The return value format is unspecified
@@ -38,16 +43,12 @@ class ReflectionReference
      * @return int|string Returns an integer or string of unspecified format.
      */
     #[Pure]
-	public function getId()
-    {
-    }
+    public function getId(): string {}
 
     /**
      * ReflectionReference cannot be cloned
      *
      * @return void
      */
-    private function __clone()
-    {
-    }
+    private function __clone(): void {}
 }

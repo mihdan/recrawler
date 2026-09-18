@@ -16,11 +16,13 @@ namespace Humbug\PhpScoper\PhpParser\NodeVisitor\NamespaceStmt;
 
 use ArrayIterator;
 use Countable;
-use Humbug\PhpScoper\PhpParser\NodeVisitor\ParentNodeAppender;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\AttributeAppender\ParentNodeAppender;
+use Humbug\PhpScoper\PhpParser\UnexpectedParsingScenario;
 use IteratorAggregate;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
+use Traversable;
 use function count;
 use function end;
 
@@ -29,19 +31,21 @@ use function end;
  * belongs a node.
  *
  * @private
+ *
+ * @implements IteratorAggregate<Namespace_>
  */
 final class NamespaceStmtCollection implements IteratorAggregate, Countable
 {
     /**
      * @var Namespace_[]
      */
-    private $nodes = [];
+    private array $nodes = [];
 
     /**
      * @var (Name|null)[] Associative array with the potentially prefixed namespace names as keys and their original name
      *                    as value.
      */
-    private $mapping = [];
+    private array $mapping = [];
 
     /**
      * @param Namespace_ $namespace New namespace, may have been prefixed.
@@ -67,17 +71,6 @@ final class NamespaceStmtCollection implements IteratorAggregate, Countable
         return $this->getNodeNamespaceName($node);
     }
 
-    public function findNamespaceByName(string $name): ?Name
-    {
-        foreach ($this->nodes as $node) {
-            if ((string) NamespaceManipulator::getOriginalName($node) === $name) {
-                return $node->name;
-            }
-        }
-
-        return null;
-    }
-
     public function getCurrentNamespaceName(): ?Name
     {
         $lastNode = end($this->nodes);
@@ -85,9 +78,6 @@ final class NamespaceStmtCollection implements IteratorAggregate, Countable
         return false === $lastNode ? null : NamespaceManipulator::getOriginalName($lastNode);
     }
 
-    /**
-     * @inheritdoc
-     */
     public function count(): int
     {
         return count($this->nodes);
@@ -95,8 +85,8 @@ final class NamespaceStmtCollection implements IteratorAggregate, Countable
 
     private function getNodeNamespaceName(Node $node): ?Name
     {
-        if (false === ParentNodeAppender::hasParent($node)) {
-            return null;
+        if (!ParentNodeAppender::hasParent($node)) {
+            throw UnexpectedParsingScenario::create();
         }
 
         $parentNode = ParentNodeAppender::getParent($node);
@@ -109,9 +99,9 @@ final class NamespaceStmtCollection implements IteratorAggregate, Countable
     }
 
     /**
-     * @inheritdoc
+     * @return Traversable<Namespace_>
      */
-    public function getIterator(): iterable
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->nodes);
     }

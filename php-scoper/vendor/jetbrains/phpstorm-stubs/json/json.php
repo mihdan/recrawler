@@ -1,6 +1,8 @@
 <?php
 
 // Start of json v.1.3.1
+use JetBrains\PhpStorm\Internal\TentativeType;
+use JetBrains\PhpStorm\Language;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -10,52 +12,51 @@ use JetBrains\PhpStorm\Pure;
  * @link https://php.net/manual/en/class.jsonserializable.php
  * @since 5.4
  */
-interface JsonSerializable  {
-
-	/**
-	 * Specify data which should be serialized to JSON
-	 * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
-	 * @return mixed data which can be serialized by <b>json_encode</b>,
-	 * which is a value of any type other than a resource.
-	 * @since 5.4
-	 */
-    public function jsonSerialize ();
-
+interface JsonSerializable
+{
+    /**
+     * Specify data which should be serialized to JSON
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function jsonSerialize(): mixed;
 }
 
-class JsonIncrementalParser  {
-	const JSON_PARSER_SUCCESS = 0;
-	const JSON_PARSER_CONTINUE = 1;
+class JsonIncrementalParser
+{
+    public const JSON_PARSER_SUCCESS = 0;
+    public const JSON_PARSER_CONTINUE = 1;
 
+    /**
+     * @param int $depth [optional]
+     * @param int $options [optional]
+     */
+    #[Pure]
+    public function __construct($depth, $options) {}
 
-	/**
-	 * @param int $depth [optional]
-	 * @param int $options [optional]
-	 */
-	#[Pure]
-	public function __construct ($depth, $options) {}
+    #[Pure]
+    public function getError() {}
 
-	#[Pure]
-	public function getError () {}
+    public function reset() {}
 
-	public function reset () {}
+    /**
+     * @param string $json
+     */
+    public function parse($json) {}
 
-	/**
-	 * @param string $json
-	 */
-	public function parse ($json) {}
+    /**
+     * @param string $filename
+     */
+    public function parseFile($filename) {}
 
-	/**
-	 * @param string $filename
-	 */
-	public function parseFile ($filename) {}
-
-	/**
-	 * @param int $options [optional]
-	 */
-	#[Pure]
-	public function get ($options) {}
-
+    /**
+     * @param int $options [optional]
+     */
+    #[Pure]
+    public function get($options) {}
 }
 
 /**
@@ -92,45 +93,42 @@ class JsonIncrementalParser  {
  * </p>
  * @return string|false a JSON encoded string on success or <b>FALSE</b> on failure.
  */
-function json_encode (mixed $value, int $flags = 0, int $depth = 512): string|false {}
+function json_encode(mixed $value, int $flags = 0, int $depth = 512): string|false {}
 
 /**
  * (PHP 5 &gt;= 5.2.0, PECL json &gt;= 1.2.0)<br/>
- * Decodes a JSON string
- * @link https://php.net/manual/en/function.json-decode.php
+ * Takes a JSON encoded string and converts it into a PHP value.
+ * @link https://www.php.net/manual/en/function.json-decode.php
  * @param string $json <p>
  * The <i>json</i> string being decoded.
  * </p>
  * <p>
  * This function only works with UTF-8 encoded strings.
  * </p>
- * <p>PHP implements a superset of
- * JSON - it will also encode and decode scalar types and <b>NULL</b>. The JSON standard
- * only supports these values when they are nested inside an array or an object.
+ * <p>PHP implements a superset of JSON as specified by <a href="https://datatracker.ietf.org/doc/html/rfc7159">RFC 7159</a>.
  * </p>
- * @param bool|null $associative [optional] <p>
- * When <b>TRUE</b>, returned objects will be converted into
- * associative arrays.
+ * @param bool|null $associative <p>
+ * When <b>TRUE</b>, JSON objects will be returned as associative arrays; when <b>FALSE</b>, JSON objects will be returned as objects.
+ * When <b>NULL</b>, JSON objects will be returned as associative arrays or objects depending on whether JSON_OBJECT_AS_ARRAY is set in the flags.
  * </p>
  * @param int $depth [optional] <p>
- * User specified recursion depth.
+ * Maximum nesting depth of the structure being decoded. The value must be greater than 0, and less than or equal to 2147483647.
  * </p>
  * @param int $flags [optional] <p>
  * Bitmask of JSON decode options:<br/>
  * {@see JSON_BIGINT_AS_STRING} decodes large integers as their original string value.<br/>
- * {@see JSON_INVALID_UTF8_IGNORE} ignores invalid UTF-8 characters,<br/>
- * {@see JSON_INVALID_UTF8_SUBSTITUTE} converts invalid UTF-8 characters to \0xfffd,<br/>
- * {@see JSON_OBJECT_AS_ARRAY} decodes JSON objects as PHP array, since 7.2.0 used by default if $assoc parameter is null,<br/>
- * {@see JSON_THROW_ON_ERROR} when passed this flag, the error behaviour of these functions is changed. The global error state is left untouched, and if an error occurs that would otherwise set it, these functions instead throw a JsonException<br/>
+ * {@see JSON_INVALID_UTF8_IGNORE} ignores invalid UTF-8 characters,
+ * {@see JSON_INVALID_UTF8_SUBSTITUTE} converts invalid UTF-8 characters to \0xfffd, Available as of PHP 7.2.0.
+ * {@see JSON_OBJECT_AS_ARRAY} Decodes JSON objects as PHP array. This option can be added automatically by calling json_decode() with the second parameter equal to true.
+ * {@see JSON_THROW_ON_ERROR} Throws JsonException if an error occurs instead of setting the global error state that is retrieved with json_last_error() and json_last_error_msg(). JSON_PARTIAL_OUTPUT_ON_ERROR takes precedence over JSON_THROW_ON_ERROR. Available as of PHP 7.3.0.<br/>
  * </p>
- * @return mixed the value encoded in <i>json</i> in appropriate
- * PHP type. Values true, false and
- * null (case-insensitive) are returned as <b>TRUE</b>, <b>FALSE</b>
- * and <b>NULL</b> respectively. <b>NULL</b> is returned if the
- * <i>json</i> cannot be decoded or if the encoded
- * data is deeper than the recursion limit.
+ * @return mixed Returns the value encoded in <i>json</i> as an appropriate PHP type. Unquoted values true, <b>FALSE</b>
+ * and <b>NULL</b> are returned as <b>TRUE</b>, <b>FALSE</b> and <b>NULL</b> respectively. <b>NULL</b> is returned
+ * if the <i>json</i> cannot be decoded or if the encoded data is deeper than the nesting limit.
+ * @throws \ValueError If depth is outside the allowed range, a ValueError is thrown as of PHP
+ * 8.0.0, while previously, an error of level E_WARNING was raised.
  */
-function json_decode (string $json, ?bool $associative = false, int $depth = 512, int $flags = 0): mixed {}
+function json_decode(#[Language("JSON")] string $json, ?bool $associative = null, int $depth = 512, int $flags = 0): mixed {}
 
 /**
  * Returns the last error occurred
@@ -223,8 +221,8 @@ function json_decode (string $json, ?bool $associative = false, int $depth = 512
  *
  * </table>
  */
-#[Pure]
-function json_last_error (): int {}
+#[Pure(true)]
+function json_last_error(): int {}
 
 /**
  * Returns the error string of the last json_encode() or json_decode() call, which did not specify <b>JSON_THROW_ON_ERROR</b>.
@@ -232,33 +230,45 @@ function json_last_error (): int {}
  * @return string Returns the error message on success, "No error" if no error has occurred.
  * @since 5.5
  */
-#[Pure]
-function json_last_error_msg (): string {}
+#[Pure(true)]
+function json_last_error_msg(): string {}
 
+/**
+ * Checks if a string contains valid JSON
+ *
+ * Returns whether the given string is syntactically valid JSON. If json_validate returns true,
+ * json_decode will successfully decode the given string when using the same depth and flags.
+ *
+ * @link https://php.net/manual/en/function.json-validate.php
+ * @since 8.3
+ * @throws \ValueError If depth is outside the allowed range, a ValueError is thrown. If flags is
+ * not a valid flag, a ValueError is thrown.
+ */
+function json_validate(#[Language("JSON")] string $json, int $depth = 512, int $flags = 0): bool {}
 
 /**
  * All &lt; and &gt; are converted to \u003C and \u003E.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_HEX_TAG', 1);
+define('JSON_HEX_TAG', 1);
 
 /**
- * All &#38;#38;s are converted to \u0026.
+ * All &s are converted to \u0026.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_HEX_AMP', 2);
+define('JSON_HEX_AMP', 2);
 
 /**
  * All ' are converted to \u0027.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_HEX_APOS', 4);
+define('JSON_HEX_APOS', 4);
 
 /**
  * All " are converted to \u0022.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_HEX_QUOT', 8);
+define('JSON_HEX_QUOT', 8);
 
 /**
  * Outputs an object rather than an array when a non-associative array is
@@ -266,55 +276,55 @@ define ('JSON_HEX_QUOT', 8);
  * an object and the array is empty.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_FORCE_OBJECT', 16);
+define('JSON_FORCE_OBJECT', 16);
 
 /**
  * Encodes numeric strings as numbers.
- * @since 5.3.3
+ * @since 5.3
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_NUMERIC_CHECK', 32);
+define('JSON_NUMERIC_CHECK', 32);
 
 /**
  * Don't escape /.
  * @since 5.4
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_UNESCAPED_SLASHES', 64);
+define('JSON_UNESCAPED_SLASHES', 64);
 
 /**
  * Use whitespace in returned data to format it.
  * @since 5.4
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_PRETTY_PRINT', 128);
+define('JSON_PRETTY_PRINT', 128);
 
 /**
  * Encode multibyte Unicode characters literally (default is to escape as \uXXXX).
  * @since 5.4
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_UNESCAPED_UNICODE', 256);
-define ('JSON_PARTIAL_OUTPUT_ON_ERROR', 512);
+define('JSON_UNESCAPED_UNICODE', 256);
+define('JSON_PARTIAL_OUTPUT_ON_ERROR', 512);
 
 /**
  * Occurs with underflow or with the modes mismatch.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_STATE_MISMATCH', 2);
+define('JSON_ERROR_STATE_MISMATCH', 2);
 
 /**
  * Control character error, possibly incorrectly encoded.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_CTRL_CHAR', 3);
+define('JSON_ERROR_CTRL_CHAR', 3);
 
 /**
  * Malformed UTF-8 characters, possibly incorrectly encoded. This
  * constant is available as of PHP 5.3.3.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_UTF8', 5);
+define('JSON_ERROR_UTF8', 5);
 
 /**
  * <p>
@@ -328,7 +338,7 @@ define ('JSON_ERROR_UTF8', 5);
  * </p>
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_RECURSION', 6);
+define('JSON_ERROR_RECURSION', 6);
 
 /**
  * <p>
@@ -344,7 +354,7 @@ define ('JSON_ERROR_RECURSION', 6);
  * </p>
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_INF_OR_NAN', 7);
+define('JSON_ERROR_INF_OR_NAN', 7);
 
 /**
  * <p>
@@ -358,47 +368,47 @@ define ('JSON_ERROR_INF_OR_NAN', 7);
  * </p>
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_UNSUPPORTED_TYPE', 8);
+define('JSON_ERROR_UNSUPPORTED_TYPE', 8);
 
 /**
  * No error has occurred.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_NONE', 0);
+define('JSON_ERROR_NONE', 0);
 
 /**
  * The maximum stack depth has been exceeded.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_DEPTH', 1);
+define('JSON_ERROR_DEPTH', 1);
 
 /**
  * Syntax error.
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_ERROR_SYNTAX', 4);
+define('JSON_ERROR_SYNTAX', 4);
 
 /**
  * Decodes JSON objects as PHP array.
  * @since 5.4
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_OBJECT_AS_ARRAY', 1);
-define ('JSON_PARSER_NOTSTRICT', 4);
+define('JSON_OBJECT_AS_ARRAY', 1);
+define('JSON_PARSER_NOTSTRICT', 4);
 
 /**
  * Decodes large integers as their original string value.
  * @since 5.4
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_BIGINT_AS_STRING', 2);
+define('JSON_BIGINT_AS_STRING', 2);
 
 /**
  * Ensures that float values are always encoded as a float value.
- * @since 5.6.6
+ * @since 5.6
  * @link https://php.net/manual/en/json.constants.php
  */
-define ('JSON_PRESERVE_ZERO_FRACTION', 1024);
+define('JSON_PRESERVE_ZERO_FRACTION', 1024);
 
 /**
  * The line terminators are kept unescaped when JSON_UNESCAPED_UNICODE is supplied.
@@ -426,7 +436,7 @@ define('JSON_INVALID_UTF8_SUBSTITUTE', 2097152);
  * @link https://php.net/manual/en/json.constants.php
  * @since 7.0
  */
-define('JSON_ERROR_INVALID_PROPERTY_NAME',9);
+define('JSON_ERROR_INVALID_PROPERTY_NAME', 9);
 
 /**
  * Single unpaired UTF-16 surrogate in unicode escape contained in the JSON string passed to json_encode().
@@ -434,7 +444,7 @@ define('JSON_ERROR_INVALID_PROPERTY_NAME',9);
  * @link https://php.net/manual/en/json.constants.php
  * @since 7.0
  */
-define('JSON_ERROR_UTF16',10);
+define('JSON_ERROR_UTF16', 10);
 
 /**
  * Throws JsonException if an error occurs instead of setting the global error state
@@ -444,6 +454,11 @@ define('JSON_ERROR_UTF16',10);
  * @since 7.3
  */
 define('JSON_THROW_ON_ERROR', 4194304);
+
+/**
+ * @since 8.1
+ */
+define('JSON_ERROR_NON_BACKED_ENUM', 11);
 
 /**
  * Class JsonException
@@ -458,8 +473,6 @@ define('JSON_THROW_ON_ERROR', 4194304);
  * @since 7.3
  * @link https://wiki.php.net/rfc/json_throw_on_error
  */
-class JsonException extends \Exception {
-}
+class JsonException extends Exception {}
 
 // End of json v.1.3.1
-?>

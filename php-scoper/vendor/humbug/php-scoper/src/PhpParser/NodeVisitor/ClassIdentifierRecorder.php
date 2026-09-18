@@ -15,72 +15,78 @@ declare(strict_types=1);
 namespace Humbug\PhpScoper\PhpParser\NodeVisitor;
 
 use Humbug\PhpScoper\PhpParser\Node\FullyQualifiedFactory;
-use Humbug\PhpScoper\PhpParser\NodeVisitor\Resolver\FullyQualifiedNameResolver;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\AttributeAppender\ParentNodeAppender;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\Resolver\IdentifierResolver;
+use Humbug\PhpScoper\PhpParser\UnexpectedParsingScenario;
+use Humbug\PhpScoper\Symbol\EnrichedReflector;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name\FullyQualified;
-use PhpParser\Node\Stmt\ClassLike;
-use PhpParser\Node\Stmt\Trait_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Interface_;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Records the user classes registered in the global namespace which have been whitelisted and whitelisted classes.
+ * Records the classes that need to be aliased.
  *
  * @private
  */
 final class ClassIdentifierRecorder extends NodeVisitorAbstract
 {
-    private $prefix;
-    private $nameResolver;
-    private $whitelist;
-
     public function __construct(
-        string $prefix,
-        FullyQualifiedNameResolver $nameResolver,
-        Whitelist $whitelist
+        private readonly string $prefix,
+        private readonly IdentifierResolver $identifierResolver,
+        private readonly SymbolsRegistry $symbolsRegistry,
+        private readonly EnrichedReflector $enrichedReflector,
     ) {
-        $this->prefix = $prefix;
-        $this->nameResolver = $nameResolver;
-        $this->whitelist = $whitelist;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function enterNode(Node $node): Node
     {
-        if (false === ($node instanceof Identifier) || false === ParentNodeAppender::hasParent($node)) {
+        if (!($node instanceof Identifier) || !ParentNodeAppender::hasParent($node)) {
             return $node;
         }
 
         $parent = ParentNodeAppender::getParent($node);
 
-        if (false === ($parent instanceof ClassLike) || $parent instanceof Trait_) {
+        $isClassOrInterface = $parent instanceof Class_ || $parent instanceof Interface_;
+
+        if (!$isClassOrInterface) {
             return $node;
         }
-        /** @var ClassLike $parent */
+
         if (null === $parent->name) {
-            return $node;
+            throw UnexpectedParsingScenario::create();
         }
 
-        /** @var Identifier $node */
-        $resolvedName = $this->nameResolver->resolveName($node)->getName();
+        $resolvedName = $this->identifierResolver->resolveIdentifier($node);
 
-        if (false === ($resolvedName instanceof FullyQualified)) {
-            return $node;
+        if (!($resolvedName instanceof FullyQualified)) {
+            throw UnexpectedParsingScenario::create();
         }
 
-        /** @var FullyQualified $resolvedName */
-        if ($this->whitelist->isGlobalWhitelistedClass((string) $resolvedName)
-            || $this->whitelist->isSymbolWhitelisted((string) $resolvedName)
-        ) {
-            $this->whitelist->recordWhitelistedClass(
+        if ($this->shouldBeAliased($resolvedName->toString())) {
+            $this->symbolsRegistry->recordClass(
                 $resolvedName,
-                FullyQualifiedFactory::concat($this->prefix, $resolvedName)
+                FullyQualifiedFactory::concat($this->prefix, $resolvedName),
             );
         }
 
         return $node;
+    }
+
+    private function shouldBeAliased(string $resolvedName): bool
+    {
+        if ($this->enrichedReflector->isExposedClass($resolvedName)) {
+            return true;
+        }
+
+        // Excluded global classes (for which we found a declaration) need to be
+        // aliased since otherwise any usage will not point to the prefixed
+        // version (since it's an alias) but the declaration will now declare
+        // a prefixed version (due to the namespace).
+        return $this->enrichedReflector->belongsToGlobalNamespace($resolvedName)
+            && $this->enrichedReflector->isClassExcluded($resolvedName);
     }
 }

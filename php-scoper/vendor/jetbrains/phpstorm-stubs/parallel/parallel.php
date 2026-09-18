@@ -7,17 +7,17 @@ use Closure;
 /**
  * Shall use the provided file to bootstrap all runtimes created for automatic scheduling via @see run().
  *
- * @param string $file
+ * @param string $file Path to the file to bootstrap all runtimes.
  *
  * @throws Runtime\Error\Bootstrap if previously called for this process.
  * @throws Runtime\Error\Bootstrap if called after @see run().
  */
-function bootstrap(string $file) : void{}
+function bootstrap(string $file): void {}
 
 /**
  * @see Runtime::run() for more details
  * @link https://www.php.net/manual/en/parallel.run
- * @param Closure $task
+ * @param Closure $task A Closure with specific characteristics.
  * @param array   $argv
  *
  * ### Automatic Scheduling
@@ -27,7 +27,8 @@ function bootstrap(string $file) : void{}
  *
  * Note: \parallel\Runtime objects created by the programmer are not used for automatic scheduling.
  *
- * @return Future|null
+ * @return Future|null The return parallel\Future must not be ignored when the task contains a
+ * return or throw statement.
  *
  * @throws Runtime\Error\Closed if \parallel\Runtime was closed.
  * @throws Runtime\Error\IllegalFunction if task is a closure created from an internal function.
@@ -35,11 +36,11 @@ function bootstrap(string $file) : void{}
  * @throws Runtime\Error\IllegalParameter if task accepts or argv contains illegal variables.
  * @throws Runtime\Error\IllegalReturn if task returns illegally.
  */
-function run(Closure $task, array $argv = null) : ?Future{}
+function run(Closure $task, ?array $argv = null): ?Future {}
 
 #ifdef ZEND_DEBUG
 /**
  * @return int
  */
-function count() : int{}
+function count(): int {}
 #endif

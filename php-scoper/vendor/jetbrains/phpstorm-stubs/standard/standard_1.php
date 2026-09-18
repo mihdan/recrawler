@@ -2,9 +2,10 @@
 
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 use JetBrains\PhpStorm\Pure;
-
 
 /**
  * Make a string uppercase
@@ -15,8 +16,7 @@ use JetBrains\PhpStorm\Pure;
  * @return string the uppercased string.
  */
 #[Pure]
-function strtoupper (string $string): string
-{}
+function strtoupper(string $string): string {}
 
 /**
  * Make a string lowercase
@@ -27,8 +27,7 @@ function strtoupper (string $string): string
  * @return string the lowercased string.
  */
 #[Pure]
-function strtolower (string $string): string
-{}
+function strtolower(string $string): string {}
 
 /**
  * Find the position of the first occurrence of a substring in a string
@@ -40,12 +39,12 @@ function strtolower (string $string): string
  * If <b>needle</b> is not a string, it is converted
  * to an integer and applied as the ordinal value of a character.
  * </p>
- * @param int $offset [optional] <p>
+ * @param int<0,max> $offset [optional] <p>
  * If specified, search will start this number of characters counted from
  * the beginning of the string. Unlike {@see strrpos()} and {@see strripos()}, the offset cannot be negative.
  * </p>
- * @return int|false <p>
- * Returns the position where the needle exists relative to the beginnning of
+ * @return int<0,max>|false <p>
+ * Returns the position where the needle exists relative to the beginning of
  * the <b>haystack</b> string (independent of search direction
  * or offset).
  * Also note that string positions start at 0, and not 1.
@@ -53,10 +52,11 @@ function strtolower (string $string): string
  * <p>
  * Returns <b>FALSE</b> if the needle was not found.
  * </p>
+ * @throws \ValueError If offset is greater than the length of haystack, a ValueError will be
+ * thrown.
  */
 #[Pure]
-function strpos (string $haystack, string $needle, int $offset = 0): int|false
-{}
+function strpos(string $haystack, string $needle, int $offset = 0): int|false {}
 
 /**
  * Find position of first occurrence of a case-insensitive string
@@ -72,7 +72,7 @@ function strpos (string $haystack, string $needle, int $offset = 0): int|false
  * If needle is not a string, it is converted to
  * an integer and applied as the ordinal value of a character.
  * </p>
- * @param int $offset [optional] <p>
+ * @param int $offset <p>
  * The optional offset parameter allows you
  * to specify which character in haystack to
  * start searching. The position returned is still relative to the
@@ -80,10 +80,11 @@ function strpos (string $haystack, string $needle, int $offset = 0): int|false
  * </p>
  * @return int|false If needle is not found,
  * stripos will return boolean false.
+ * @throws \ValueError If offset is greater than the length of haystack, a ValueError will be
+ * thrown.
  */
 #[Pure]
-function stripos (string $haystack, string $needle, int $offset): int|false
-{}
+function stripos(string $haystack, string $needle, int $offset = 0): int|false {}
 
 /**
  * Find the position of the last occurrence of a substring in a string
@@ -106,10 +107,11 @@ function stripos (string $haystack, string $needle, int $offset): int|false
  * <p>
  * Returns <b>FALSE</b> if the needle was not found.
  * </p>
+ * @throws \ValueError If offset is greater than the length of haystack, a ValueError will be
+ * thrown.
  */
 #[Pure]
-function strrpos (string $haystack, string $needle, int $offset = 0): int|false
-{}
+function strrpos(string $haystack, string $needle, int $offset = 0): int|false {}
 
 /**
  * Find position of last occurrence of a case-insensitive string in a string
@@ -121,7 +123,7 @@ function strrpos (string $haystack, string $needle, int $offset = 0): int|false
  * Note that the needle may be a string of one or
  * more characters.
  * </p>
- * @param int $offset [optional] <p>
+ * @param int $offset <p>
  * The offset parameter may be specified to begin
  * searching an arbitrary number of characters into the string.
  * </p>
@@ -136,10 +138,11 @@ function strrpos (string $haystack, string $needle, int $offset = 0): int|false
  * </p>
  * <p>
  * If needle is not found, false is returned.
+ * @throws \ValueError If offset is greater than the length of haystack, a ValueError will be
+ * thrown.
  */
 #[Pure]
-function strripos (string $haystack, string $needle, int $offset): int|false
-{}
+function strripos(string $haystack, string $needle, int $offset = 0): int|false {}
 
 /**
  * Reverse a string
@@ -150,8 +153,7 @@ function strripos (string $haystack, string $needle, int $offset): int|false
  * @return string the reversed string.
  */
 #[Pure]
-function strrev (string $string): string
-{}
+function strrev(string $string): string {}
 
 /**
  * Convert logical Hebrew text to visual text
@@ -159,15 +161,14 @@ function strrev (string $string): string
  * @param string $string <p>
  * A Hebrew input string.
  * </p>
- * @param int $max_chars_per_line [optional] <p>
+ * @param int $max_chars_per_line <p>
  * This optional parameter indicates maximum number of characters per
  * line that will be returned.
  * </p>
  * @return string the visual string.
  */
 #[Pure]
-function hebrev (string $string, int $max_chars_per_line): string
-{}
+function hebrev(string $string, int $max_chars_per_line = 0): string {}
 
 /**
  * Convert logical Hebrew text to visual text with newline conversion
@@ -183,8 +184,7 @@ function hebrev (string $string, int $max_chars_per_line): string
  * @removed 8.0
  */
 #[Deprecated(replacement: 'nl2br(hebrev(%parameter0%))', since: '7.4')]
-function hebrevc (string $hebrew_text, $max_chars_per_line): string
-{}
+function hebrevc(string $hebrew_text, $max_chars_per_line = 0): string {}
 
 /**
  * Inserts HTML line breaks before all newlines in a string
@@ -193,13 +193,12 @@ function hebrevc (string $hebrew_text, $max_chars_per_line): string
  * The input string.
  * </p>
  * @param bool $use_xhtml [optional] <p>
- * Whenever to use XHTML compatible line breaks or not.
+ * Whether to use XHTML compatible line breaks or not.
  * </p>
  * @return string the altered string.
  */
 #[Pure]
-function nl2br (string $string, bool $use_xhtml = true): string
-{}
+function nl2br(string $string, bool $use_xhtml = true): string {}
 
 /**
  * Returns trailing name component of path
@@ -212,15 +211,14 @@ function nl2br (string $string, bool $use_xhtml = true): string
  * (\) are used as directory separator character. In
  * other environments, it is the forward slash (/).
  * </p>
- * @param string $suffix [optional] <p>
+ * @param string $suffix <p>
  * If the filename ends in suffix this will also
  * be cut off.
  * </p>
  * @return string the base name of the given path.
  */
 #[Pure]
-function basename (string $path, string $suffix): string
-{}
+function basename(string $path, string $suffix = ''): string {}
 
 /**
  * Returns a parent directory's path
@@ -244,8 +242,7 @@ function basename (string $path, string $suffix): string
  * /component removed.
  */
 #[Pure]
-function dirname (string $path, int $levels = 1): string
-{}
+function dirname(string $path, #[PhpStormStubsElementAvailable(from: '7.0')] int $levels = 1): string {}
 
 /**
  * Returns information about a file path
@@ -262,7 +259,7 @@ function dirname (string $path, int $levels = 1): string
  * PATHINFO_FILENAME. It
  * defaults to return all elements.
  * </p>
- * @return string[]|string The following associative array elements are returned:
+ * @return string|array{dirname: string, basename: string, extension: string, filename: string} The following associative array elements are returned:
  * dirname, basename,
  * extension (if any), and filename.
  * </p>
@@ -270,9 +267,14 @@ function dirname (string $path, int $levels = 1): string
  * If options is used, this function will return a
  * string if not all elements are requested.
  */
-#[Pure]
-function pathinfo (string $path, int $flags): array|string
-{}
+#[Pure(true)]
+#[ArrayShape(['dirname' => 'string', 'basename' => 'string', 'extension' => 'string', 'filename' => 'string'])]
+function pathinfo(string $path, #[ExpectedValues(flags: [
+    PATHINFO_DIRNAME,
+    PATHINFO_BASENAME,
+    PATHINFO_EXTENSION,
+    PATHINFO_FILENAME
+])] int $flags = PATHINFO_ALL): array|string {}
 
 /**
  * Un-quotes a quoted string
@@ -286,8 +288,7 @@ function pathinfo (string $path, int $flags): array|string
  * backslash (\).
  */
 #[Pure]
-function stripslashes (string $string): string
-{}
+function stripslashes(string $string): string {}
 
 /**
  * Un-quote string quoted with <function>addcslashes</function>
@@ -298,8 +299,7 @@ function stripslashes (string $string): string
  * @return string the unescaped string.
  */
 #[Pure]
-function stripcslashes (string $string): string
-{}
+function stripcslashes(string $string): string {}
 
 /**
  * Find the first occurrence of a string
@@ -320,8 +320,7 @@ function stripcslashes (string $string): string
  * is not found.
  */
 #[Pure]
-function strstr (string $haystack, string $needle, bool $before_needle): string|false
-{}
+function strstr(string $haystack, string $needle, bool $before_needle = false): string|false {}
 
 /**
  * Case-insensitive <function>strstr</function>
@@ -342,8 +341,7 @@ function strstr (string $haystack, string $needle, bool $before_needle): string|
  * found, returns false.
  */
 #[Pure]
-function stristr (string $haystack, string $needle, bool $before_needle): string|false
-{}
+function stristr(string $haystack, string $needle, bool $before_needle = false): string|false {}
 
 /**
  * Find the last occurrence of a character in a string
@@ -359,14 +357,15 @@ function stristr (string $haystack, string $needle, bool $before_needle): string
  * If <b>needle</b> is not a string, it is converted to
  * an integer and applied as the ordinal value of a character.
  * </p>
+ * @param bool $before_needle Since 8.3 If true, strrchr() returns the part of the haystack before the last occurrence
+ * of the needle (excluding the needle).
  * @return string|false <p>
  * This function returns the portion of string, or <b>FALSE</b> if
  * <b>needle</b> is not found.
  * </p>
  */
 #[Pure]
-function strrchr (string $haystack, string $needle): string|false
-{}
+function strrchr(string $haystack, string $needle, #[PhpStormStubsElementAvailable(from: '8.3')] bool $before_needle = false): string|false {}
 
 /**
  * Randomly shuffles a string
@@ -376,9 +375,7 @@ function strrchr (string $haystack, string $needle): string|false
  * </p>
  * @return string the shuffled string.
  */
-#[Pure]
-function str_shuffle (string $string): string
-{}
+function str_shuffle(string $string): string {}
 
 /**
  * Return information about words used in a string
@@ -398,8 +395,7 @@ function str_shuffle (string $string): string
  * format chosen.
  */
 #[Pure]
-function str_word_count (string $string, int $format, ?string $characters): array|int
-{}
+function str_word_count(string $string, int $format = 0, ?string $characters = null): array|int {}
 
 /**
  * Convert a string to an array
@@ -410,7 +406,7 @@ function str_word_count (string $string, int $format, ?string $characters): arra
  * @param int $length [optional] <p>
  * Maximum length of the chunk.
  * </p>
- * @return string[]|false If the optional split_length parameter is
+ * @return string[]|false <p>If the optional split_length parameter is
  * specified, the returned array will be broken down into chunks with each
  * being split_length in length, otherwise each chunk
  * will be one character in length.
@@ -421,11 +417,11 @@ function str_word_count (string $string, int $format, ?string $characters): arra
  * string, the entire string is returned as the first
  * (and only) array element.
  * </p>
+ * @throws \ValueError If length is less than 1, a ValueError will be thrown.
  */
 #[Pure]
 #[LanguageLevelTypeAware(["8.0" => "array"], default: "array|false")]
-function str_split (string $string, int $length = 1): array|bool
-{}
+function str_split(string $string, int $length = 1) {}
 
 /**
  * Search a string for any of a set of characters
@@ -440,8 +436,11 @@ function str_split (string $string, int $length = 1): array|bool
  * not found.
  */
 #[Pure]
-function strpbrk (string $string, string $characters): string|false
-{}
+function strpbrk(
+    string $string,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.0')] $char_list = '',
+    #[PhpStormStubsElementAvailable(from: '7.1')] string $characters
+): string|false {}
 
 /**
  * Binary safe comparison of two strings from an offset, up to length characters
@@ -468,12 +467,11 @@ function strpbrk (string $string, string $characters): string|false
  * 0 if it is greater than str, and 0 if they are equal.
  * If offset is equal to or greater than the length of
  * main_str or length is set and
- * is less than 1, substr_compare prints a warning and returns
- * false.
+ * is less than 1, a ValueError is thrown. Prior to PHP 8.0, a warning was raised and false was
+ * returned instead.
  */
 #[Pure]
-function substr_compare (string $haystack, string $needle, int $offset, ?int $length, bool $case_insensitive): int
-{}
+function substr_compare(string $haystack, string $needle, int $offset, ?int $length = null, bool $case_insensitive = false): int {}
 
 /**
  * Locale based string comparison
@@ -490,15 +488,14 @@ function substr_compare (string $haystack, string $needle, int $offset, ?int $le
  * str2, and 0 if they are equal.
  */
 #[Pure]
-function strcoll (string $string1, string $string2): int
-{}
+function strcoll(string $string1, string $string2): int {}
 
 /**
  * Formats a number as a currency string
  * @link https://php.net/manual/en/function.money-format.php
  * @param string $format <p>
- * The format specification consists of the following sequence:
- * <p>a % character</p>
+ * The format specification consists of the following sequence:<br>
+ * a % character</p>
  * @param float $number <p>
  * The number to be formatted.
  * </p>
@@ -510,35 +507,26 @@ function strcoll (string $string1, string $string2): int
  * @see NumberFormatter
  */
 #[Deprecated(reason: 'Use the NumberFormatter functionality', since: '7.4')]
-function money_format (string $format, float $number): ?string
-{}
+function money_format(string $format, float $number): ?string {}
 
 /**
- * Return part of a string
+ * Returns the portion of string specified by the offset and length parameters.
  * @link https://php.net/manual/en/function.substr.php
  * @param string $string <p>
  * The input string.
  * </p>
  * @param int $offset <p>
- * If start is non-negative, the returned string
- * will start at the start'th position in
- * string, counting from zero. For instance,
- * in the string 'abcdef', the character at
- * position 0 is 'a', the
- * character at position 2 is
- * 'c', and so forth.
+ * If offset is non-negative, the returned string will start at the offset'th position in string, counting from zero.
+ * For instance, in the string 'abcdef', the character at position 0 is 'a', the character at position 2 is 'c', and so forth.
  * </p>
  * <p>
- * If start is negative, the returned string
- * will start at the start'th character
- * from the end of string.
+ * If offset is negative, the returned string will start at the offset'th character from the end of string.
  * </p>
  * <p>
- * If string is less than or equal to
- * start characters long, false will be returned.
+ * If string is less than offset characters long, an empty string will be returned.
  * </p>
  * <p>
- * Using a negative start
+ * Using a negative offset
  * </p>
  * <pre>
  * <?php
@@ -548,24 +536,22 @@ function money_format (string $format, float $number): ?string
  * ?>
  * </pre>
  * @param int|null $length [optional] <p>
- * If length is given and is positive, the string
- * returned will contain at most length characters
- * beginning from start (depending on the length of
- * string).
+ * If length is given and is positive, the string returned will contain at most length characters beginning from offset
+ * (depending on the length of string).
  * </p>
  * <p>
- * If length is given and is negative, then that many
- * characters will be omitted from the end of string
- * (after the start position has been calculated when a
- * start is negative). If
- * start denotes a position beyond this truncation,
- * an empty string will be returned.
+ * If length is given and is negative, then that many characters will be omitted from the end of string.
+ * If offset denotes the position of this truncation or beyond, an empty string will be returned.
  * </p>
  * <p>
- * If length is given and is 0,
- * false or null an empty string will be returned.
+ * If length is given and is 0, an empty string will be returned.
  * </p>
+ * <p>
+ * Starting from PHP 8.0 if length is omitted or null, the substring starting from offset until the end of the string will be returned.
+ * </p>
+ * <p>
  * Using a negative length:
+ * </p>
  * <pre>
  * <?php
  * $rest = substr("abcdef", 0, -1);  // returns "abcde"
@@ -574,23 +560,40 @@ function money_format (string $format, float $number): ?string
  * $rest = substr("abcdef", -3, -1); // returns "de"
  * ?>
  * </pre>
- * @return string|false the extracted part of string or false on failure.
+ * @return string|false Returns the extracted part of string, or an empty string. (FALSE prior PHP 8.0)
+ *  <p>
+ *   Basic usage:
+ *  </p>
+ *   <code>
+ *   echo substr('abcdef', 1), PHP_EOL;     // bcdef
+ *   echo substr("abcdef", 1, null), PHP_EOL; // bcdef; prior to PHP 8.0.0, empty string was returned
+ *   echo substr('abcdef', 1, 3), PHP_EOL;  // bcd
+ *   echo substr('abcdef', 0, 4), PHP_EOL;  // abcd
+ *   echo substr('abcdef', 0, 8), PHP_EOL;  // abcdef
+ *   echo substr('abcdef', -1, 1), PHP_EOL; // f
+ *
+ *   // Accessing single characters in a string
+ *   // can also be achieved using "square brackets"
+ *   $string = 'abcdef';
+ *   echo $string[0], PHP_EOL;                 // a
+ *   echo $string[3], PHP_EOL;                 // d
+ *   echo $string[strlen($string)-1], PHP_EOL; // f
+ *   </code>
  */
 #[Pure]
 #[LanguageLevelTypeAware(["8.0" => "string"], default: "string|false")]
-function substr (string $string, int $offset, ?int $length)
-{}
+function substr(string $string, int $offset, ?int $length = null) {}
 
 /**
  * Replace text within a portion of a string
  * @link https://php.net/manual/en/function.substr-replace.php
- * @param array|string $string <p>
+ * @param string[]|string $string <p>
  * The input string.
  * </p>
- * @param string|array $replace <p>
+ * @param string[]|string $replace <p>
  * The replacement string.
  * </p>
- * @param array|int $offset <p>
+ * @param int[]|int $offset <p>
  * If start is positive, the replacing will
  * begin at the start'th offset into
  * string.
@@ -600,7 +603,7 @@ function substr (string $string, int $offset, ?int $length)
  * begin at the start'th character from the
  * end of string.
  * </p>
- * @param int $length [optional] <p>
+ * @param int[]|int $length [optional] <p>
  * If given and is positive, it represents the length of the portion of
  * string which is to be replaced. If it is
  * negative, it represents the number of characters from the end of
@@ -617,8 +620,7 @@ function substr (string $string, int $offset, ?int $length)
  * array then array is returned.
  */
 #[Pure]
-function substr_replace (array|string $string, array|string $replace, array|int $offset, array|int $length = null): array|string
-{}
+function substr_replace(array|string $string, array|string $replace, array|int $offset, array|int|null $length = null): array|string {}
 
 /**
  * Quote meta characters
@@ -629,8 +631,7 @@ function substr_replace (array|string $string, array|string $replace, array|int 
  * @return string the string with meta characters quoted.
  */
 #[Pure]
-function quotemeta (string $string): string
-{}
+function quotemeta(string $string): string {}
 
 /**
  * Make a string's first character uppercase
@@ -641,8 +642,7 @@ function quotemeta (string $string): string
  * @return string the resulting string.
  */
 #[Pure]
-function ucfirst (string $string): string
-{}
+function ucfirst(string $string): string {}
 
 /**
  * Make a string's first character lowercase
@@ -653,8 +653,7 @@ function ucfirst (string $string): string
  * @return string the resulting string.
  */
 #[Pure]
-function lcfirst (string $string): string
-{}
+function lcfirst(string $string): string {}
 
 /**
  * Uppercase the first character of each word in a string
@@ -663,11 +662,12 @@ function lcfirst (string $string): string
  * The input string.
  * </p>
  * @param string $separators [optional] <p>
+ * The optional separators contains the word separator characters.
+ * </p>
  * @return string the modified string.
  */
 #[Pure]
-function ucwords (string $string, string $separators = " \t\r\n\f\v"): string
-{}
+function ucwords(string $string, string $separators = " \t\r\n\f\v"): string {}
 
 /**
  * Translate characters or replace substrings
@@ -687,8 +687,7 @@ function ucwords (string $string, string $separators = " \t\r\n\f\v"): string
  * to.
  */
 #[Pure]
-function strtr (string $string, string $from, string $to): string
-{}
+function strtr(string $string, string $from, string $to): string {}
 
 /**
  * Translate certain characters
@@ -698,8 +697,7 @@ function strtr (string $string, string $from, string $to): string
  * @return string A copy of str, translating all occurrences of each character in from to the corresponding character in to.
  */
 #[Pure]
-function strtr (string $str, array $replace_pairs): string
-{}
+function strtr(string $str, array $replace_pairs): string {}
 
 /**
  * Quote string with slashes
@@ -710,8 +708,7 @@ function strtr (string $str, array $replace_pairs): string
  * @return string the escaped string.
  */
 #[Pure]
-function addslashes (string $string): string
-{}
+function addslashes(string $string): string {}
 
 /**
  * Quote string with slashes in a C style
@@ -720,17 +717,12 @@ function addslashes (string $string): string
  * The string to be escaped.
  * </p>
  * @param string $characters <p>
- * A list of characters to be escaped. If
- * charlist contains characters
- * \n, \r etc., they are
- * converted in C-like style, while other non-alphanumeric characters
- * with ASCII codes lower than 32 and higher than 126 converted to
- * octal representation.
+ * A list of characters to be escaped. If characters contains characters \n, \r etc., they are converted in C-like style,
+ * while other non-alphanumeric characters with ASCII codes lower than 32 and higher than 126 converted to octal representation.
  * </p>
  * <p>
- * When you define a sequence of characters in the charlist argument
- * make sure that you know what characters come between the
- * characters that you set as the start and end of the range.
+ * When you define a sequence of characters in the characters argument make sure that you know what characters come
+ * between the characters that you set as the start and end of the range.
  * </p>
  * <pre>
  * <?php
@@ -754,18 +746,26 @@ function addslashes (string $string): string
  * ?>
  * </pre>
  * <p>
- * Be careful if you choose to escape characters 0, a, b, f, n, r,
- * t and v. They will be converted to \0, \a, \b, \f, \n, \r, \t
- * and \v.
- * In PHP \0 (NULL), \r (carriage return), \n (newline), \f (form feed),
- * \v (vertical tab) and \t (tab) are predefined escape sequences,
- * while in C all of these are predefined escape sequences.
+ * Be careful if you choose to escape characters 0, a, b, f, n, r, t and v.
+ * They will be converted to \0, \a, \b, \f, \n, \r, \t and \v, all of which are predefined escape sequences in C.
+ * Many of these sequences are also defined in other C-derived languages, including PHP, meaning that you may not get
+ * the desired result if you use the output of addcslashes() to generate code in those languages with these characters
+ * defined in characters.
  * </p>
  * @return string the escaped string.
+ * <p>
+ * Example usage:
+ * </p>
+ * <code>
+ * <?php
+ * $not_escaped = "PHP isThirty\nYears Old!\tYay to the Elephant!\n";
+ * $escaped = addcslashes($not_escaped, "\0..\37!@\177..\377");
+ * echo $escaped;
+ * ?>
+ * </code>
  */
 #[Pure]
-function addcslashes (string $string, string $characters): string
-{}
+function addcslashes(string $string, string $characters): string {}
 
 /**
  * Strip whitespace (or other characters) from the end of a string.
@@ -791,8 +791,7 @@ function addcslashes (string $string, string $characters): string
  * @return string the modified string.
  */
 #[Pure]
-function rtrim (string $string, string $characters = " \t\n\r\0\x0B"): string
-{}
+function rtrim(string $string, #[PhpStormStubsElementAvailable(to: '8.5')] string $characters = " \n\r\t\v\0", #[PhpStormStubsElementAvailable(from: '8.6')] string $characters = " \f\n\r\t\v\0"): string {}
 
 /**
  * Replace all occurrences of the search string with the replacement string
@@ -817,9 +816,9 @@ function rtrim (string $string, string $characters = " \t\n\r\0\x0B"): string
  * </p>
  * @param int &$count [optional] If passed, this will hold the number of matched and replaced needles.
  * @return string|string[] This function returns a string or an array with the replaced values.
+ * @meta
  */
-function str_replace (array|string $search, array|string $replace, array|string $subject, &$count): array|string
-{}
+function str_replace(array|string $search, array|string $replace, array|string $subject, &$count = null): array|string {}
 
 /**
  * Case-insensitive version of <function>str_replace</function>.
@@ -843,8 +842,7 @@ function str_replace (array|string $search, array|string $replace, array|string 
  * </p>
  * @return string|string[] a string or an array of replacements.
  */
-function str_ireplace (array|string $search, array|string $replace, array|string $subject, &$count): array|string
-{}
+function str_ireplace(array|string $search, array|string $replace, array|string $subject, &$count = null): array|string {}
 
 /**
  * Repeat a string
@@ -864,8 +862,7 @@ function str_ireplace (array|string $search, array|string $replace, array|string
  * @return string the repeated string.
  */
 #[Pure]
-function str_repeat (string $string, int $times): string
-{}
+function str_repeat(string $string, int $times): string {}
 
 /**
  * Return information about characters used in a string
@@ -873,7 +870,7 @@ function str_repeat (string $string, int $times): string
  * @param string $string <p>
  * The examined string.
  * </p>
- * @param int $mode [optional] <p>
+ * @param int $mode <p>
  * See return values.
  * </p>
  * @return int[]|string Depending on mode
@@ -888,8 +885,7 @@ function str_repeat (string $string, int $times): string
  * 4 - a string containing all not used characters is returned.
  */
 #[Pure]
-function count_chars (string $string, int $mode): array|string
-{}
+function count_chars(string $string, int $mode = 0): array|string {}
 
 /**
  * Split a string into smaller chunks
@@ -906,8 +902,7 @@ function count_chars (string $string, int $mode): array|string
  * @return string the chunked string.
  */
 #[Pure]
-function chunk_split (string $string, int $length = 76, string $separator = "\r\n"): string
-{}
+function chunk_split(string $string, int $length = 76, string $separator = "\r\n"): string {}
 
 /**
  * Strip whitespace (or other characters) from the beginning and end of a string
@@ -924,8 +919,7 @@ function chunk_split (string $string, int $length = 76, string $separator = "\r\
  * @return string The trimmed string.
  */
 #[Pure]
-function trim (string $string, string $characters = " \t\n\r\0\x0B"): string
-{}
+function trim(string $string, #[PhpStormStubsElementAvailable(to: '8.5')] string $characters = " \n\r\t\v\0", #[PhpStormStubsElementAvailable(from: '8.6')] string $characters = " \f\n\r\t\v\0"): string {}
 
 /**
  * Strip whitespace (or other characters) from the beginning of a string
@@ -957,8 +951,7 @@ function trim (string $string, string $characters = " \t\n\r\0\x0B"): string
  * (0x0B)), a vertical tab.
  */
 #[Pure]
-function ltrim (string $string, string $characters = " \t\n\r\0\x0B"): string
-{}
+function ltrim(string $string, #[PhpStormStubsElementAvailable(to: '8.5')] string $characters = " \n\r\t\v\0", #[PhpStormStubsElementAvailable(from: '8.6')] string $characters = " \f\n\r\t\v\0"): string {}
 
 /**
  * Strip HTML and PHP tags from a string
@@ -966,10 +959,9 @@ function ltrim (string $string, string $characters = " \t\n\r\0\x0B"): string
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array|string $allowed_tags [optional] <p>
+ * @param string[]|string|null $allowed_tags [optional] <p>
  * You can use the optional second parameter to specify tags which should
- * not be stripped.<br/>
- * Since 7.4.0 alternatively accepts an array of allowed tags.
+ * not be stripped.
  * </p>
  * <p>
  * HTML comments and PHP tags are also stripped. This is hardcoded and
@@ -978,8 +970,7 @@ function ltrim (string $string, string $characters = " \t\n\r\0\x0B"): string
  * @return string the stripped string.
  */
 #[Pure]
-function strip_tags (string $string, array|string $allowed_tags = null): string
-{}
+function strip_tags(string $string, #[LanguageLevelTypeAware(["7.4" => "string[]|string|null"], default: "string|null")] $allowed_tags = null): string {}
 
 /**
  * Calculate the similarity between two strings
@@ -997,8 +988,7 @@ function strip_tags (string $string, array|string $allowed_tags = null): string
  * </p>
  * @return int the number of matching chars in both strings.
  */
-function similar_text (string $string1, string $string2, &$percent): int
-{}
+function similar_text(string $string1, string $string2, &$percent = null): int {}
 
 /**
  * Split a string by a string
@@ -1021,18 +1011,17 @@ function similar_text (string $string1, string $string2, &$percent): int
  * <p>
  * If the limit parameter is zero, then this is treated as 1.
  * </p>
- * @return string[]|false If delimiter is an empty string (""),
+ * @return string[]|false If separator is an empty string (""),
  * explode will return false.
- * If delimiter contains a value that is not
+ * If separator contains a value that is not
  * contained in string and a negative
  * limit is used, then an empty array will be
  * returned. For any other limit, an array containing
  * string will be returned.
  */
 #[Pure]
-#[LanguageLevelTypeAware(["8.0" => "array"], default: "array|false")]
-function explode (string $separator, string $string, int $limit): array|bool
-{}
+#[LanguageLevelTypeAware(["8.0" => "string[]"], default: "string[]|false")]
+function explode(string $separator, string $string, int $limit = PHP_INT_MAX) {}
 
 /**
  * Join array elements with a string
@@ -1049,11 +1038,11 @@ function explode (string $separator, string $string, int $limit): array|bool
  * elements in the same order, with the glue string between each element.
  */
 #[Pure]
-function implode (array|string $separator = "", ?array $array): string
-{}
+function implode(array|string $separator = "", ?array $array = null): string {}
 
 /**
- * &Alias; <function>implode</function>
+ * Alias:
+ * {@see implode}
  * @link https://php.net/manual/en/function.join.php
  * @param array|string  $separator [optional] <p>
  * Defaults to an empty string. This is not the preferred usage of
@@ -1067,14 +1056,12 @@ function implode (array|string $separator = "", ?array $array): string
  * elements in the same order, with the glue string between each element.
  */
 #[Pure]
-function join (array|string  $separator = "", ?array $array): string
-{}
+function join(array|string $separator = "", ?array $array = null): string {}
 
 /**
  * Set locale information
  * @link https://php.net/manual/en/function.setlocale.php
  * @param int $category <p>
- * <p>
  * <em>category</em> is a named constant specifying the
  * category of the functions affected by the locale setting:
  * </p><ul>
@@ -1096,7 +1083,7 @@ function join (array|string  $separator = "", ?array $array): string
  * <b>LC_NUMERIC</b> for decimal separator (See also
  * {@see localeconv()})
  * </li>
- *<li>
+ * <li>
  * <b>LC_TIME</b> for date and time formatting with
  * {@see strftime()}
  *
@@ -1107,7 +1094,7 @@ function join (array|string  $separator = "", ?array $array): string
  *
  * </li>
  * </ul>
- * @param string|array $locales <p>
+ * @param string|string[]|int $locales <p>
  * If locale is null or the empty string
  * "", the locale names will be set from the
  * values of environment variables with the same names as the above
@@ -1124,8 +1111,9 @@ function join (array|string  $separator = "", ?array $array): string
  * different names on different systems or for providing a fallback
  * for a possibly not available locale.
  * </p>
- * @param string ...$rest [optional]
- * @return string|false the new current locale, or false if the locale functionality is
+ * @param string|string[] ...$rest Optional string parameters to try as locale settings until
+ * success.
+ * @return string|false <p>the new current locale, or false if the locale functionality is
  * not implemented on your platform, the specified locale does not exist or
  * the category name is invalid.
  * </p>
@@ -1138,10 +1126,14 @@ function join (array|string  $separator = "", ?array $array): string
  * <p>
  * The return value of setlocale depends
  * on the system that PHP is running. It returns exactly
- * what the system setlocale function returns.
+ * what the system setlocale function returns.</p>
  */
-function setlocale (int $category, array|string $locales, ...$rest): string|false
-{}
+function setlocale(
+    #[ExpectedValues([LC_ALL,  LC_COLLATE,  LC_CTYPE,  LC_MONETARY,  LC_NUMERIC,  LC_TIME,  LC_MESSAGES])] int $category,
+    #[PhpStormStubsElementAvailable(from: '8.0')] $locales,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.4')] $rest = null,
+    ...$rest
+): string|false {}
 
 /**
  * Get numeric formatting information
@@ -1261,7 +1253,6 @@ function setlocale (int $category, array|string $locales, ...$rest): string|fals
  * no further grouping is done. If an array element is equal to 0, the previous
  * element should be used.
  */
-#[ArrayShape(["decimal_point" => "string", "thousands_sep" => "string", "grouping" => "array", "int_curr_symbol" => "string", "currency_symbol" => "string", "mon_decimal_point" => "string", "mon_thousands_sep" => "string", "mon_grouping" => "string", "positive_sign" => "string", "negative_sign" => "string", "int_frac_digits" => "string", "frac_digits" => "string", "p_cs_precedes" => "bool", "p_sep_by_space" => "bool", "n_cs_precedes" => "bool", "n_sep_by_space" => "bool", "p_sign_posn" => "int", "n_sign_posn" => "int",])]
-#[Pure]
-function localeconv (): array
-{}
+#[ArrayShape(["decimal_point" => "string", "thousands_sep" => "string", "grouping" => "array", "int_curr_symbol" => "string", "currency_symbol" => "string", "mon_decimal_point" => "string", "mon_thousands_sep" => "string", "mon_grouping" => "string", "positive_sign" => "string", "negative_sign" => "string", "int_frac_digits" => "string", "frac_digits" => "string", "p_cs_precedes" => "bool", "p_sep_by_space" => "bool", "n_cs_precedes" => "bool", "n_sep_by_space" => "bool", "p_sign_posn" => "int", "n_sign_posn" => "int"])]
+#[Pure(true)]
+function localeconv(): array {}

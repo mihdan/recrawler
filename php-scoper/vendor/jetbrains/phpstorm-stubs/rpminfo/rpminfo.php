@@ -274,7 +274,6 @@ const RPMTAG_VERIFYSCRIPTPROG = 1091;
 const RPMTAG_VERSION = 1001;
 const RPMTAG_XPM = 1013;
 
-
 /**
  * Compare two RPM evr (epoch:version-release) strings
  *
@@ -289,7 +288,7 @@ const RPMTAG_XPM = 1013;
  * </p>
  * @since 0.1.0
  */
-function rpmvercmp (string $evr1, string $evr2) {}
+function rpmvercmp(string $evr1, string $evr2) {}
 
 /**
  * Retrieve information from a RPM file, reading its metadata.
@@ -304,7 +303,7 @@ function rpmvercmp (string $evr1, string $evr2) {}
  * @param bool $full [optional] <p>
  * If TRUE all information headers for the file are retrieved, else only a minimal set.
  * </p>
- * @param string &$error [optional] <p>
+ * @param null|string &$error [optional] <p>
  * If provided, will receive the possible error message, and will avoid a runtime warning.
  * </p>
  *
@@ -313,7 +312,7 @@ function rpmvercmp (string $evr1, string $evr2) {}
  * </p>
  * @since 0.1.0
  */
-function rpminfo (string $path, bool $full = false, string &$error = null) {}
+function rpminfo(string $path, bool $full = false, ?string &$error = null) {}
 
 /**
  * Retrieve information about an installed package, from the system RPM database.
@@ -330,7 +329,7 @@ function rpminfo (string $path, bool $full = false, string &$error = null) {}
  * </p>
  * @since 0.2.0
  */
-function rpmdbinfo (string $nevr, bool $full = false) {}
+function rpmdbinfo(string $nevr, bool $full = false) {}
 
 /**
  * Retriev information from the local RPM database.
@@ -354,4 +353,14 @@ function rpmdbinfo (string $nevr, bool $full = false) {}
  * </p>
  * @since 0.3.0
  */
-function rpmdbsearch (string $pattern, int $rpmtag = RPMTAG_NAME, int $rpmmire = -1, bool $full = false) {}
+function rpmdbsearch(string $pattern, int $rpmtag = RPMTAG_NAME, int $rpmmire = -1, bool $full = false) {}
+
+/**
+ * Add an additional retrieved tag in subsequent queries.
+ *
+ * @param int $tag One of RPMTAG_* constant, see the rpminfo constants page.
+ *
+ * @return bool Returns true on success or false on failure.
+ * @since 0.5.0
+ */
+function rpmaddtag(int $tag): bool {}

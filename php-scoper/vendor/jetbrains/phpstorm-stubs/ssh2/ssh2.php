@@ -10,7 +10,7 @@
  * </p>
  * @param int $port [optional] <p>
  * </p>
- * @param array $methods [optional] <p>
+ * @param null|array $methods [optional] <p>
  * methods may be an associative array with up to four parameters
  * as described below.
  * </p>
@@ -127,7 +127,7 @@
  * for the underlying library for more information.
  * </p>
  * </p>
- * @param array $callbacks [optional] <p>
+ * @param null|array $callbacks [optional] <p>
  * callbacks may be an associative array with any
  * or all of the following parameters.
  * <table>
@@ -175,7 +175,7 @@
  * </p>
  * @return resource|false a resource on success, or false on error.
  */
-function ssh2_connect ($host, $port = null, array $methods = null , array $callbacks = null ) {}
+function ssh2_connect($host, $port = 22, ?array $methods = null, ?array $callbacks = null) {}
 
 /**
  * (PECL ssh2 &gt;= 1.0)<br/>
@@ -185,9 +185,9 @@ function ssh2_connect ($host, $port = null, array $methods = null , array $callb
  * An SSH connection link identifier, obtained from a call to
  * ssh2_connect.
  * </p>
- * @return bool
+ * @return bool Returns true on success or false on failure.
  */
-function ssh2_disconnect ($session) {}
+function ssh2_disconnect($session) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -199,7 +199,7 @@ function ssh2_disconnect ($session) {}
  * </p>
  * @return array
  */
-function ssh2_methods_negotiated ($session) {}
+function ssh2_methods_negotiated($session) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -218,7 +218,7 @@ function ssh2_methods_negotiated ($session) {}
  * </p>
  * @return string the hostkey hash as a string.
  */
-function ssh2_fingerprint ($session, $flags = null) {}
+function ssh2_fingerprint($session, $flags = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -234,7 +234,7 @@ function ssh2_fingerprint ($session, $flags = null) {}
  * @return array|bool true if the server does accept "none" as an authentication
  * method, or an array of accepted authentication methods on failure.
  */
-function ssh2_auth_none ($session, $username) {}
+function ssh2_auth_none($session, $username) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -252,7 +252,34 @@ function ssh2_auth_none ($session, $username) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_auth_password ($session, $username, $password) {}
+function ssh2_auth_password($session, $username, $password) {}
+
+/**
+ * (PECL ssh2 &gt;= 1.4.0)<br/>
+ *  Authenticate using a public key in a variable
+ * @link https://php.net/manual/en/function.ssh2-auth-pubkey.php
+ * @param resource $session <p>
+ * An SSH connection link identifier, obtained from a call to
+ * ssh2_connect.
+ * </p>
+ * @param string $username <p>
+ * Name of the user to authenticate as on the remote server.
+ * </p>
+ * @param string $pubkey <p>
+ * Public key in OpenSSH's format. It should look something like:
+ * ssh-rsa AAAAB3NzaC1yc2EAAA....NX6sqSnHA8= rsa-key-20121110
+ * </p>
+ * @param string $privkey <p>
+ * Private OpenSSH key. It should begin with:
+ * -----BEGIN RSA PRIVATE KEY-----
+ * </p>
+ * @param ?string $passphrase [optional] <p>
+ * If privkey is encrypted (which it should
+ * be), the passphrase must be provided.
+ * </p>
+ * @return bool true on success or false on failure.
+ */
+function ssh2_auth_pubkey($session, $username, $pubkey, $privkey, $passphrase = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -274,7 +301,7 @@ function ssh2_auth_password ($session, $username, $password) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_auth_pubkey_file ($session, $username, $pubkeyfile, $privkeyfile, $passphrase = null) {}
+function ssh2_auth_pubkey_file($session, $username, $pubkeyfile, $privkeyfile, $passphrase = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -302,11 +329,36 @@ function ssh2_auth_pubkey_file ($session, $username, $pubkeyfile, $privkeyfile, 
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_auth_hostbased_file ($session, $username, $hostname, $pubkeyfile, $privkeyfile, $passphrase = null, $local_username = null) {}
+function ssh2_auth_hostbased_file($session, $username, $hostname, $pubkeyfile, $privkeyfile, $passphrase = null, $local_username = null) {}
 
-function ssh2_forward_listen () {}
+/**
+ * (PECL ssh2 &gt;= 0.9.0)<br/>
+ * Bind a port on the remote server and listen for connections
+ * @link https://www.php.net/manual/en/function.ssh2-forward-listen.php
+ * @param resource $session <p>
+ * An SSH connection link identifier, obtained from a call to `ssh2_connect()`.
+ * </p>
+ * @param int $port <p>
+ * The port of the remote server.
+ * </p>
+ * @param string $host [optional] <p>
+ * </p>
+ * @param int $max_connections [optional] <p>
+ * </p>
+ * @return resource|false Returns an SSH2 Listener, or false on failure.
+ */
+function ssh2_forward_listen($session, $port, $host = null, $max_connections = 16) {}
 
-function ssh2_forward_accept () {}
+/**
+ * (PECL ssh2 &gt;= 0.9.0)<br/>
+ * Accept a connection created by a listener
+ * @link https://www.php.net/manual/en/function.ssh2-forward-accept.php
+ * @param resource $listener <p>
+ * An SSH2 Listener resource, obtained from a call to ssh2_forward_listen().
+ * </p>
+ * @return resource|false Returns a stream resource, or false on failure.
+ */
+function ssh2_forward_accept($listener) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -320,24 +372,24 @@ function ssh2_forward_accept () {}
  * term_type should correspond to one of the
  * entries in the target system's /etc/termcap file.
  * </p>
- * @param array $env [optional] <p>
+ * @param null|array $env [optional] <p>
  * env may be passed as an associative array of
  * name/value pairs to set in the target environment.
  * </p>
- * @param int $width [optional] <p>
+ * @param null|int $width [optional] <p>
  * Width of the virtual terminal.
  * </p>
- * @param int $height [optional] <p>
+ * @param null|int $height [optional] <p>
  * Height of the virtual terminal.
  * </p>
- * @param int $width_height_type [optional] <p>
+ * @param null|int $width_height_type [optional] <p>
  * width_height_type should be one of
  * SSH2_TERM_UNIT_CHARS or
  * SSH2_TERM_UNIT_PIXELS.
  * </p>
- * @return resource
+ * @return resource Returns a stream resource on success, or false on failure.
  */
-function ssh2_shell ($session, $term_type = null, array $env = null , $width = null, $height = null, $width_height_type = null) {}
+function ssh2_shell($session, $term_type = null, ?array $env = null, $width = null, $height = null, $width_height_type = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -349,26 +401,26 @@ function ssh2_shell ($session, $term_type = null, array $env = null , $width = n
  * </p>
  * @param string $command <p>
  * </p>
- * @param string $pty [optional] <p>
+ * @param null|string $pty [optional] <p>
  * </p>
- * @param array $env [optional] <p>
+ * @param null|array $env [optional] <p>
  * env may be passed as an associative array of
  * name/value pairs to set in the target environment.
  * </p>
- * @param int $width [optional] <p>
+ * @param null|int $width [optional] <p>
  * Width of the virtual terminal.
  * </p>
- * @param int $height [optional] <p>
+ * @param null|int $height [optional] <p>
  * Height of the virtual terminal.
  * </p>
- * @param int $width_height_type [optional] <p>
+ * @param null|int $width_height_type [optional] <p>
  * width_height_type should be one of
  * SSH2_TERM_UNIT_CHARS or
  * SSH2_TERM_UNIT_PIXELS.
  * </p>
  * @return resource|false a stream on success or false on failure.
  */
-function ssh2_exec ($session, $command, $pty = null, array $env = null , $width = null, $height = null, $width_height_type = null) {}
+function ssh2_exec($session, $command, $pty = null, ?array $env = null, $width = null, $height = null, $width_height_type = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -384,7 +436,7 @@ function ssh2_exec ($session, $command, $pty = null, array $env = null , $width 
  * </p>
  * @return resource
  */
-function ssh2_tunnel ($session, $host, $port) {}
+function ssh2_tunnel($session, $host, $port) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -402,7 +454,7 @@ function ssh2_tunnel ($session, $host, $port) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_scp_recv ($session, $remote_file, $local_file) {}
+function ssh2_scp_recv($session, $remote_file, $local_file) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -424,7 +476,7 @@ function ssh2_scp_recv ($session, $remote_file, $local_file) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_scp_send ($session, $local_file, $remote_file, $create_mode = null) {}
+function ssh2_scp_send($session, $local_file, $remote_file, $create_mode = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -437,12 +489,25 @@ function ssh2_scp_send ($session, $local_file, $remote_file, $create_mode = null
  * </p>
  * @return resource the requested stream resource.
  */
-function ssh2_fetch_stream ($channel, $streamid) {}
+function ssh2_fetch_stream($channel, $streamid) {}
 
 /**
- * @param array &$var1
+ * (PECL ssh2 &gt;= 0.9.0)<br/>
+ * Poll the channels/listeners/streams for events
+ * @link https://www.php.net/manual/en/function.ssh2-poll.php
+ * @param array &$desc <p>
+ * An indexed array of subarrays with the keys 'resource' and 'events'.
+ * The value of the resource is a (channel) stream or an SSH2 Listener resource.
+ * The value of the event are SSH2_POLL* flags bitwise ORed together.
+ * Each subarray will be populated with an 'revents' element on return,
+ * whose values are SSH2_POLL* flags bitwise ORed together of the events that occurred.
+ * </p>
+ * @param int $timeout <p>
+ * The timeout in seconds.
+ * </p>
+ * @return int Returns the number of descriptors which returned non-zero revents.
  */
-function ssh2_poll (&$var1) {}
+function ssh2_poll(&$desc, $timeout = 30) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -456,7 +521,7 @@ function ssh2_poll (&$var1) {}
  * all other ssh2_sftp_*() methods and the
  * ssh2.sftp:// fopen wrapper.
  */
-function ssh2_sftp ($session) {}
+function ssh2_sftp($session) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -473,7 +538,7 @@ function ssh2_sftp ($session) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_sftp_rename ($sftp, $from, $to) {}
+function ssh2_sftp_rename($sftp, $from, $to) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -486,7 +551,7 @@ function ssh2_sftp_rename ($sftp, $from, $to) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_sftp_unlink ($sftp, $filename) {}
+function ssh2_sftp_unlink($sftp, $filename) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -507,7 +572,7 @@ function ssh2_sftp_unlink ($sftp, $filename) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_sftp_mkdir ($sftp, $dirname, $mode = null, $recursive = null) {}
+function ssh2_sftp_mkdir($sftp, $dirname, $mode = null, $recursive = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -520,7 +585,7 @@ function ssh2_sftp_mkdir ($sftp, $dirname, $mode = null, $recursive = null) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_sftp_rmdir ($sftp, $dirname) {}
+function ssh2_sftp_rmdir($sftp, $dirname) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -531,10 +596,10 @@ function ssh2_sftp_rmdir ($sftp, $dirname) {}
  * </p>
  * @param string $path <p>
  * </p>
- * @return array See the documentation for stat for details on the
+ * @return array|false See the documentation for stat for details on the
  * values which may be returned.
  */
-function ssh2_sftp_stat ($sftp, $path) {}
+function ssh2_sftp_stat($sftp, $path) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -548,7 +613,7 @@ function ssh2_sftp_stat ($sftp, $path) {}
  * @return array See the documentation for stat for details on the
  * values which may be returned.
  */
-function ssh2_sftp_lstat ($sftp, $path) {}
+function ssh2_sftp_lstat($sftp, $path) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -564,7 +629,7 @@ function ssh2_sftp_lstat ($sftp, $path) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_sftp_symlink ($sftp, $target, $link) {}
+function ssh2_sftp_symlink($sftp, $target, $link) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -578,7 +643,7 @@ function ssh2_sftp_symlink ($sftp, $target, $link) {}
  * </p>
  * @return string the target of the symbolic link.
  */
-function ssh2_sftp_readlink ($sftp, $link) {}
+function ssh2_sftp_readlink($sftp, $link) {}
 
 /**
  * (PECL ssh2 &gt;= 0.9.0)<br/>
@@ -591,7 +656,7 @@ function ssh2_sftp_readlink ($sftp, $link) {}
  * </p>
  * @return string the real path as a string.
  */
-function ssh2_sftp_realpath ($sftp, $filename) {}
+function ssh2_sftp_realpath($sftp, $filename) {}
 
 /**
  * (PECL ssh2 &gt;= 0.10)<br/>
@@ -602,7 +667,7 @@ function ssh2_sftp_realpath ($sftp, $filename) {}
  * @return resource|false an SSH2 Publickey Subsystem resource for use
  * with all other ssh2_publickey_*() methods or false on failure.
  */
-function ssh2_publickey_init ($session) {}
+function ssh2_publickey_init($session) {}
 
 /**
  * (PECL ssh2 &gt;= 0.10)<br/>
@@ -617,10 +682,10 @@ function ssh2_publickey_init ($session) {}
  * @param string $blob <p>
  * Publickey blob as raw binary data
  * </p>
- * @param bool $overwrite [optional] <p>
+ * @param null|bool $overwrite [optional] <p>
  * If the specified key already exists, should it be overwritten?
  * </p>
- * @param array $attributes [optional] <p>
+ * @param null|array $attributes [optional] <p>
  * Associative array of attributes to assign to this public key.
  * Refer to ietf-secsh-publickey-subsystem for a list of supported attributes.
  * To mark an attribute as mandatory, precede its name with an asterisk.
@@ -629,7 +694,7 @@ function ssh2_publickey_init ($session) {}
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_publickey_add ($pkey, $algoname, $blob, $overwrite = null, array $attributes = null ) {}
+function ssh2_publickey_add($pkey, $algoname, $blob, $overwrite = null, ?array $attributes = null) {}
 
 /**
  * (PECL ssh2 &gt;= 0.10)<br/>
@@ -646,7 +711,7 @@ function ssh2_publickey_add ($pkey, $algoname, $blob, $overwrite = null, array $
  * </p>
  * @return bool true on success or false on failure.
  */
-function ssh2_publickey_remove ($pkey, $algoname, $blob) {}
+function ssh2_publickey_remove($pkey, $algoname, $blob) {}
 
 /**
  * (PECL ssh2 &gt;= 0.10)<br/>
@@ -684,7 +749,7 @@ function ssh2_publickey_remove ($pkey, $algoname, $blob) {}
  * </tr>
  * </table>
  */
-function ssh2_publickey_list ($pkey) {}
+function ssh2_publickey_list($pkey) {}
 
 /**
  * (PECL ssh2 &gt;= 0.12)<br/>
@@ -695,7 +760,7 @@ function ssh2_publickey_list ($pkey) {}
  * @param int $mode <p>Permissions on the file. See the chmod() for more details on this parameter.</p>
  * @return bool <p>Returns TRUE on success or FALSE on failure.</p>
  */
-function ssh2_sftp_chmod ($sftp, $filename, $mode) {}
+function ssh2_sftp_chmod($sftp, $filename, $mode) {}
 
 /**
  * (PECL ssh2 &gt;= 0.12)<br/>
@@ -711,35 +776,50 @@ function ssh2_sftp_chmod ($sftp, $filename, $mode) {}
  * @param string $username <p>Remote user name.</p>
  * @return bool <p>Returns TRUE on success or FALSE on failure.</p>
  */
-function ssh2_auth_agent ($session, $username) {}
+function ssh2_auth_agent($session, $username) {}
+
+/**
+ * (PECL ssh2 >= 1.0)<br/>
+ * Send end-of-file signal through an SSH2 channel
+ *
+ * @param resource $channel <p>
+ * The SSH2 channel resource created by ssh2_shell,
+ * ssh2_exec, or ssh2_tunnel.
+ * </p>
+ *
+ * @return bool Returns true on success or false on failure.
+ *
+ * @link https://php.net/manual/en/function.ssh2-send-eof.php
+ */
+function ssh2_send_eof($channel): bool {}
 
 /**
  * Flag to ssh2_fingerprint requesting hostkey
  * fingerprint as an MD5 hash.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_FINGERPRINT_MD5', 0);
+define('SSH2_FINGERPRINT_MD5', 0);
 
 /**
  * Flag to ssh2_fingerprint requesting hostkey
  * fingerprint as an SHA1 hash.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_FINGERPRINT_SHA1', 1);
+define('SSH2_FINGERPRINT_SHA1', 1);
 
 /**
  * Flag to ssh2_fingerprint requesting hostkey
  * fingerprint as a string of hexits.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_FINGERPRINT_HEX', 0);
+define('SSH2_FINGERPRINT_HEX', 0);
 
 /**
  * Flag to ssh2_fingerprint requesting hostkey
  * fingerprint as a raw string of 8-bit characters.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_FINGERPRINT_RAW', 2);
+define('SSH2_FINGERPRINT_RAW', 2);
 
 /**
  * Flag to ssh2_shell specifying that
@@ -747,7 +827,7 @@ define ('SSH2_FINGERPRINT_RAW', 2);
  * are provided as character sizes.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_TERM_UNIT_CHARS', 0);
+define('SSH2_TERM_UNIT_CHARS', 0);
 
 /**
  * Flag to ssh2_shell specifying that
@@ -755,50 +835,50 @@ define ('SSH2_TERM_UNIT_CHARS', 0);
  * are provided in pixel units.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_TERM_UNIT_PIXELS', 1);
+define('SSH2_TERM_UNIT_PIXELS', 1);
 
 /**
  * Default terminal type (e.g. vt102, ansi, xterm, vanilla) requested
  * by ssh2_shell.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_DEFAULT_TERMINAL', "vanilla");
+define('SSH2_DEFAULT_TERMINAL', "vanilla");
 
 /**
  * Default terminal width requested by ssh2_shell.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_DEFAULT_TERM_WIDTH', 80);
+define('SSH2_DEFAULT_TERM_WIDTH', 80);
 
 /**
  * Default terminal height requested by ssh2_shell.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_DEFAULT_TERM_HEIGHT', 25);
+define('SSH2_DEFAULT_TERM_HEIGHT', 25);
 
 /**
  * Default terminal units requested by ssh2_shell.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_DEFAULT_TERM_UNIT', 0);
+define('SSH2_DEFAULT_TERM_UNIT', 0);
 
 /**
  * Flag to ssh2_fetch_stream requesting STDIO subchannel.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_STREAM_STDIO', 0);
+define('SSH2_STREAM_STDIO', 0);
 
 /**
  * Flag to ssh2_fetch_stream requesting STDERR subchannel.
  * @link https://php.net/manual/en/ssh2.constants.php
  */
-define ('SSH2_STREAM_STDERR', 1);
-define ('SSH2_POLLIN', 1);
-define ('SSH2_POLLEXT', 2);
-define ('SSH2_POLLOUT', 4);
-define ('SSH2_POLLERR', 8);
-define ('SSH2_POLLHUP', 16);
-define ('SSH2_POLLNVAL', 32);
-define ('SSH2_POLL_SESSION_CLOSED', 16);
-define ('SSH2_POLL_CHANNEL_CLOSED', 128);
-define ('SSH2_POLL_LISTENER_CLOSED', 128);
+define('SSH2_STREAM_STDERR', 1);
+define('SSH2_POLLIN', 1);
+define('SSH2_POLLEXT', 2);
+define('SSH2_POLLOUT', 4);
+define('SSH2_POLLERR', 8);
+define('SSH2_POLLHUP', 16);
+define('SSH2_POLLNVAL', 32);
+define('SSH2_POLL_SESSION_CLOSED', 16);
+define('SSH2_POLL_CHANNEL_CLOSED', 128);
+define('SSH2_POLL_LISTENER_CLOSED', 128);

@@ -7,31 +7,25 @@ use RdKafka\Metadata\Topic;
 
 class Metadata
 {
+    private function __construct() {}
+
     /**
      * @return Collection
      */
-    public function getBrokers()
-    {
-    }
+    public function getBrokers() {}
 
     /**
      * @return Collection|Topic[]
      */
-    public function getTopics()
-    {
-    }
+    public function getTopics() {}
 
     /**
      * @return int
      */
-    public function getOrigBrokerId()
-    {
-    }
+    public function getOrigBrokerId() {}
 
     /**
      * @return string
      */
-    public function getOrigBrokerName()
-    {
-    }
+    public function getOrigBrokerName() {}
 }
