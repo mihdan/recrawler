@@ -74,6 +74,15 @@ class HooksTest extends TestCase {
 		$hooks->setup_hooks();
 	}
 
+	public function test_exclude_last_update_meta_from_duplicate_appends_our_key() {
+		$this->setup_defaults();
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
+
+		$result = $hooks->exclude_last_update_meta_from_duplicate(['_sku']);
+
+		$this->assertSame(['_sku', 'recrawler_last_update'], $result);
+	}
+
 	protected function tearDown(): void {
 		parent::tearDown();
 		_assert_wp_mock('add_action');
@@ -197,6 +206,29 @@ class HooksTest extends TestCase {
 
 		$hooks->post_updated('publish', 'draft', $this->make_post());
 		$this->assertEmpty($do_action_calls);
+	}
+
+	public function test_post_updated_ignores_last_update_meta_inherited_from_duplicated_post() {
+		$this->setup_defaults();
+		// WooCommerce "Duplicate product" copies all post meta, including
+		// ours: the timestamp predates the new post's own creation date.
+		_set_wp_override('get_post_meta', function () { return 990; });
+		_set_wp_override('get_post_time', function () { return 1000; });
+		$this->wposa->method('get_option')->willReturnMap([
+			['post_types', 'general', [], ['post']],
+			['ping_delay', 'general', 60, 60],
+			['ping_on_post', 'general', 'on', 'on'],
+		]);
+
+		$hooks = new Hooks($this->wposa, $this->indexability(true));
+		$do_action_calls = [];
+		_set_wp_override('do_action', function ($tag, ...$args) use (&$do_action_calls) {
+			$do_action_calls[] = ['tag' => $tag, 'args' => $args];
+		});
+
+		$hooks->post_updated('publish', 'draft', $this->make_post());
+		$this->assertCount(1, $do_action_calls);
+		$this->assertSame('recrawler/post_added', $do_action_calls[0]['tag']);
 	}
 
 	public function test_comment_updated_returns_early_if_not_approved() {

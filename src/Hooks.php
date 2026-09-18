@@ -59,6 +59,22 @@ class Hooks {
 		add_action( 'transition_comment_status', [ $this, 'comment_updated' ], 10, 3 );
 		add_action( 'wp_insert_comment', [ $this, 'comment_inserted' ], 10, 2 );
 		add_action( 'saved_term', [ $this, 'term_updated' ], 10, 3 );
+		add_filter( 'woocommerce_duplicate_product_exclude_meta', [ $this, 'exclude_last_update_meta_from_duplicate' ] );
+	}
+
+	/**
+	 * Keep our own "last pinged" marker out of WooCommerce's
+	 * "Duplicate product" — a copied timestamp would make the plugin
+	 * think a freshly published duplicate was already sent.
+	 *
+	 * @param string[] $meta_keys Meta keys excluded from duplication.
+	 *
+	 * @return string[]
+	 */
+	public function exclude_last_update_meta_from_duplicate( array $meta_keys ): array {
+		$meta_keys[] = Utils::get_last_update_meta_key();
+
+		return $meta_keys;
 	}
 
 	/**
@@ -79,7 +95,7 @@ class Hooks {
 		// Delay.
 		$last_update = (int) get_comment_meta(
 			$id,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			true
 		);
 
@@ -95,7 +111,7 @@ class Hooks {
 
 		update_comment_meta(
 			$id,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			current_time( 'timestamp' )
 		);
 	}
@@ -139,9 +155,16 @@ class Hooks {
 		// Delay.
 		$last_update = (int) get_post_meta(
 			$post->ID,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			true
 		);
+
+		// Duplicators (e.g. WooCommerce "Duplicate product") copy all post meta,
+		// including ours. A value older than the post itself couldn't have been
+		// set by this post, so it must be inherited — ignore it.
+		if ( $last_update < (int) get_post_time( 'U', true, $post ) ) {
+			$last_update = 0;
+		}
 
 		if ( ( current_time( 'timestamp' ) - $last_update ) < $this->ping_delay ) {
 			return;
@@ -165,7 +188,7 @@ class Hooks {
 
 		update_post_meta(
 			$post->ID,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			current_time( 'timestamp' )
 		);
 	}
@@ -185,7 +208,7 @@ class Hooks {
 		// Delay.
 		$last_update = (int) get_comment_meta(
 			$comment->comment_ID,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			true
 		);
 
@@ -205,7 +228,7 @@ class Hooks {
 
 		update_comment_meta(
 			$comment->comment_ID,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			current_time( 'timestamp' )
 		);
 	}
@@ -222,7 +245,7 @@ class Hooks {
 		// Delay.
 		$last_update = (int) get_term_meta(
 			$term_id,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			true
 		);
 
@@ -238,7 +261,7 @@ class Hooks {
 
 		update_term_meta(
 			$term_id,
-			Utils::get_plugin_prefix() . '_last_update',
+			Utils::get_last_update_meta_key(),
 			current_time( 'timestamp' )
 		);
 	}

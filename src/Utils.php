@@ -90,6 +90,15 @@ class Utils {
 	}
 
 	/**
+	 * Get meta key used to track when a post/comment/term was last pinged.
+	 *
+	 * @return string
+	 */
+	public static function get_last_update_meta_key(): string {
+		return self::get_plugin_prefix() . '_last_update';
+	}
+
+	/**
 	 * Get plugin name.
 	 *
 	 * @return string
