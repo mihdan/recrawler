@@ -5,9 +5,10 @@ use JetBrains\PhpStorm\Pure;
 /**
  * The ReflectionGenerator class reports information about a generator.
  *
+ * @link https://php.net/manual/en/class.reflectiongenerator.php
  * @since 7.0
  */
-class ReflectionGenerator
+final class ReflectionGenerator
 {
     /**
      * Constructs a ReflectionGenerator object
@@ -16,9 +17,7 @@ class ReflectionGenerator
      * @param Generator $generator A generator object.
      * @since 7.0
      */
-    public function __construct(Generator $generator)
-    {
-    }
+    public function __construct(Generator $generator) {}
 
     /**
      * Gets the currently executing line of the generator
@@ -29,9 +28,7 @@ class ReflectionGenerator
      * @since 7.0
      */
     #[Pure]
-	public function getExecutingLine()
-    {
-    }
+    public function getExecutingLine(): int {}
 
     /**
      * Gets the file name of the currently executing generator
@@ -42,9 +39,7 @@ class ReflectionGenerator
      * @since 7.0
      */
     #[Pure]
-	public function getExecutingFile()
-    {
-    }
+    public function getExecutingFile(): string {}
 
     /**
      * Gets the trace of the executing generator
@@ -58,16 +53,12 @@ class ReflectionGenerator
      *
      * {@see DEBUG_BACKTRACE_IGNORE_ARGS} - Don't include the argument
      * information for functions in the stack trace.
-     * </p>
      *
      * @return array Returns the trace of the currently executing generator.
      * @since 7.0
      */
     #[Pure]
-	public function getTrace($options = DEBUG_BACKTRACE_PROVIDE_OBJECT)
-    {
-    }
-
+    public function getTrace(int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT): array {}
 
     /**
      * Gets the function name of the generator
@@ -79,9 +70,7 @@ class ReflectionGenerator
      * @since 7.0
      */
     #[Pure]
-	public function getFunction()
-    {
-    }
+    public function getFunction(): ReflectionFunctionAbstract {}
 
     /**
      * Gets the function name of the generator
@@ -92,9 +81,7 @@ class ReflectionGenerator
      * @since 7.0
      */
     #[Pure]
-	public function getThis()
-    {
-    }
+    public function getThis(): ?object {}
 
     /**
      * Gets the executing Generator object
@@ -102,10 +89,18 @@ class ReflectionGenerator
      * @link https://php.net/manual/en/reflectiongenerator.construct.php
      * @return Generator Returns the currently executing Generator object.
      * @since 7.0
-     *
      */
     #[Pure]
-	public function getExecutingGenerator()
-    {
-    }
+    public function getExecutingGenerator(): Generator {}
+
+    /**
+     * Checks if execution finished
+     *
+     * Returns whether the execution reached the end of the function, a return statement or if an
+     * exception was thrown.
+     *
+     * @link https://php.net/manual/en/reflectiongenerator.isclosed.php
+     * @since 8.4
+     */
+    public function isClosed(): bool {}
 }

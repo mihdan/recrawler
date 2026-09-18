@@ -5,26 +5,20 @@ namespace RdKafka;
 class Consumer extends \RdKafka
 {
     /**
-     * @param Conf $conf
+     * @param null|Conf $conf
      */
-    public function __construct(Conf $conf = null)
-    {
-    }
+    public function __construct($conf = null) {}
 
     /**
      * @param string    $topic_name
-     * @param TopicConf $topic_conf
+     * @param null|TopicConf $topic_conf
      *
      * @return ConsumerTopic
      */
-    public function newTopic($topic_name, TopicConf $topic_conf = null)
-    {
-    }
+    public function newTopic($topic_name, ?TopicConf $topic_conf = null) {}
 
     /**
      * @return Queue
      */
-    public function newQueue()
-    {
-    }
+    public function newQueue() {}
 }

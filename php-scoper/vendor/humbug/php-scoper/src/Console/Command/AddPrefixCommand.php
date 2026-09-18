@@ -14,485 +14,319 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\Console\Command;
 
-use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
-use Humbug\PhpScoper\Configuration;
-use Humbug\PhpScoper\Console\ScoperLogger;
-use Humbug\PhpScoper\Scoper;
-use Humbug\PhpScoper\Scoper\ConfigurableScoper;
-use Humbug\PhpScoper\Throwable\Exception\ParsingException;
-use Humbug\PhpScoper\Whitelist;
+use Fidry\Console\Application\Application;
+use Fidry\Console\Command\Command;
+use Fidry\Console\Command\CommandAware;
+use Fidry\Console\Command\CommandAwareness;
+use Fidry\Console\Command\Configuration as CommandConfiguration;
+use Fidry\Console\ExitCode;
+use Fidry\Console\IO;
+use Humbug\PhpScoper\Configuration\Configuration;
+use Humbug\PhpScoper\Configuration\ConfigurationFactory;
+use Humbug\PhpScoper\Configuration\Throwable\InvalidConfigurationValue;
+use Humbug\PhpScoper\Configuration\Throwable\UnknownConfigurationKey;
+use Humbug\PhpScoper\Console\ConfigLoader;
+use Humbug\PhpScoper\Console\ConsoleScoper;
+use Humbug\PhpScoper\Console\InputOption\PhpVersionInputOption;
+use Humbug\PhpScoper\Scoper\Factory\ScoperFactory;
+use InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
-use Throwable;
-use function array_keys;
+use Symfony\Component\Filesystem\Path;
 use function array_map;
-use function bin2hex;
-use function count;
-use function file_exists;
-use function file_get_contents;
-use function getcwd;
-use function Humbug\PhpScoper\get_common_path;
 use function is_dir;
 use function is_writable;
-use function preg_match;
-use function random_bytes;
+use function Safe\getcwd;
 use function sprintf;
-use function str_replace;
-use function strlen;
-use function usort;
 use const DIRECTORY_SEPARATOR;
 
-final class AddPrefixCommand extends BaseCommand
+/**
+ * @private
+ */
+final class AddPrefixCommand implements Command, CommandAware
 {
+    use CommandAwareness;
+
     private const PATH_ARG = 'paths';
     private const PREFIX_OPT = 'prefix';
     private const OUTPUT_DIR_OPT = 'output-dir';
     private const FORCE_OPT = 'force';
     private const STOP_ON_FAILURE_OPT = 'stop-on-failure';
+    private const CONTINUE_ON_FAILURE_OPT = 'continue-on-failure';
     private const CONFIG_FILE_OPT = 'config';
-    private const CONFIG_FILE_DEFAULT = 'scoper.inc.php';
     private const NO_CONFIG_OPT = 'no-config';
 
-    private $fileSystem;
-    private $scoper;
-    private $init = false;
+    private const DEFAULT_OUTPUT_DIR = 'build';
 
-    /**
-     * @inheritdoc
-     */
-    public function __construct(Filesystem $fileSystem, Scoper $scoper)
+    private bool $init = false;
+
+    public function __construct(
+        private readonly Filesystem $fileSystem,
+        private readonly ScoperFactory $scoperFactory,
+        private readonly Application $application,
+        private readonly ConfigurationFactory $configFactory,
+    ) {
+    }
+
+    public function getConfiguration(): CommandConfiguration
     {
-        parent::__construct();
-
-        $this->fileSystem = $fileSystem;
-        $this->scoper = new ConfigurableScoper($scoper);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function configure(): void
-    {
-        parent::configure();
-
-        $this
-            ->setName('add-prefix')
-            ->setDescription('Goes through all the PHP files found in the given paths to apply the given prefix to namespaces & FQNs.')
-            ->addArgument(
-                self::PATH_ARG,
-                InputArgument::IS_ARRAY,
-                'The path(s) to process.'
-            )
-            ->addOption(
-                self::PREFIX_OPT,
-                'p',
-                InputOption::VALUE_REQUIRED,
-                'The namespace prefix to add.'
-            )
-            ->addOption(
-                self::OUTPUT_DIR_OPT,
-                'o',
-                InputOption::VALUE_REQUIRED,
-                'The output directory in which the prefixed code will be dumped.',
-                'build'
-            )
-            ->addOption(
-                self::FORCE_OPT,
-                'f',
-                InputOption::VALUE_NONE,
-                'Deletes any existing content in the output directory without any warning.'
-            )
-            ->addOption(
-                self::STOP_ON_FAILURE_OPT,
-                's',
-                InputOption::VALUE_NONE,
-                'Stops on failure.'
-            )
-            ->addOption(
-                self::CONFIG_FILE_OPT,
-                'c',
-                InputOption::VALUE_REQUIRED,
-                sprintf(
-                    'Configuration file. Will use "%s" if found by default.',
-                    self::CONFIG_FILE_DEFAULT
-                )
-            )
-            ->addOption(
-                self::NO_CONFIG_OPT,
-                null,
-                InputOption::VALUE_NONE,
-                'Do not look for a configuration file.'
-            )
-        ;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $io = new SymfonyStyle($input, $output);
-        $io->writeln('');
-
-        $this->changeWorkingDirectory($input);
-
-        $this->validatePrefix($input);
-        $this->validatePaths($input);
-        $this->validateOutputDir($input, $io);
-
-        $config = $this->retrieveConfig($input, $output, $io);
-        $output = $input->getOption(self::OUTPUT_DIR_OPT);
-
-        if ([] !== $config->getWhitelistedFiles()) {
-            $this->scoper = $this->scoper->withWhitelistedFiles(...$config->getWhitelistedFiles());
-        }
-
-        $logger = new ScoperLogger(
-            $this->getApplication(),
-            $io
-        );
-
-        $logger->outputScopingStart(
-            $config->getPrefix(),
-            $input->getArgument(self::PATH_ARG)
-        );
-
-        try {
-            $this->scopeFiles(
-                $config->getPrefix(),
-                $config->getFilesWithContents(),
-                $output,
-                $config->getPatchers(),
-                $config->getWhitelist(),
-                $input->getOption(self::STOP_ON_FAILURE_OPT),
-                $logger
-            );
-        } catch (Throwable $throwable) {
-            $this->fileSystem->remove($output);
-
-            $logger->outputScopingEndWithFailure();
-
-            throw $throwable;
-        }
-
-        $logger->outputScopingEnd();
-
-        return 0;
-    }
-
-    /**
-     * @var callable[]
-     */
-    private function scopeFiles(
-        string $prefix,
-        array $filesWithContents,
-        string $output,
-        array $patchers,
-        Whitelist $whitelist,
-        bool $stopOnFailure,
-        ScoperLogger $logger
-    ): void {
-        // Creates output directory if does not already exist
-        $this->fileSystem->mkdir($output);
-
-        $logger->outputFileCount(count($filesWithContents));
-
-        $vendorDirs = [];
-        $commonPath = get_common_path(array_keys($filesWithContents));
-
-        foreach ($filesWithContents as [$inputFilePath, $inputContents]) {
-            $outputFilePath = $output.str_replace($commonPath, '', $inputFilePath);
-
-            $pattern = '~((?:.*)\\'.DIRECTORY_SEPARATOR.'vendor)\\'.DIRECTORY_SEPARATOR.'.*~';
-            if (preg_match($pattern, $outputFilePath, $matches)) {
-                $vendorDirs[$matches[1]] = true;
-            }
-
-            $this->scopeFile(
-                $inputFilePath,
-                $inputContents,
-                $outputFilePath,
-                $prefix,
-                $patchers,
-                $whitelist,
-                $stopOnFailure,
-                $logger
-            );
-        }
-
-        $vendorDirs = array_keys($vendorDirs);
-
-        usort(
-            $vendorDirs,
-            static function ($a, $b) {
-                return strlen($b) <=> strlen($a);
-            }
-        );
-
-        $vendorDir = (0 === count($vendorDirs)) ? null : $vendorDirs[0];
-
-        if (null !== $vendorDir) {
-            $autoload = (new ScoperAutoloadGenerator($whitelist))->dump();
-
-            $this->fileSystem->dumpFile($vendorDir.'/scoper-autoload.php', $autoload);
-        }
-    }
-
-    /**
-     * @param callable[] $patchers
-     */
-    private function scopeFile(
-        string $inputFilePath,
-        string $inputContents,
-        string $outputFilePath,
-        string $prefix,
-        array $patchers,
-        Whitelist $whitelist,
-        bool $stopOnFailure,
-        ScoperLogger $logger
-    ): void {
-        try {
-            $scoppedContent = $this->scoper->scope($inputFilePath, $inputContents, $prefix, $patchers, $whitelist);
-        } catch (Throwable $throwable) {
-            $exception = new ParsingException(
-                sprintf(
-                    'Could not parse the file "%s".',
-                    $inputFilePath
+        return new CommandConfiguration(
+            'add-prefix',
+            'Goes through all the PHP files found in the given paths to apply the given prefix to namespaces & FQNs.',
+            '',
+            [
+                new InputArgument(
+                    self::PATH_ARG,
+                    InputArgument::IS_ARRAY,
+                    'The path(s) to process.',
                 ),
-                0,
-                $throwable
-            );
-
-            if ($stopOnFailure) {
-                throw $exception;
-            }
-
-            $logger->outputWarnOfFailure($inputFilePath, $exception);
-
-            $scoppedContent = file_get_contents($inputFilePath);
-        }
-
-        $this->fileSystem->dumpFile($outputFilePath, $scoppedContent);
-
-        if (false === isset($exception)) {
-            $logger->outputSuccess($inputFilePath);
-        }
+            ],
+            [
+                ChangeableDirectory::createOption(),
+                new InputOption(
+                    self::PREFIX_OPT,
+                    'p',
+                    InputOption::VALUE_REQUIRED,
+                    'The namespace prefix to add.',
+                    '',
+                ),
+                new InputOption(
+                    self::OUTPUT_DIR_OPT,
+                    'o',
+                    InputOption::VALUE_REQUIRED,
+                    'The output directory in which the prefixed code will be dumped.',
+                    '',
+                ),
+                new InputOption(
+                    self::FORCE_OPT,
+                    'f',
+                    InputOption::VALUE_NONE,
+                    'Deletes any existing content in the output directory without any warning.',
+                ),
+                new InputOption(
+                    self::STOP_ON_FAILURE_OPT,
+                    's',
+                    InputOption::VALUE_NONE,
+                    'Stops on failure.',
+                ),
+                new InputOption(
+                    self::CONTINUE_ON_FAILURE_OPT,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Continue on non PHP-Parser parsing failures.',
+                ),
+                new InputOption(
+                    self::CONFIG_FILE_OPT,
+                    'c',
+                    InputOption::VALUE_REQUIRED,
+                    sprintf(
+                        'Configuration file. Will use "%s" if found by default.',
+                        ConfigurationFactory::DEFAULT_FILE_NAME,
+                    ),
+                ),
+                new InputOption(
+                    self::NO_CONFIG_OPT,
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Do not look for a configuration file.',
+                ),
+                PhpVersionInputOption::createInputOption(),
+            ],
+        );
     }
 
-    private function validatePrefix(InputInterface $input): void
+    public function execute(IO $io): int
     {
-        $prefix = $input->getOption(self::PREFIX_OPT);
+        $io->newLine();
 
-        if (null !== $prefix && 1 === preg_match('/(?<prefix>.*?)\\\\*$/', $prefix, $matches)) {
-            $prefix = $matches['prefix'];
-        }
+        ChangeableDirectory::changeWorkingDirectory($io);
 
-        $input->setOption(self::PREFIX_OPT, $prefix);
-    }
-
-    private function validatePaths(InputInterface $input): void
-    {
+        // Only get current working directory _after_ we changed to the desired
+        // working directory
         $cwd = getcwd();
-        $fileSystem = $this->fileSystem;
 
-        $paths = array_map(
-            static function (string $path) use ($cwd, $fileSystem) {
-                if (false === $fileSystem->isAbsolutePath($path)) {
-                    return $cwd.DIRECTORY_SEPARATOR.$path;
-                }
+        $paths = $this->getPathArguments($io, $cwd);
+        $config = $this->retrieveConfig($io, $paths, $cwd);
+        $phpVersion = PhpVersionInputOption::getPhpVersion($io);
 
-                return $path;
-            },
-            $input->getArgument(self::PATH_ARG)
+        $outputDir = $this->canonicalizePath(
+            $this->getOutputDir($io, $config),
+            $cwd,
+        );
+        $this->checkOutputDir($io, $outputDir);
+
+        $this->getScoper()->scope(
+            $io,
+            $config,
+            $phpVersion,
+            $paths,
+            $outputDir,
+            self::getStopOnFailure($io),
         );
 
-        $input->setArgument(self::PATH_ARG, $paths);
+        return ExitCode::SUCCESS;
     }
 
-    private function validateOutputDir(InputInterface $input, OutputStyle $io): void
+    private static function getStopOnFailure(IO $io): bool
     {
-        $outputDir = $input->getOption(self::OUTPUT_DIR_OPT);
+        $stopOnFailure = $io->getTypedOption(self::STOP_ON_FAILURE_OPT)->asBoolean();
+        $continueOnFailure = $io->getTypedOption(self::CONTINUE_ON_FAILURE_OPT)->asBoolean();
 
-        if (false === $this->fileSystem->isAbsolutePath($outputDir)) {
-            $outputDir = getcwd().DIRECTORY_SEPARATOR.$outputDir;
+        if ($stopOnFailure) {
+            $io->info(
+                sprintf(
+                    'Using the option "%s" is now deprecated. Any non PHP-Parser parsing error will now halt the process. To continue upon non-PHP-Parser parsing errors, use the option "%s".',
+                    self::STOP_ON_FAILURE_OPT,
+                    self::CONTINUE_ON_FAILURE_OPT,
+                ),
+            );
         }
 
-        $input->setOption(self::OUTPUT_DIR_OPT, $outputDir);
+        if (true === $stopOnFailure && true === $continueOnFailure) {
+            $io->info(
+                sprintf(
+                    'Only one of the two options "%s" and "%s" can be used at the same time.',
+                    self::STOP_ON_FAILURE_OPT,
+                    self::CONTINUE_ON_FAILURE_OPT,
+                ),
+            );
+        }
 
-        if (false === $this->fileSystem->exists($outputDir)) {
+        return !$continueOnFailure;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getOutputDir(IO $io, Configuration $configuration): string
+    {
+        $commandOutputDir = $io->getTypedOption(self::OUTPUT_DIR_OPT)->asString();
+
+        if ('' !== $commandOutputDir) {
+            return $commandOutputDir;
+        }
+
+        return $configuration->getOutputDir() ?? self::DEFAULT_OUTPUT_DIR;
+    }
+
+    private function checkOutputDir(IO $io, string $outputDir): void
+    {
+        if (!$this->fileSystem->exists($outputDir)) {
             return;
         }
 
-        if (false === is_writable($outputDir)) {
+        self::checkPathIsWriteable($outputDir);
+
+        $canDeleteFile = self::canDeleteOutputDir($io, $outputDir);
+
+        if (!$canDeleteFile) {
+            throw new RuntimeException('Cannot delete the output directory. Interrupting the process.');
+        }
+
+        $this->fileSystem->remove($outputDir);
+    }
+
+    private static function checkPathIsWriteable(string $path): void
+    {
+        if (!is_writable($path)) {
             throw new RuntimeException(
                 sprintf(
                     'Expected "<comment>%s</comment>" to be writeable.',
-                    $outputDir
-                )
-            );
-        }
-
-        if ($input->getOption(self::FORCE_OPT)) {
-            $this->fileSystem->remove($outputDir);
-
-            return;
-        }
-
-        if (false === is_dir($outputDir)) {
-            $canDeleteFile = $io->confirm(
-                sprintf(
-                    'Expected "<comment>%s</comment>" to be a directory but found a file instead. It will be '
-                    .'removed, do you wish to proceed?',
-                    $outputDir
+                    $path,
                 ),
-                false
             );
-
-            if (false === $canDeleteFile) {
-                return;
-            }
-
-            $this->fileSystem->remove($outputDir);
-        } else {
-            $canDeleteFile = $io->confirm(
-                sprintf(
-                    'The output directory "<comment>%s</comment>" already exists. Continuing will erase its'
-                    .' content, do you wish to proceed?',
-                    $outputDir
-                ),
-                false
-            );
-
-            if (false === $canDeleteFile) {
-                return;
-            }
-
-            $this->fileSystem->remove($outputDir);
         }
     }
 
-    private function retrieveConfig(InputInterface $input, OutputInterface $output, OutputStyle $io): Configuration
+    private static function canDeleteOutputDir(IO $io, string $outputDir): bool
     {
-        $prefix = $input->getOption(self::PREFIX_OPT);
-
-        if ($input->getOption(self::NO_CONFIG_OPT)) {
-            $io->writeln(
-                'Loading without configuration file.',
-                OutputInterface::VERBOSITY_DEBUG
-            );
-
-            $config = Configuration::load();
-
-            if (null !== $prefix) {
-                $config = $config->withPrefix($prefix);
-            }
-
-            if (null === $config->getPrefix()) {
-                $config = $config->withPrefix($this->generateRandomPrefix());
-            }
-
-            return $this->retrievePaths($input, $config);
+        if ($io->getTypedOption(self::FORCE_OPT)->asBoolean()) {
+            return true;
         }
 
-        $configFile = $input->getOption(self::CONFIG_FILE_OPT);
+        $question = sprintf(
+            is_dir($outputDir)
+                ? 'The output directory "<comment>%s</comment>" already exists. Continuing will erase its content, do you wish to proceed?'
+                : 'Expected "<comment>%s</comment>" to be a directory but found a file instead. It will be  removed, do you wish to proceed?',
+            $outputDir,
+        );
 
-        if (null === $configFile) {
-            $configFile = $this->makeAbsolutePath(self::CONFIG_FILE_DEFAULT);
-
-            if (false === $this->init && false === file_exists($configFile)) {
-                $this->init = true;
-
-                $initCommand = $this->getApplication()->find('init');
-
-                $initInput = new StringInput('');
-                $initInput->setInteractive($input->isInteractive());
-
-                $initCommand->run($initInput, $output);
-
-                $io->writeln(
-                    sprintf(
-                        'Config file "<comment>%s</comment>" not found. Skipping.',
-                        $configFile
-                    ),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-
-                return self::retrieveConfig($input, $output, $io);
-            }
-
-            if ($this->init) {
-                $configFile = null;
-            }
-        } else {
-            $configFile = $this->makeAbsolutePath($configFile);
-        }
-
-        if (null === $configFile) {
-            $io->writeln(
-                'Loading without configuration file.',
-                OutputInterface::VERBOSITY_DEBUG
-            );
-        } elseif (false === file_exists($configFile)) {
-            throw new RuntimeException(
-                sprintf(
-                    'Could not find the configuration file "%s".',
-                    $configFile
-                )
-            );
-        } else {
-            $io->writeln(
-                sprintf(
-                    'Using the configuration file "%s".',
-                    $configFile
-                ),
-                OutputInterface::VERBOSITY_DEBUG
-            );
-        }
-
-        $config = Configuration::load($configFile);
-        $config = $this->retrievePaths($input, $config);
-
-        if (null !== $prefix) {
-            $config = $config->withPrefix($prefix);
-        }
-
-        if (null === $config->getPrefix()) {
-            $config = $config->withPrefix($this->generateRandomPrefix());
-        }
-
-        return $config;
+        return $io->confirm($question, false);
     }
 
-    private function retrievePaths(InputInterface $input, Configuration $config): Configuration
+    /**
+     * @param list<non-empty-string> $paths
+     *
+     * @throws InvalidConfigurationValue
+     * @throws UnknownConfigurationKey
+     */
+    private function retrieveConfig(IO $io, array $paths, string $cwd): Configuration
     {
-        // Checks if there is any path included and if note use the current working directory as the include path
-        $paths = $input->getArgument(self::PATH_ARG);
+        $configLoader = new ConfigLoader(
+            $this->getCommandRegistry(),
+            $this->fileSystem,
+            $this->configFactory,
+        );
 
-        if (0 === count($paths) && 0 === count($config->getFilesWithContents())) {
-            $paths = [getcwd()];
-        }
-
-        return $config->withPaths($paths);
+        return $configLoader->loadConfig(
+            $io,
+            $io->getTypedOption(self::PREFIX_OPT)->asString(),
+            $io->getTypedOption(self::NO_CONFIG_OPT)->asBoolean(),
+            $this->getConfigFilePath($io, $cwd),
+            ConfigurationFactory::DEFAULT_FILE_NAME,
+            $this->init,
+            $paths,
+            $cwd,
+        );
     }
 
-    private function makeAbsolutePath(string $path): string
+    /**
+     * @return non-empty-string|null
+     */
+    private function getConfigFilePath(IO $io, string $cwd): ?string
     {
-        if (false === $this->fileSystem->isAbsolutePath($path)) {
-            $path = getcwd().DIRECTORY_SEPARATOR.$path;
-        }
+        $configFilePath = (string) $io->getTypedOption(self::CONFIG_FILE_OPT)->asNullableString();
 
-        return $path;
+        return '' === $configFilePath ? null : $this->canonicalizePath($configFilePath, $cwd);
     }
 
-    private function generateRandomPrefix(): string
+    /**
+     * @return list<non-empty-string> List of absolute canonical paths
+     */
+    private function getPathArguments(IO $io, string $cwd): array
     {
-        return '_PhpScoper'.bin2hex(random_bytes(6));
+        return array_map(
+            fn (string $path) => $this->canonicalizePath($path, $cwd),
+            $io->getTypedArgument(self::PATH_ARG)->asNonEmptyStringList(),
+        );
+    }
+
+    /**
+     * @return non-empty-string Absolute canonical path
+     */
+    private function canonicalizePath(string $path, string $cwd): string
+    {
+        $canonicalPath = Path::canonicalize(
+            $this->fileSystem->isAbsolutePath($path)
+                ? $path
+                : $cwd.DIRECTORY_SEPARATOR.$path,
+        );
+
+        if ('' === $canonicalPath) {
+            throw new InvalidArgumentException('Cannot canonicalize empty path and empty working directory');
+        }
+
+        return $canonicalPath;
+    }
+
+    private function getScoper(): ConsoleScoper
+    {
+        return new ConsoleScoper(
+            $this->fileSystem,
+            $this->application,
+            $this->scoperFactory,
+        );
     }
 }

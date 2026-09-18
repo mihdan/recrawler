@@ -32,166 +32,187 @@
  * @author  Tawana Musewe <tawana@aeonis.co.za>
  * @link    https://github.com/tbtmuse/phpredis-sentinel-phpdoc
  */
-class RedisSentinel {
+class RedisSentinel
+{
+    /**
+     * Creates a Redis Sentinel
+     *
+     * You can either pass an array of options (recommended >= 6.0.0) or separate parameters (legacy).
+     *
+     * Available options for array:
+     *   - 'host'           => string, Sentinel IP address or hostname
+     *   - 'port'           => int, Sentinel Port (optional, default is 26379)
+     *   - 'connectTimeout' => float, Value in seconds (optional, default is 0 meaning unlimited)
+     *   - 'persistent'     => string, Persistent connection id (optional, default is NULL meaning not persistent)
+     *   - 'retryInterval'  => int, Value in milliseconds (optional, default is 0)
+     *   - 'readTimeout'    => float, Value in seconds (optional, default is 0 meaning unlimited)
+     *   - 'auth'           => string|array, Authentication credentials (optional, default is NULL meaning NOAUTH)
+     *
+     * @param array|string|null $options_or_host Associative array of options, or Sentinel IP address/hostname
+     * @param int               $port            Sentinel Port (ignored if $options_or_host is an array)
+     * @param float             $timeout         Value in seconds (optional, default is 0 meaning unlimited)
+     * @param string|null       $persistent      Persistent connection id (optional, default is null meaning not persistent)
+     * @param int               $retryInterval   Value in milliseconds (optional, default is 0)
+     * @param float             $readTimeout     Value in seconds (optional, default is 0 meaning unlimited)
+     *
+     * @example $sentinel = new RedisSentinel(['host' => '127.0.0.1']); // Default parameters (>= 6.0.0)
+     * @example $sentinel = new RedisSentinel('127.0.0.1', 26379, 1, null, 100); // Legacy format
+     */
+    public function __construct(
+        array|string|null $options_or_host = null,
+        int $port = 26379,
+        float $timeout = 0.0,
+        ?string $persistent = null,
+        int $retryInterval = 0,
+        float $readTimeout = 0.0
+    ) {}
 
-	/**
-	 * Creates a Redis Sentinel
-	 *
-	 * @param string      $host          Sentinel IP address or hostname
-	 * @param int         $port          Sentinel Port
-	 * @param float       $timeout       Value in seconds (optional, default is 0 meaning unlimited)
-	 * @param string|null $persistent    Persistent connection id (optional, default is null meaning not persistent)
-	 * @param int         $retryInterval Value in milliseconds (optional, default is 0)
-	 * @param float       $readTimeout   Value in seconds (optional, default is 0 meaning unlimited)
-	 *
-	 * @example
-	 * // 1s timeout, 100ms delay between reconnection attempts.
-	 * $sentinel = new RedisSentinel('127.0.0.1', 26379, 1, null, 100);
-	 */
-	public function __construct(
-		string $host,
-		int $port,
-		float $timeout = 0,
-		?string $persistent = null,
-		int $retryInterval = 0,
-		float $readTimeout = 0
-	) {}
+    /**
+     * Check if the current Sentinel configuration is able to reach the quorum needed to failover a master, and the
+     * majority needed to authorize the failover. This command should be used in monitoring systems to check if a
+     * Sentinel deployment is ok.
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|bool True in case of success, False in case of failure.
+     *
+     * @example $sentinel->ckquorum('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function ckquorum(string $master): RedisSentinel|bool {}
 
-	/**
-	 * Check if the current Sentinel configuration is able to reach the quorum needed to failover a master, and the
-	 * majority needed to authorize the failover. This command should be used in monitoring systems to check if a
-	 * Sentinel deployment is ok.
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return bool True in case of success, False in case of failure.
-	 *
-	 * @example $sentinel->ckquorum('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function ckquorum(string $master): bool {}
+    /**
+     * Force a failover as if the master was not reachable, and without asking for agreement to other Sentinels
+     * (however a new version of the configuration will be published so that the other Sentinels will update
+     * their configurations).
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|bool True in case of success, False in case of failure.
+     *
+     * @example $sentinel->failover('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function failover(string $master): RedisSentinel|bool {}
 
-	/**
-	 * Force a failover as if the master was not reachable, and without asking for agreement to other Sentinels
-	 * (however a new version of the configuration will be published so that the other Sentinels will update
-	 * their configurations).
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return bool True in case of success, False in case of failure.
-	 *
-	 * @example $sentinel->failover('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function failover(string $master): bool {}
+    /**
+     * Force Sentinel to rewrite its configuration on disk, including the current Sentinel state.
+     *
+     * Normally Sentinel rewrites the configuration every time something changes in its state (in the context of the
+     * subset of the state which is persisted on disk across restart). However sometimes it is possible that the
+     * configuration file is lost because of operation errors, disk failures, package upgrade scripts or configuration
+     * managers. In those cases a way to to force Sentinel to rewrite the configuration file is handy.
+     *
+     * This command works even if the previous configuration file is completely missing.
+     *
+     * @return RedisSentinel|bool True in case of success, False in case of failure.
+     *
+     * @example $sentinel->flushconfig();
+     *
+     * @since   >= 5.2.0
+     */
+    public function flushconfig(): RedisSentinel|bool {}
 
-	/**
-	 * Force Sentinel to rewrite its configuration on disk, including the current Sentinel state.
-	 *
-	 * Normally Sentinel rewrites the configuration every time something changes in its state (in the context of the
-	 * subset of the state which is persisted on disk across restart). However sometimes it is possible that the
-	 * configuration file is lost because of operation errors, disk failures, package upgrade scripts or configuration
-	 * managers. In those cases a way to to force Sentinel to rewrite the configuration file is handy.
-	 *
-	 * This command works even if the previous configuration file is completely missing.
-	 *
-	 * @return bool True in case of success, False in case of failure.
-	 *
-	 * @example $sentinel->flushconfig();
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function flushconfig(): bool {}
+    /**
+     * Return the ip and port number of the master with that name. If a failover is in progress or terminated
+     * successfully for this master it returns the address and port of the promoted replica.
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|array|bool ['address', 'port'] in case of success, False in case of failure.
+     *
+     * @example $sentinel->getMasterAddrByName('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function getMasterAddrByName(string $master): RedisSentinel|array|bool {}
 
-	/**
-	 * Return the ip and port number of the master with that name. If a failover is in progress or terminated
-	 * successfully for this master it returns the address and port of the promoted replica.
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return array|false ['address', 'port'] in case of success, False in case of failure.
-	 *
-	 * @example $sentinel->getMasterAddrByName('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function getMasterAddrByName(string $master) {}
+    /**
+     * Return the state and info of the specified master
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|array|bool Associative array with info in case of success, False in case of failure.
+     *
+     * @example $sentinel->master('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function master(string $master): RedisSentinel|array|bool {}
 
-	/**
-	 * Return the state and info of the specified master
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return array|false Associative array with info in case of success, False in case of failure.
-	 *
-	 * @example $sentinel->master('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function master(string $master) {}
+    /**
+     * Return a list of monitored masters and their state
+     *
+     * @return RedisSentinel|array|bool Array of arrays with info for each master in case of success, FALSE in case of failure.
+     *
+     * @example $sentinel->masters();
+     *
+     * @since   >= 5.2.0
+     */
+    public function masters(): RedisSentinel|array|bool {}
 
-	/**
-	 * Return a list of monitored masters and their state
-	 *
-	 * @return array|false Array of arrays with info for each master in case of success, FALSE in case of failure.
-	 *
-	 * @example $sentinel->masters();
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function masters() {}
+    /**
+     * Return the run ID of this Sentinel instance.
+     *
+     * @return string The run id of this Sentinel instance.
+     *
+     * @example $sentinel->myid();
+     *
+     * @since   >= 5.2.0
+     */
+    public function myid(): string {}
 
-	/**
-	 * Ping the sentinel
-	 *
-	 * @return bool True in case of success, False in case of failure
-	 *
-	 * @example $sentinel->ping();
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function ping(): bool {}
+    /**
+     * Ping the sentinel
+     *
+     * @return RedisSentinel|bool True in case of success, False in case of failure
+     *
+     * @example $sentinel->ping();
+     *
+     * @since   >= 5.2.0
+     */
+    public function ping(): RedisSentinel|bool {}
 
-	/**
-	 * Reset all the masters with matching name. The pattern argument is a glob-style pattern.
-	 * The reset process clears any previous state in a master (including a failover in progress), and removes every
-	 * replica and sentinel already discovered and associated with the master.
-	 *
-	 * @param string $pattern Glob-style pattern
-	 *
-	 * @return bool True in case of success, False in case of failure
-	 *
-	 * @example $sentinel->reset('*');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function reset(string $pattern): bool {}
+    /**
+     * Reset all the masters with matching name. The pattern argument is a glob-style pattern.
+     * The reset process clears any previous state in a master (including a failover in progress), and removes every
+     * replica and sentinel already discovered and associated with the master.
+     *
+     * @param string $pattern Glob-style pattern
+     *
+     * @return RedisSentinel|int The number of masters that were reset.
+     *
+     * @example $sentinel->reset('*');
+     *
+     * @since   >= 5.2.0
+     */
+    public function reset(string $pattern): RedisSentinel|int {}
 
-	/**
-	 * Return a list of sentinel instances for this master, and their state
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return array|false Array of arrays with info for each sentinel in case of success, False in case of failure
-	 *
-	 * @example $sentinel->sentinels('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function sentinels(string $master) {}
+    /**
+     * Return a list of sentinel instances for this master, and their state
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|array|bool Array of arrays with info for each sentinel in case of success, False in case of failure
+     *
+     * @example $sentinel->sentinels('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function sentinels(string $master): RedisSentinel|array|bool {}
 
-	/**
-	 * Return a list of sentinel instances for this master, and their state
-	 *
-	 * @param string $master Name of master
-	 *
-	 * @return array|false Array of arrays with info for each replica in case of success, False in case of failure
-	 *
-	 * @example $sentinel->slaves('mymaster');
-	 *
-	 * @since   >= 5.2.0
-	 */
-	public function slaves(string $master) {}
+    /**
+     * Return a list of sentinel instances for this master, and their state
+     *
+     * @param string $master Name of master
+     *
+     * @return RedisSentinel|array|bool Array of arrays with info for each replica in case of success, False in case of failure
+     *
+     * @example $sentinel->slaves('mymaster');
+     *
+     * @since   >= 5.2.0
+     */
+    public function slaves(string $master): RedisSentinel|array|bool {}
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\PhpParser\NodeVisitor\UseStmt;
 
+use Humbug\PhpScoper\NotInstantiable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\UseUse;
 use PhpParser\NodeVisitorAbstract;
@@ -23,6 +24,8 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class UseStmtManipulator extends NodeVisitorAbstract
 {
+    use NotInstantiable;
+
     private const ORIGINAL_NAME_ATTRIBUTE = 'originalName';
 
     public static function hasOriginalName(UseUse $use): bool
@@ -32,7 +35,7 @@ final class UseStmtManipulator extends NodeVisitorAbstract
 
     public static function getOriginalName(UseUse $use): ?Name
     {
-        if (false === self::hasOriginalName($use)) {
+        if (!self::hasOriginalName($use)) {
             return $use->name;
         }
 
@@ -42,9 +45,5 @@ final class UseStmtManipulator extends NodeVisitorAbstract
     public static function setOriginalName(UseUse $use, ?Name $originalName): void
     {
         $use->setAttribute(self::ORIGINAL_NAME_ATTRIBUTE, $originalName);
-    }
-
-    private function __construct()
-    {
     }
 }

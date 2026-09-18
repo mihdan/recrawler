@@ -1,5 +1,6 @@
 <?php
 
+use JetBrains\PhpStorm\Internal\TentativeType;
 use RdKafka\Exception;
 use RdKafka\Metadata;
 use RdKafka\Topic;
@@ -9,70 +10,71 @@ use RdKafka\TopicPartition;
 abstract class RdKafka
 {
     /**
+     * @var callable|null
+     */
+    private $error_cb;
+
+    /**
+     * @var callable|null
+     */
+    private $dr_cb;
+
+    private function __construct() {}
+
+    /**
      * @param string $broker_list
      *
      * @return int
      */
-    public function addBrokers($broker_list)
-    {
-    }
+    public function addBrokers($broker_list) {}
 
     /**
      * @param bool  $all_topics
-     * @param Topic $only_topic
+     * @param null|Topic $only_topic
      * @param int   $timeout_ms
      *
      * @throws Exception
      * @return Metadata
      */
-    public function getMetadata($all_topics, $only_topic = null, $timeout_ms)
-    {
-    }
+    public function getMetadata($all_topics, $only_topic = null, $timeout_ms = 0) {}
+
+    #[TentativeType]
+    public function getControllerId(int $timeout_ms): int {}
 
     /**
      * @return int
      */
-    public function getOutQLen()
-    {
-    }
+    public function getOutQLen() {}
 
     /**
      * @param string    $topic_name
-     * @param TopicConf $topic_conf
+     * @param null|TopicConf $topic_conf
      *
      * @return Topic
      */
-    public function newTopic($topic_name, TopicConf $topic_conf = null)
-    {
-    }
+    public function newTopic($topic_name, $topic_conf = null) {}
 
     /**
      * @param int $timeout_ms
      *
      * @return void
      */
-    public function poll($timeout_ms)
-    {
-    }
+    public function poll($timeout_ms) {}
 
     /**
      * @param int $level
      *
      * @return void
      */
-    public function setLogLevel($level)
-    {
-    }
+    public function setLogLevel($level) {}
 
     /**
-     * @param TopicPartition[] $topicPartitions
+     * @param TopicPartition[] $topic_partitions
      * @param int $timeout_ms
      *
      * @return TopicPartition[]
      */
-    public function offsetsForTimes(array $topicPartitions, int $timeout_ms)
-    {
-    }
+    public function offsetsForTimes($topic_partitions, $timeout_ms) {}
 
     /**
      * @param string $topic
@@ -83,25 +85,37 @@ abstract class RdKafka
      *
      * @return void
      */
-    public function queryWatermarkOffsets(string $topic, int $partition, int &$low, int &$high, int $timeout_ms)
-    {
-    }
+    public function queryWatermarkOffsets($topic, $partition = 0, &$low = 0, &$high = 0, $timeout_ms = 0) {}
 
     /**
      * @param int $purge_flags
      *
      * @return int
      */
-    public function purge(int $purge_flags)
-    {
-    }
+    public function purge($purge_flags) {}
 
     /**
      * @param int $timeout_ms
      *
      * @return int
      */
-    public function flush(int $timeout_ms)
-    {
-    }
+    public function flush($timeout_ms) {}
+
+    public function metadata($all_topics, $only_topic = false, $timeout_ms = 0) {}
+
+    public function setLogger($logger) {}
+
+    public function outqLen() {}
+
+    #[TentativeType]
+    public function pausePartitions(array $topic_partitions): array {}
+
+    #[TentativeType]
+    public function resumePartitions(array $topic_partitions): array {}
+
+    #[TentativeType]
+    public function oauthbearerSetToken(string $token_value, int|float|string $lifetime_ms, string $principal_name, array $extensions = []): void {}
+
+    #[TentativeType]
+    public function oauthbearerSetTokenFailure(string $error): void {}
 }

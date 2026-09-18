@@ -36,65 +36,53 @@ function msgpack_pack($value) {}
  *  <p>
  * @return mixed
  */
-function msgpack_unpack($str, $object = null)
-{
-}
+function msgpack_unpack($str, $object = null) {}
 
 class MessagePack
 {
-    const OPT_PHPONLY = 1;
+    public const OPT_PHPONLY = -1001;
 
-    public function __construct($opt)
-    {
-    }
+    /**
+     * @param $opt [optional]
+     */
+    public function __construct($opt) {}
 
-    public function setOption($option, $value)
-    {
-    }
+    public function setOption($option, $value) {}
 
-    public function pack($value)
-    {
-    }
+    public function pack($value) {}
 
-    public function unpack($str, $object)
-    {
-    }
+    /**
+     * @param $str
+     * @param $object [optional]
+     */
+    public function unpack($str, $object) {}
 
-    public function unpacker()
-    {
-
-    }
+    public function unpacker() {}
 }
 
 class MessagePackUnpacker
 {
-    public function __construct($opt)
-    {
-    }
+    /**
+     * @param $opt [optional]
+     */
+    public function __construct($opt) {}
 
-    public function __destruct()
-    {
-    }
+    public function __destruct() {}
 
-    public function setOption($option, $value)
-    {
-    }
+    public function setOption($option, $value) {}
 
-    public function feed($str)
-    {
-    }
+    public function feed($str) {}
 
-    public function execute($str, &$offset)
-    {
-    }
+    /**
+     * @param $str [optional]
+     * @param $offset [optional]
+     */
+    public function execute($str, &$offset) {}
 
-    public function data($object)
-    {
+    /**
+     * @param $object [optional]
+     */
+    public function data($object) {}
 
-    }
-
-    public function reset()
-    {
-
-    }
+    public function reset() {}
 }

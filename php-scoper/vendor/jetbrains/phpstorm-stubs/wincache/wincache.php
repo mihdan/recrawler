@@ -130,7 +130,7 @@ function wincache_ocache_meminfo() {}
  * or relative file paths can be used.</p>
  * @return bool Returns TRUE on success or FALSE on failure.
  */
-function wincache_refresh_if_changed(array $files) {}
+function wincache_refresh_if_changed(?array $files = null) {}
 
 /**
  * (PHP 5.2+; PECL wincache &gt;= 1.0.0)<br/>
@@ -277,17 +277,17 @@ function wincache_ucache_clear() {}
  * get decremented. If the argument is a floating point number it will be truncated
  * to nearest integer. The variable associated with the key should be of type long,
  * otherwise the function fails and returns FALSE.</p>
- * @param bool &$success [optional]
+ * @param bool|null &$success [optional]
  * <p>Will be set to TRUE on success and FALSE on failure.</p>
  * @return int|false Returns the decremented value on success and FALSE on failure.
  */
-function wincache_ucache_dec($key, $dec_by = 1, &$success) {}
+function wincache_ucache_dec($key, $dec_by = 1, &$success = null) {}
 
 /**
  * (PHP 5.2+; PECL wincache &gt;= 1.1.0)<br/>
  * Deletes the elements in the user cache pointed by key.
  * @link https://secure.php.net/manual/en/function.wincache-ucache-delete.php
- * @param mixed $key <p>The key that was used to store the variable in the cache.
+ * @param string|string[] $key <p>The key that was used to store the variable in the cache.
  * key is case sensitive. key can be an array of keys.</p>
  * @return bool Returns TRUE on success or FALSE on failure.
  * <p>If key is an array then the function returns FALSE if every element of
@@ -309,10 +309,10 @@ function wincache_ucache_exists($key) {}
  * (PHP 5.2+; PECL wincache &gt;= 1.1.0)<br/>
  * Gets a variable stored in the user cache.
  * @link https://secure.php.net/manual/en/function.wincache-ucache-get.php
- * @param mixed $key <p>The key that was used to store the variable in the cache.
+ * @param string|string[] $key <p>The key that was used to store the variable in the cache.
  * key is case sensitive. key can be an array of keys. In this case the return
  * value will be an array of values of each element in the key array.</p>
- * @param bool &$success [optional]
+ * @param bool|null &$success [optional]
  * <p>Will be set to TRUE on success and FALSE on failure.</p>
  * @return mixed <p>If key is a string, the function returns the value of the variable
  * stored with that key. The success is set to TRUE on success and to FALSE on failure.</p>
@@ -321,7 +321,7 @@ function wincache_ucache_exists($key) {}
  * operation in user cache was successful. If none of the keys in the key array finds a
  * match in the user cache an empty array will be returned.</p>
  */
-function wincache_ucache_get($key, &$success) {}
+function wincache_ucache_get($key, &$success = null) {}
 
 /**
  * (PHP 5.2+; PECL wincache &gt;= 1.1.0)<br/>
@@ -333,11 +333,11 @@ function wincache_ucache_get($key, &$success) {}
  * get incremented. If the argument is a floating point number it will be truncated
  * to nearest integer. The variable associated with the key should be of type long,
  * otherwise the function fails and returns FALSE.</p>
- * @param bool &$success [optional]
+ * @param bool|null &$success [optional]
  * <p>Will be set to TRUE on success and FALSE on failure.</p>
  * @return int|false Returns the incremented value on success and FALSE on failure.
  */
-function wincache_ucache_inc($key, $inc_by = 1, &$success) {}
+function wincache_ucache_inc($key, $inc_by = 1, &$success = null) {}
 
 /**
  * (PHP 5.2+; PECL wincache &gt;= 1.1.0)<br/>
@@ -346,7 +346,7 @@ function wincache_ucache_inc($key, $inc_by = 1, &$success) {}
  * @param bool $summaryonly [optional]
  * <p>Controls whether the returned array will contain information about
  * individual cache entries along with the user cache summary.</p>
- * @param string $key [optional]
+ * @param null|string $key [optional]
  * <p>The key of an entry in the user cache. If specified then the returned array
  * will contain information only about that cache entry. If not specified and
  * summaryonly is set to false then the returned array will contain information
@@ -373,7 +373,7 @@ function wincache_ucache_inc($key, $inc_by = 1, &$success) {}
  * </ul></li>
  * </ul></p>
  */
-function wincache_ucache_info($summaryonly = false, $key) {}
+function wincache_ucache_info(bool $summaryonly = false, $key = null) {}
 
 /**
  * (PHP 5.2+; PECL wincache &gt;= 1.1.0)<br/>
@@ -398,13 +398,13 @@ function wincache_ucache_meminfo() {}
  * live expires or it is deleted by using wincache_ucache_delete() or
  * wincache_ucache_clear() functions.</p>
  * @link https://secure.php.net/manual/en/function.wincache-ucache-set.php
- * @param mixed $key <p>
+ * @param string|string[] $key <p>
  * Store the variable using this key name. If a variable with same key is already
  * present the function will overwrite the previous value with the new one. key
  * is case sensitive. key can also take array of name =&gt; value pairs where
  * names will be used as keys. This can be used to add multiple values in the
  * cache in one operation, thus avoiding race condition.</p>
- * @param mixed $value<p>
+ * @param mixed $value <p>
  * Value of a variable to store. Value supports all data types except resources,
  * such as file handles. This parameter is ignored if first argument is an array.
  * A general guidance is to pass NULL as value while using array as key.</p>
@@ -437,4 +437,3 @@ function wincache_ucache_set($key, $value, $ttl = 0) {}
  * @return bool Returns TRUE on success or FALSE on failure.
  */
 function wincache_unlock($key) {}
-?>

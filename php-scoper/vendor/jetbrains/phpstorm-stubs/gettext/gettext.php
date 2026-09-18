@@ -1,6 +1,7 @@
 <?php
 
 // Start of gettext v.
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -12,9 +13,9 @@ use JetBrains\PhpStorm\Pure;
  * </p>
  * @return string If successful, this function returns the current message
  * domain, after possibly changing it.
+ * @throws \ValueError Throws a ValueError if domain is the empty string.
  */
-function textdomain (?string $domain): string
-{}
+function textdomain(?string $domain = null): string {}
 
 /**
  * Lookup a message in the current domain
@@ -26,8 +27,7 @@ function textdomain (?string $domain): string
  * translation table, or the submitted message if not found.
  */
 #[Pure]
-function _ (string $message): string
-{}
+function _(string $message): string {}
 
 /**
  * Lookup a message in the current domain
@@ -39,8 +39,7 @@ function _ (string $message): string
  * translation table, or the submitted message if not found.
  */
 #[Pure]
-function gettext (string $message): string
-{}
+function gettext(string $message): string {}
 
 /**
  * Override the current domain
@@ -52,9 +51,9 @@ function gettext (string $message): string
  * The message
  * </p>
  * @return string A string on success.
+ * @throws \ValueError Throws a ValueError if domain is the empty string.
  */
-function dgettext (string $domain, string $message): string
-{}
+function dgettext(string $domain, string $message): string {}
 
 /**
  * Overrides the domain for a single lookup
@@ -70,8 +69,7 @@ function dgettext (string $domain, string $message): string
  * </p>
  * @return string A string on success.
  */
-function dcgettext (string $domain, string $message, int $category): string
-{}
+function dcgettext(string $domain, string $message, int $category): string {}
 
 /**
  * Sets the path for a domain
@@ -79,27 +77,26 @@ function dcgettext (string $domain, string $message, int $category): string
  * @param string $domain <p>
  * The domain
  * </p>
- * @param string $directory <p>
- * The directory path
+ * @param string|null $directory <p>
+ * The directory path. Since PHP 8.0.3 directory is nullable. If null is passed, the currently set directory is returned.
  * </p>
  * @return string|false The full pathname for the <i>domain</i> currently being set.
  */
-function bindtextdomain (string $domain, string $directory): string|false
-{}
+function bindtextdomain(string $domain, #[LanguageLevelTypeAware(['8.0' => 'string|null'], default: 'string')] $directory = null): string|false {}
 
 /**
  * Plural version of gettext
  * @link https://php.net/manual/en/function.ngettext.php
- * @param string $singular
- * @param string $plural
- * @param int $count
+ * @param string $singular The singular message ID.
+ * @param string $plural The plural message ID.
+ * @param int $count The number (e.g. item count) to determine the translation for the respective
+ * grammatical number.
  * @return string correct plural form of message identified by
  * <i>msgid1</i> and <i>msgid2</i>
  * for count <i>n</i>.
  */
 #[Pure]
-function ngettext (string $singular, string $plural, int $count): string
-{}
+function ngettext(string $singular, string $plural, int $count): string {}
 
 /**
  * Plural version of dgettext
@@ -111,10 +108,10 @@ function ngettext (string $singular, string $plural, int $count): string
  * @param string $plural
  * @param int $count
  * @return string A string on success.
+ * @throws \ValueError Throws a ValueError if domain is the empty string.
  */
 #[Pure]
-function dngettext (string $domain, string $singular, string $plural, int $count): string
-{}
+function dngettext(string $domain, string $singular, string $plural, int $count): string {}
 
 /**
  * Plural version of dcgettext
@@ -129,8 +126,7 @@ function dngettext (string $domain, string $singular, string $plural, int $count
  * @return string A string on success.
  */
 #[Pure]
-function dcngettext (string $domain, string $singular, string $plural, int $count, int $category): string
-{}
+function dcngettext(string $domain, string $singular, string $plural, int $count, int $category): string {}
 
 /**
  * Specify the character encoding in which the messages from the DOMAIN message catalog will be returned
@@ -138,13 +134,12 @@ function dcngettext (string $domain, string $singular, string $plural, int $coun
  * @param string $domain <p>
  * The domain
  * </p>
- * @param string $codeset <p>
- * The code set
+ * @param string|null $codeset <p>
+ * The code set. Since 8.0.3 is nullable.  If null is passed, the currently set encoding is returned.
  * </p>
  * @return string|false A string on success.
+ * @throws \ValueError Throws a ValueError if domain is the empty string.
  */
-function bind_textdomain_codeset (string $domain, string $codeset): string|false
-{}
+function bind_textdomain_codeset(string $domain, #[LanguageLevelTypeAware(['8.0' => 'string|null'], default: 'string')] $codeset = null): string|false {}
 
 // End of gettext v.
-?>

@@ -1,205 +1,275 @@
 <?php
 
 // Start of xsl v.0.1
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\TentativeType;
 
 /**
  * @link https://php.net/manual/en/class.xsltprocessor.php
  */
-class XSLTProcessor  {
+class XSLTProcessor
+{
+    /**
+     * Controls whether the input document is cloned before transformation
+     * @link https://php.net/manual/en/class.xsltprocessor.php#xsltprocessor.props.clonedocument
+     */
+    #[PhpStormStubsElementAvailable(from: '8.4')]
+    public bool $cloneDocument;
 
-	/**
-	 * Import stylesheet
-	 * @link https://php.net/manual/en/xsltprocessor.importstylesheet.php
-	 * @param object $stylesheet <p>
-	 * The imported style sheet as a <b>DOMDocument</b> or
-	 * <b>SimpleXMLElement</b> object.
-	 * </p>
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 */
-	public function importStylesheet ($stylesheet) {}
+    /**
+     * Controls whether XInclude substitution is performed
+     * @link https://php.net/manual/en/class.xsltprocessor.php#xsltprocessor.props.doxinclude
+     */
+    #[PhpStormStubsElementAvailable(from: '8.4')]
+    public bool $doXInclude;
 
-	/**
-	 * Transform to a DOMDocument
-	 * @link https://php.net/manual/en/xsltprocessor.transformtodoc.php
-	 * @param DOMNode $doc <p>
-	 * The node to be transformed.
-	 * </p>
-	 * @return DOMDocument|false The resulting <b>DOMDocument</b> or <b>FALSE</b> on error.
-	 */
-	public function transformToDoc (DOMNode $doc) {}
+    /**
+     * The maximum template nesting depth
+     * @link https://php.net/manual/en/class.xsltprocessor.php#xsltprocessor.props.maxtemplatedepth
+     */
+    #[PhpStormStubsElementAvailable(from: '8.4')]
+    public int $maxTemplateDepth;
 
-	/**
-	 * Transform to URI
-	 * @link https://php.net/manual/en/xsltprocessor.transformtouri.php
-	 * @param DOMDocument|SimpleXMLElement $doc <p>
-	 * The document to transform.
-	 * </p>
-	 * @param string $uri <p>
-	 * The target URI for the transformation.
-	 * </p>
-	 * @return int|false the number of bytes written or <b>FALSE</b> if an error occurred.
-	 */
-	public function transformToUri ($doc, $uri) {}
+    /**
+     * The maximum number of template variables
+     * @link https://php.net/manual/en/class.xsltprocessor.php#xsltprocessor.props.maxtemplatevars
+     */
+    #[PhpStormStubsElementAvailable(from: '8.4')]
+    public int $maxTemplateVars;
 
-	/**
-	 * Transform to XML
-	 * @link https://php.net/manual/en/xsltprocessor.transformtoxml.php
-	 * @param DOMDocument|SimpleXMLElement $doc <p>
-	 * The transformed document.
-	 * </p>
-	 * @return string|false The result of the transformation as a string or <b>FALSE</b> on error.
-	 */
-	public function transformToXml ($doc) {}
+    /**
+     * Import stylesheet
+     * @link https://php.net/manual/en/xsltprocessor.importstylesheet.php
+     * @param object $stylesheet <p>
+     * The imported style sheet as a <b>DOMDocument</b> or
+     * <b>SimpleXMLElement</b> object.
+     * </p>
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @throws \TypeError Throws a TypeError if stylesheet is not an XML object.
+     */
+    #[TentativeType]
+    public function importStylesheet(#[LanguageLevelTypeAware(['8.0' => 'object'], default: '')] $stylesheet): bool {}
 
-	/**
-	 * Set value for a parameter
-	 * @link https://php.net/manual/en/xsltprocessor.setparameter.php
-	 * @param string $namespace <p>
-	 * The namespace URI of the XSLT parameter.
-	 * </p>
-	 * @param array $options <p>
-	 * An array of name => value pairs. This syntax is available since PHP 5.1.0.
-	 * </p>
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 */
-	public function setParameter ($namespace, $options) {}
+    /**
+     * Transform to a DOMDocument
+     * @link https://php.net/manual/en/xsltprocessor.transformtodoc.php
+     * @param object $document The DOMDocument or SimpleXMLElement or libxml-compatible object to be transformed.
+     * @param string|null $returnClass This optional parameter may be used so that
+     * XSLTProcessor::transformToDoc will return an object of the specified class. That class should
+     * either extend or be the same class as document's class.
+     * @return DOMDocument|false The resulting <b>DOMDocument</b> or <b>FALSE</b> on error.
+     */
+    #[TentativeType]
+    public function transformToDoc(
+        #[LanguageLevelTypeAware(['8.0' => 'object'], default: '')] $document,
+        #[LanguageLevelTypeAware(['8.0' => 'string|null'], default: '')] $returnClass = null
+    ): object|false {}
 
-	/**
-	 * Set value for a parameter
-	 * @link https://php.net/manual/en/xsltprocessor.setparameter.php
-	 * @param string $namespace <p>
-	 * The namespace URI of the XSLT parameter.
-	 * </p>
-	 * @param string $name <p>
-	 * The local name of the XSLT parameter.
-	 * </p>
-	 * @param string $value <p>
-	 * The new value of the XSLT parameter.
-	 * </p>
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 */
-	public function setParameter ($namespace, $name, $value) {}
+    /**
+     * Transform to URI
+     * @link https://php.net/manual/en/xsltprocessor.transformtouri.php
+     * @param DOMDocument|SimpleXMLElement $document <p>
+     * The document to transform.
+     * </p>
+     * @param string $uri <p>
+     * The target URI for the transformation.
+     * </p>
+     * @return int the number of bytes written or <b>FALSE</b> if an error occurred.
+     */
+    #[TentativeType]
+    public function transformToUri(
+        #[LanguageLevelTypeAware(['8.0' => 'object'], default: '')] $document,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $uri
+    ): int {}
 
-	/**
-	 * Get value of a parameter
-	 * @link https://php.net/manual/en/xsltprocessor.getparameter.php
-	 * @param string $namespaceURI <p>
-	 * The namespace URI of the XSLT parameter.
-	 * </p>
-	 * @param string $localName <p>
-	 * The local name of the XSLT parameter.
-	 * </p>
-	 * @return string|false The value of the parameter (as a string), or <b>FALSE</b> if it's not set.
-	 */
-	public function getParameter ($namespaceURI, $localName) {}
+    /**
+     * Transform to XML
+     * @link https://php.net/manual/en/xsltprocessor.transformtoxml.php
+     * @param DOMDocument|SimpleXMLElement $document <p>
+     * The transformed document.
+     * </p>
+     * @return string|false|null The result of the transformation as a string or <b>FALSE</b> on error.
+     */
+    #[TentativeType]
+    public function transformToXml(#[LanguageLevelTypeAware(['8.0' => 'object'], default: '')] $document): string|false|null {}
 
-	/**
-	 * Remove parameter
-	 * @link https://php.net/manual/en/xsltprocessor.removeparameter.php
-	 * @param string $namespaceURI <p>
-	 * The namespace URI of the XSLT parameter.
-	 * </p>
-	 * @param string $localName <p>
-	 * The local name of the XSLT parameter.
-	 * </p>
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 */
-	public function removeParameter ($namespaceURI, $localName) {}
+    /**
+     * Set value for a parameter
+     * @link https://php.net/manual/en/xsltprocessor.setparameter.php
+     * @param string $namespace <p>
+     * The namespace URI of the XSLT parameter.
+     * </p>
+     * @param string $name <p>
+     * The local name of the XSLT parameter.
+     * </p>
+     * @param string $value <p>
+     * The new value of the XSLT parameter.
+     * </p>
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @throws \ValueError Throws a ValueError if any of the arguments contain null bytes.
+     */
+    #[TentativeType]
+    public function setParameter(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $namespace,
+        #[LanguageLevelTypeAware(['8.0' => 'array|string'], default: '')] $name,
+        #[LanguageLevelTypeAware(['8.0' => 'string|null'], default: '')] $value = null
+    ): bool {}
 
-	/**
-	 * Determine if PHP has EXSLT support
-	 * @link https://php.net/manual/en/xsltprocessor.hasexsltsupport.php
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 * @since 5.0.4
-	 */
-	public function hasExsltSupport () {}
+    /**
+     * Get value of a parameter
+     * @link https://php.net/manual/en/xsltprocessor.getparameter.php
+     * @param string $namespace <p>
+     * The namespace URI of the XSLT parameter.
+     * </p>
+     * @param string $name <p>
+     * The local name of the XSLT parameter.
+     * </p>
+     * @return string|false The value of the parameter (as a string), or <b>FALSE</b> if it's not set.
+     */
+    #[TentativeType]
+    public function getParameter(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $namespace,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $name
+    ): string|false {}
 
-	/**
-	 * Enables the ability to use PHP functions as XSLT functions
-	 * @link https://php.net/manual/en/xsltprocessor.registerphpfunctions.php
-	 * @param mixed $restrict [optional] <p>
-	 * Use this parameter to only allow certain functions to be called from
-	 * XSLT.
-	 * </p>
-	 * <p>
-	 * This parameter can be either a string (a function name) or an array of
-	 * functions.
-	 * </p>
-	 * @return void No value is returned.
-	 * @since 5.0.4
-	 */
-	public function registerPHPFunctions ($restrict = null) {}
+    /**
+     * Remove parameter
+     * @link https://php.net/manual/en/xsltprocessor.removeparameter.php
+     * @param string $namespace <p>
+     * The namespace URI of the XSLT parameter.
+     * </p>
+     * @param string $name <p>
+     * The local name of the XSLT parameter.
+     * </p>
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     */
+    #[TentativeType]
+    public function removeParameter(
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $namespace,
+        #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $name
+    ): bool {}
 
-	/**
-	 * Sets profiling output file
-	 * @link https://php.net/manual/en/xsltprocessor.setprofiling.php
-	 * @param string $filename <p>
-	 * Path to the file to dump profiling information.
-	 * </p>
-	 * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
-	 */
-	public function setProfiling ($filename) {}
+    /**
+     * Determine if PHP has EXSLT support
+     * @link https://php.net/manual/en/xsltprocessor.hasexsltsupport.php
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @since 5.0
+     */
+    #[TentativeType]
+    public function hasExsltSupport(): bool {}
 
-	/**
-	 * Set security preferences
-	 * @link https://php.net/manual/en/xsltprocessor.setsecurityprefs.php
-	 * @param int $securityPrefs
-	 * @return int
-	 * @since 5.4
-	 */
-	public function setSecurityPrefs ($securityPrefs) {}
+    /**
+     * Enables the ability to use PHP functions as XSLT functions
+     * @link https://php.net/manual/en/xsltprocessor.registerphpfunctions.php
+     * @param array|string|null $functions [optional] <p>
+     * Use this parameter to only allow certain functions to be called from
+     * XSLT.
+     * </p>
+     * <p>
+     * This parameter can be either a string (a function name) or an array of
+     * functions.
+     * </p>
+     * @return void No value is returned.
+     * @since 5.0
+     */
+    #[TentativeType]
+    public function registerPHPFunctions(#[LanguageLevelTypeAware(['8.0' => 'array|string|null'], default: '')] $functions = null): void {}
 
-	/**
-	 * Get security preferences
-	 * @link https://php.net/manual/en/xsltprocessor.getsecurityprefs.php
-	 * @return int
-	 * @since 5.4
-	 */
-	public function getSecurityPrefs () {}
+    /**
+     * Registers a PHP function to be callable from XSLT under the given namespace
+     * @link https://php.net/manual/en/xsltprocessor.registerphpfunctionns.php
+     * @param string $namespaceURI <p>
+     * The namespace URI the function is registered under.
+     * </p>
+     * @param string $name <p>
+     * The name the function is exposed as inside the stylesheet.
+     * </p>
+     * @param callable $callable <p>
+     * The PHP callable to invoke.
+     * </p>
+     * @return void No value is returned.
+     * @since 8.4
+     */
+    #[PhpStormStubsElementAvailable(from: '8.4')]
+    public function registerPHPFunctionNS(string $namespaceURI, string $name, callable $callable): void {}
 
+    /**
+     * Sets profiling output file
+     * @link https://php.net/manual/en/xsltprocessor.setprofiling.php
+     * @param string $filename <p>
+     * Path to the file to dump profiling information.
+     * </p>
+     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     */
+    #[LanguageLevelTypeAware(['8.4' => 'true'], default: '')]
+    #[TentativeType]
+    public function setProfiling(#[LanguageLevelTypeAware(['8.0' => 'string|null'], default: '')] $filename) {}
+
+    /**
+     * Set security preferences
+     * @link https://php.net/manual/en/xsltprocessor.setsecurityprefs.php
+     * @param int $preferences The new security preferences. The following constants can be ORed:
+     * XSL_SECPREF_READ_FILE, XSL_SECPREF_WRITE_FILE, XSL_SECPREF_CREATE_DIRECTORY,
+     * XSL_SECPREF_READ_NETWORK, XSL_SECPREF_WRITE_NETWORK. Alternatively, XSL_SECPREF_NONE or
+     * XSL_SECPREF_DEFAULT can be passed.
+     * @return int Returns the old security preferences.
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function setSecurityPrefs(#[LanguageLevelTypeAware(['8.0' => 'int'], default: '')] $preferences): int {}
+
+    /**
+     * Get security preferences
+     * @link https://php.net/manual/en/xsltprocessor.getsecurityprefs.php
+     * @return int A bitmask consisting of XSL_SECPREF_READ_FILE, XSL_SECPREF_WRITE_FILE,
+     * XSL_SECPREF_CREATE_DIRECTORY, XSL_SECPREF_READ_NETWORK, XSL_SECPREF_WRITE_NETWORK.
+     * @since 5.4
+     */
+    #[TentativeType]
+    public function getSecurityPrefs(): int {}
 }
-define ('XSL_CLONE_AUTO', 0);
-define ('XSL_CLONE_NEVER', -1);
-define ('XSL_CLONE_ALWAYS', 1);
+define('XSL_CLONE_AUTO', 0);
+define('XSL_CLONE_NEVER', -1);
+define('XSL_CLONE_ALWAYS', 1);
 
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_NONE', 0);
+define('XSL_SECPREF_NONE', 0);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_READ_FILE', 2);
+define('XSL_SECPREF_READ_FILE', 2);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_WRITE_FILE', 4);
+define('XSL_SECPREF_WRITE_FILE', 4);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_CREATE_DIRECTORY', 8);
+define('XSL_SECPREF_CREATE_DIRECTORY', 8);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_READ_NETWORK', 16);
+define('XSL_SECPREF_READ_NETWORK', 16);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_WRITE_NETWORK', 32);
+define('XSL_SECPREF_WRITE_NETWORK', 32);
 /** @link https://php.net/manual/en/xsl.constants.php */
-define ('XSL_SECPREF_DEFAULT', 44);
+define('XSL_SECPREF_DEFAULT', 44);
 
 /**
  * libxslt version like 10117. Available as of PHP 5.1.2.
  * @link https://php.net/manual/en/xsl.constants.php
  */
-define ('LIBXSLT_VERSION', 10128);
+define('LIBXSLT_VERSION', 10128);
 
 /**
  * libxslt version like 1.1.17. Available as of PHP 5.1.2.
  * @link https://php.net/manual/en/xsl.constants.php
  */
-define ('LIBXSLT_DOTTED_VERSION', "1.1.28");
+define('LIBXSLT_DOTTED_VERSION', "1.1.28");
 
 /**
  * libexslt version like 813. Available as of PHP 5.1.2.
  * @link https://php.net/manual/en/xsl.constants.php
  */
-define ('LIBEXSLT_VERSION', 817);
+define('LIBEXSLT_VERSION', 817);
 
 /**
  * libexslt version like 1.1.17. Available as of PHP 5.1.2.
  * @link https://php.net/manual/en/xsl.constants.php
  */
-define ('LIBEXSLT_DOTTED_VERSION', "1.1.28");
+define('LIBEXSLT_DOTTED_VERSION', "1.1.28");
 
 // End of xsl v.0.1
-?>

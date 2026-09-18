@@ -1,32 +1,34 @@
 <?php
 
 // Start of odbc v.1.0
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 
 /**
  * Toggle autocommit behaviour
  * @link https://php.net/manual/en/function.odbc-autocommit.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param bool $OnOff [optional] <p>
+ * @param bool $enable [optional] <p>
  * If <i>OnOff</i> is <b>TRUE</b>, auto-commit is enabled, if
  * it is <b>FALSE</b> auto-commit is disabled.
  * </p>
- * @return mixed Without the <i>OnOff</i> parameter, this function returns
+ * @return int|bool Without the <i>$enable</i> parameter, this function returns
  * auto-commit status for <i>connection_id</i>. Non-zero is
  * returned if auto-commit is on, 0 if it is off, or <b>FALSE</b> if an error
  * occurs.
- * </p>
  * <p>
- * If <i>OnOff</i> is set, this function returns <b>TRUE</b> on
+ * If <i>$enable</i> is set, this function returns <b>TRUE</b> on
  * success and <b>FALSE</b> on failure.
+ * </p>
  */
-function odbc_autocommit ($connection_id, $OnOff = false) {}
+function odbc_autocommit(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?bool $enable = false): int|bool {}
 
 /**
  * Handling of binary column data
  * @link https://php.net/manual/en/function.odbc-binmode.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
  * <p>
@@ -40,45 +42,46 @@ function odbc_autocommit ($connection_id, $OnOff = false) {}
  * @param int $mode <p>
  * Possible values for <i>mode</i> are:
  * <b>ODBC_BINMODE_PASSTHRU</b>: Passthru BINARY data
+ * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_binmode ($result_id, $mode) {}
+#[LanguageLevelTypeAware(['8.4' => 'true'], default: 'bool')]
+function odbc_binmode(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $mode) {}
 
 /**
  * Close an ODBC connection
  * @link https://php.net/manual/en/function.odbc-close.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @return void No value is returned.
  */
-function odbc_close ($connection_id) {}
+function odbc_close(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc): void {}
 
 /**
  * Close all ODBC connections
  * @link https://php.net/manual/en/function.odbc-close-all.php
  * @return void No value is returned.
  */
-function odbc_close_all () {}
+function odbc_close_all(): void {}
 
 /**
  * Lists the column names in specified tables
  * @link https://php.net/manual/en/function.odbc-columns.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier [optional] <p>
+ * @param string|null $catalog [optional] <p>
  * The qualifier.
  * </p>
- * @param string $schema [optional] <p>
+ * @param string|null $schema [optional] <p>
  * The owner.
  * </p>
- * @param string $table_name [optional] <p>
+ * @param string|null $table [optional] <p>
  * The table name.
  * </p>
- * @param string $column_name [optional] <p>
+ * @param string|null $column [optional] <p>
  * The column name.
  * </p>
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on failure.
- * </p>
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on failure.
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -97,17 +100,19 @@ function odbc_close_all () {}
  * <p>
  * The result set is ordered by TABLE_QUALIFIER, TABLE_SCHEM and
  * TABLE_NAME.
+ * </p>
  */
-function odbc_columns ($connection_id, $qualifier = null, $schema = null, $table_name = null, $column_name = null) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_columns(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog = null, ?string $schema = null, ?string $table = null, ?string $column = null) {}
 
 /**
  * Commit an ODBC transaction
  * @link https://php.net/manual/en/function.odbc-commit.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_commit ($connection_id) {}
+function odbc_commit(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc): bool {}
 
 /**
  * Connect to a datasource
@@ -122,32 +127,41 @@ function odbc_commit ($connection_id) {}
  * @param string $password <p>
  * The password.
  * </p>
- * @param int $cursor_type [optional] <p>
+ * @param int $cursor_option [optional] <p>
  * This sets the type of cursor to be used
  * for this connection. This parameter is not normally needed, but
  * can be useful for working around problems with some ODBC drivers.
  * </p>
- * The following constants are defined for cursortype:
  * <p>
+ * The following constants are defined for cursortype:
  * SQL_CUR_USE_IF_NEEDED
- * @return resource|false an ODBC connection or (<b>FALSE</b>) on error.
+ * </p>
+ * @return Odbc\Connection|resource|false an ODBC connection or (<b>FALSE</b>) on error.
  */
-function odbc_connect ($dsn, $user, $password, $cursor_type = null) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection|false'], default: 'resource|false')]
+function odbc_connect(
+    string $dsn,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '8.3')] string $user,
+    #[PhpStormStubsElementAvailable(from: '8.4')] ?string $user = null,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '8.3')] string $password,
+    #[PhpStormStubsElementAvailable(from: '8.4')] ?string $password = null,
+    int $cursor_option = SQL_CUR_USE_DRIVER
+) {}
 
 /**
  * Get cursorname
  * @link https://php.net/manual/en/function.odbc-cursor.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @return string the cursor name, as a string.
+ * @return string|false the cursor name, as a string.
  */
-function odbc_cursor ($result_id) {}
+function odbc_cursor(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement): string|false {}
 
 /**
  * Returns information about a current connection
  * @link https://php.net/manual/en/function.odbc-data-source.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @param int $fetch_type <p>
  * The <i>fetch_type</i> can be one of two constant types:
@@ -155,17 +169,18 @@ function odbc_cursor ($result_id) {}
  * Use <b>SQL_FETCH_FIRST</b> the first time this function is
  * called, thereafter use the <b>SQL_FETCH_NEXT</b>.
  * </p>
- * @return array|false <b>FALSE</b> on error, and an array upon success.
+ * @return array|false|null <b>FALSE</b> on error, and an array upon success.
  */
-function odbc_data_source ($connection_id, $fetch_type) {}
+#[ArrayShape(["server" => "string", "description" => "string"])]
+function odbc_data_source(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, int $fetch_type): array|false|null {}
 
 /**
  * Execute a prepared statement
  * @link https://php.net/manual/en/function.odbc-execute.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result id resource, from <b>odbc_prepare</b>.
  * </p>
- * @param array $parameters_array [optional] <p>
+ * @param array $params [optional] <p>
  * Parameters in <i>parameter_array</i> will be
  * substituted for placeholders in the prepared statement in order.
  * Elements of this array will be converted to strings by calling this
@@ -185,45 +200,44 @@ function odbc_data_source ($connection_id, $fetch_type) {}
  * executing the query directly with <b>odbc_exec</b>).
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_execute ($result_id, array $parameters_array = null) {}
+function odbc_execute(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, array $params = []): bool {}
 
 /**
  * Get the last error code
  * @link https://php.net/manual/en/function.odbc-error.php
- * @param resource $connection_id [optional] The ODBC connection identifier,
+ * @param Odbc\Connection|resource|null $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @return string If <i>connection_id</i> is specified, the last state
+ * @return string If <i>$odbc</i> is specified, the last state
  * of that connection is returned, else the last state of any connection
  * is returned.
- * </p>
  * <p>
  * This function returns meaningful value only if last odbc query failed
  * (i.e. <b>odbc_exec</b> returned <b>FALSE</b>).
+ * </p>
  */
-function odbc_error ($connection_id = null) {}
+function odbc_error(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection|null'], default: 'resource')] $odbc = null): string {}
 
 /**
  * Get the last error message
  * @link https://php.net/manual/en/function.odbc-errormsg.php
- * @param resource $connection_id [optional] The ODBC connection identifier,
+ * @param Odbc\Connection|resource|null $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @return string If <i>connection_id</i> is specified, the last state
+ * @return string If <i>$odbc</i> is specified, the last state
  * of that connection is returned, else the last state of any connection
  * is returned.
- * </p>
  * <p>
  * This function returns meaningful value only if last odbc query failed
  * (i.e. <b>odbc_exec</b> returned <b>FALSE</b>).
+ * </p>
  */
-function odbc_errormsg ($connection_id = null) {}
+function odbc_errormsg(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection|null'], default: 'resource')] $odbc = null): string {}
 
-#[PhpStormStubsElementAvailable(to: '7.4')]
 /**
  * Prepare and execute an SQL statement
  * @link https://php.net/manual/en/function.odbc-exec.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $query_string <p>
+ * @param string $query <p>
  * The SQL statement.
  * </p>
  * @param int $flags [optional] <p>
@@ -232,59 +246,44 @@ function odbc_errormsg ($connection_id = null) {}
  * @return resource|false an ODBC result identifier if the SQL command was executed
  * successfully, or <b>FALSE</b> on error.
  */
-function odbc_exec ($connection_id, $query_string, $flags = null) {}
-
-#[PhpStormStubsElementAvailable('8.0')]
-/**
- * Prepare and execute an SQL statement
- * @link https://php.net/manual/en/function.odbc-exec.php
- * @param resource $connection_id The ODBC connection identifier,
- * see <b>odbc_connect</b> for details.</p>
- * @param string $query_string <p>
- * The SQL statement.
- * </p>
- * @return resource|false an ODBC result identifier if the SQL command was executed
- * successfully, or <b>FALSE</b> on error.
- */
-function odbc_exec($connection_id, $query_string)
-{
-}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_exec(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, string $query, #[PhpStormStubsElementAvailable(from: '5.3', to: '7.4')] $flags = null) {}
 
 /**
  * Fetch a result row as an associative array
  * @link https://php.net/manual/en/function.odbc-fetch-array.php
- * @param resource $result <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result resource from <b>odbc_exec</b>.
  * </p>
- * @param int $rownumber [optional] <p>
+ * @param int $row [optional] <p>
  * Optionally choose which row number to retrieve.
  * </p>
  * @return array|false an array that corresponds to the fetched row, or <b>FALSE</b> if there
  * are no more rows.
  */
-function odbc_fetch_array ($result, $rownumber = null) {}
+function odbc_fetch_array(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, #[LanguageLevelTypeAware(['8.4' => 'int|null'], default: 'int')] $row = -1): array|false {}
 
 /**
  * Fetch a result row as an object
  * @link https://php.net/manual/en/function.odbc-fetch-object.php
- * @param resource $result <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result resource from <b>odbc_exec</b>.
  * </p>
- * @param int $rownumber [optional] <p>
+ * @param int $row [optional] <p>
  * Optionally choose which row number to retrieve.
  * </p>
- * @return object|false an object that corresponds to the fetched row, or <b>FALSE</b> if there
+ * @return stdClass|false an object that corresponds to the fetched row, or <b>FALSE</b> if there
  * are no more rows.
  */
-function odbc_fetch_object ($result, $rownumber = null) {}
+function odbc_fetch_object(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, #[LanguageLevelTypeAware(['8.4' => 'int|null'], default: 'int')] $row = -1): stdClass|false {}
 
 /**
  * Fetch a row
  * @link https://php.net/manual/en/function.odbc-fetch-row.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param int $row_number [optional] <p>
+ * @param int|null $row [optional] <p>
  * If <i>row_number</i> is not specified,
  * <b>odbc_fetch_row</b> will try to fetch the next row in
  * the result set. Calls to <b>odbc_fetch_row</b> with and
@@ -301,116 +300,116 @@ function odbc_fetch_object ($result, $rownumber = null) {}
  * </p>
  * @return bool <b>TRUE</b> if there was a row, <b>FALSE</b> otherwise.
  */
-function odbc_fetch_row ($result_id, $row_number = null) {}
+function odbc_fetch_row(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, ?int $row = null): bool {}
 
 /**
  * Fetch one result row into array
  * @link https://php.net/manual/en/function.odbc-fetch-into.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result resource.
  * </p>
- * @param array &$result_array <p>
+ * @param array &$array <p>
  * The result array
  * that can be of any type since it will be converted to type
  * array. The array will contain the column values starting at array
  * index 0.
  * </p>
- * @param int $rownumber [optional] <p>
+ * @param int $row [optional] <p>
  * The row number.
  * </p>
- * @return int the number of columns in the result;
+ * @return int|false the number of columns in the result;
  * <b>FALSE</b> on error.
  */
-function odbc_fetch_into ($result_id, array &$result_array, $rownumber = null) {}
+function odbc_fetch_into(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, array &$array, #[LanguageLevelTypeAware(['8.4' => 'int|null'], default: 'int')] $row = 0): int|false {}
 
 /**
  * Get the length (precision) of a field
  * @link https://php.net/manual/en/function.odbc-field-len.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param int $field_number <p>
+ * @param int $field <p>
  * The field number. Field numbering starts at 1.
  * </p>
  * @return int|false the field name as a string, or <b>FALSE</b> on error.
  */
-function odbc_field_len ($result_id, $field_number) {}
+function odbc_field_len(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $field): int|false {}
 
 /**
  * Get the scale of a field
  * @link https://php.net/manual/en/function.odbc-field-scale.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param int $field_number <p>
+ * @param int $field <p>
  * The field number. Field numbering starts at 1.
  * </p>
  * @return int|false the field scale as a integer, or <b>FALSE</b> on error.
  */
-function odbc_field_scale ($result_id, $field_number) {}
+function odbc_field_scale(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $field): int|false {}
 
 /**
  * Get the columnname
  * @link https://php.net/manual/en/function.odbc-field-name.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param int $field_number <p>
+ * @param int $field <p>
  * The field number. Field numbering starts at 1.
  * </p>
  * @return string|false the field name as a string, or <b>FALSE</b> on error.
  */
-function odbc_field_name ($result_id, $field_number) {}
+function odbc_field_name(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $field): string|false {}
 
 /**
  * Datatype of a field
  * @link https://php.net/manual/en/function.odbc-field-type.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param int $field_number <p>
+ * @param int $field <p>
  * The field number. Field numbering starts at 1.
  * </p>
  * @return string|false the field type as a string, or <b>FALSE</b> on error.
  */
-function odbc_field_type ($result_id, $field_number) {}
+function odbc_field_type(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $field): string|false {}
 
 /**
  * Return column number
  * @link https://php.net/manual/en/function.odbc-field-num.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
- * @param string $field_name <p>
+ * @param string $field <p>
  * The field name.
  * </p>
  * @return int|false the field number as a integer, or <b>FALSE</b> on error.
  * Field numbering starts at 1.
  */
-function odbc_field_num ($result_id, $field_name) {}
+function odbc_field_num(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, string $field): int|false {}
 
 /**
  * Free resources associated with a result
  * @link https://php.net/manual/en/function.odbc-free-result.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
  * @return bool Always returns <b>TRUE</b>.
  */
-function odbc_free_result ($result_id) {}
+#[LanguageLevelTypeAware(['8.4' => 'true'], default: 'bool')]
+function odbc_free_result(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement) {}
 
 /**
  * Retrieves information about data types supported by the data source
  * @link https://php.net/manual/en/function.odbc-gettypeinfo.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @param int $data_type [optional] <p>
  * The data type, which can be used to restrict the information to a
  * single data type.
  * </p>
- * @return resource|false an ODBC result identifier or
+ * @return Odbc\Result|resource|false an ODBC result identifier or
  * <b>FALSE</b> on failure.
- * </p>
  * <p>
  * The result set has the following columns:
  * TYPE_NAME
@@ -431,13 +430,15 @@ function odbc_free_result ($result_id) {}
  * </p>
  * <p>
  * The result set is ordered by DATA_TYPE and TYPE_NAME.
+ * </p>
  */
-function odbc_gettypeinfo ($connection_id, $data_type = null) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_gettypeinfo(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, int $data_type = 0) {}
 
 /**
  * Handling of LONG columns
  * @link https://php.net/manual/en/function.odbc-longreadlen.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
  * @param int $length <p>
@@ -447,38 +448,39 @@ function odbc_gettypeinfo ($connection_id, $data_type = null) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_longreadlen ($result_id, $length) {}
+#[LanguageLevelTypeAware(['8.4' => 'true'], default: 'bool')]
+function odbc_longreadlen(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $length) {}
 
 /**
  * Checks if multiple results are available
  * @link https://php.net/manual/en/function.odbc-next-result.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
  * @return bool <b>TRUE</b> if there are more result sets, <b>FALSE</b> otherwise.
  */
-function odbc_next_result ($result_id) {}
+function odbc_next_result(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement): bool {}
 
 /**
  * Number of columns in a result
  * @link https://php.net/manual/en/function.odbc-num-fields.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier returned by <b>odbc_exec</b>.
  * </p>
  * @return int the number of fields, or -1 on error.
  */
-function odbc_num_fields ($result_id) {}
+function odbc_num_fields(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement): int {}
 
 /**
  * Number of rows in a result
  * @link https://php.net/manual/en/function.odbc-num-rows.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier returned by <b>odbc_exec</b>.
  * </p>
  * @return int the number of rows in an ODBC result.
  * This function will return -1 on error.
  */
-function odbc_num_rows ($result_id) {}
+function odbc_num_rows(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement): int {}
 
 /**
  * Open a persistent database connection
@@ -486,72 +488,82 @@ function odbc_num_rows ($result_id) {}
  * @param string $dsn
  * @param string $user
  * @param string $password
- * @param int $cursor_type [optional]
- * @return resource|false an ODBC connection id or 0 (<b>FALSE</b>) on
+ * @param int $cursor_option [optional]
+ * @return Odbc\Connection|resource|false an ODBC connection id or 0 (<b>FALSE</b>) on
  * error.
  */
-function odbc_pconnect ($dsn, $user, $password, $cursor_type = null) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection|false'], default: 'resource|false')]
+function odbc_pconnect(
+    string $dsn,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '8.3')] string $user,
+    #[PhpStormStubsElementAvailable(from: '8.4')] ?string $user = null,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '8.3')] string $password,
+    #[PhpStormStubsElementAvailable(from: '8.4')] ?string $password = null,
+    int $cursor_option = SQL_CUR_USE_DRIVER
+) {}
 
 /**
  * Prepares a statement for execution
  * @link https://php.net/manual/en/function.odbc-prepare.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $query_string <p>
+ * @param string $query <p>
  * The query string statement being prepared.
  * </p>
- * @return resource|false an ODBC result identifier if the SQL command was prepared
+ * @return Odbc\Result|resource|false an ODBC result identifier if the SQL command was prepared
  * successfully. Returns <b>FALSE</b> on error.
  */
-function odbc_prepare ($connection_id, $query_string) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_prepare(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, string $query) {}
 
 /**
  * Get result data
  * @link https://php.net/manual/en/function.odbc-result.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The ODBC resource.
  * </p>
- * @param mixed $field <p>
+ * @param string|int $field <p>
  * The field name being retrieved. It can either be an integer containing
  * the column number of the field you want; or it can be a string
  * containing the name of the field.
  * </p>
- * @return mixed the string contents of the field, <b>FALSE</b> on error, <b>NULL</b> for
+ * @return string|bool|null the string contents of the field, <b>FALSE</b> on error, <b>NULL</b> for
  * NULL data, or <b>TRUE</b> for binary data.
  */
-function odbc_result ($result_id, $field) {}
+function odbc_result(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, string|int $field): string|bool|null {}
 
 /**
  * Print result as HTML table
  * @link https://php.net/manual/en/function.odbc-result-all.php
- * @param resource $result_id <p>
+ * @param Odbc\Result|resource $statement <p>
  * The result identifier.
  * </p>
  * @param string $format [optional] <p>
  * Additional overall table formatting.
  * </p>
  * @return int|false the number of rows in the result or <b>FALSE</b> on error.
+ * @deprecated 8.1
  */
-function odbc_result_all ($result_id, $format = null) {}
+function odbc_result_all(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, string $format = ''): int|false {}
 
 /**
  * Rollback a transaction
  * @link https://php.net/manual/en/function.odbc-rollback.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_rollback ($connection_id) {}
+function odbc_rollback(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc): bool {}
 
 /**
  * Adjust ODBC settings
  * @link https://php.net/manual/en/function.odbc-setoption.php
- * @param resource $id <p>
+ * @param Odbc\Connection|Odbc\Result|resource $odbc <p>
  * Is a connection id or result id on which to change the settings.
  * For SQLSetConnectOption(), this is a connection id.
  * For SQLSetStmtOption(), this is a result id.
  * </p>
- * @param int $function <p>
+ * @param int $which <p>
  * Is the ODBC function to use. The value should be
  * 1 for SQLSetConnectOption() and
  * 2 for SQLSetStmtOption().
@@ -559,17 +571,17 @@ function odbc_rollback ($connection_id) {}
  * @param int $option <p>
  * The option to set.
  * </p>
- * @param int $param <p>
+ * @param int $value <p>
  * The value for the given <i>option</i>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function odbc_setoption ($id, $function, $option, $param) {}
+function odbc_setoption(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection|\Odbc\Result'], default: 'resource')] $odbc, int $which, int $option, int $value): bool {}
 
 /**
  * Retrieves special columns
  * @link https://php.net/manual/en/function.odbc-specialcolumns.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
  * @param int $type When the type argument is <b>SQL_BEST_ROWID</b>,
  * <b>odbc_specialcolumns</b> returns the
@@ -578,10 +590,10 @@ function odbc_setoption ($id, $function, $option, $param) {}
  * <b>odbc_specialcolumns</b> returns the column or columns in the
  * specified table, if any, that are automatically updated by the data source
  * when any value in the row is updated by any transaction.
- * @param string $qualifier <p>
+ * @param string|null $catalog <p>
  * The qualifier.
  * </p>
- * @param string $owner <p>
+ * @param string $schema <p>
  * The owner.
  * </p>
  * @param string $table <p>
@@ -593,9 +605,8 @@ function odbc_setoption ($id, $function, $option, $param) {}
  * @param int $nullable <p>
  * The nullable option.
  * </p>
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on
  * failure.
- * </p>
  * <p>
  * The result set has the following columns:
  * SCOPE
@@ -606,21 +617,23 @@ function odbc_setoption ($id, $function, $option, $param) {}
  * LENGTH
  * SCALE
  * PSEUDO_COLUMN
+ * </p>
  */
-function odbc_specialcolumns ($connection_id, $type, $qualifier, $owner, $table, $scope, $nullable) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_specialcolumns(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, int $type, ?string $catalog, string $schema, string $table, int $scope, int $nullable) {}
 
 /**
  * Retrieve statistics about a table
  * @link https://php.net/manual/en/function.odbc-statistics.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier <p>
+ * @param string|null $catalog <p>
  * The qualifier.
  * </p>
- * @param string $owner <p>
+ * @param string $schema <p>
  * The owner.
  * </p>
- * @param string $table_name <p>
+ * @param string $table <p>
  * The table name.
  * </p>
  * @param int $unique <p>
@@ -629,8 +642,7 @@ function odbc_specialcolumns ($connection_id, $type, $qualifier, $owner, $table,
  * @param int $accuracy <p>
  * The accuracy.
  * </p>
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on failure.
- * </p>
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on failure.
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -646,26 +658,28 @@ function odbc_specialcolumns ($connection_id, $type, $qualifier, $owner, $table,
  * CARDINALITY
  * PAGES
  * FILTER_CONDITION
+ * </p>
  */
-function odbc_statistics ($connection_id, $qualifier, $owner, $table_name, $unique, $accuracy) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_statistics(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog, string $schema, string $table, int $unique, int $accuracy) {}
 
 /**
  * Get the list of table names stored in a specific data source
  * @link https://php.net/manual/en/function.odbc-tables.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier [optional] <p>
+ * @param string|null $catalog [optional] <p>
  * The qualifier.
  * </p>
- * @param string $owner [optional] <p>
+ * @param string|null $schema [optional] <p>
  * The owner. Accepts search patterns ('%' to match zero or more
  * characters and '_' to match a single character).
  * </p>
- * @param string $name [optional] <p>
+ * @param string|null $table [optional] <p>
  * The name. Accepts search patterns ('%' to match zero or more
  * characters and '_' to match a single character).
  * </p>
- * @param string $types [optional] <p>
+ * @param string|null $types [optional] <p>
  * If <i>table_type</i> is not an empty string, it
  * must contain a list of comma-separated values for the types of
  * interest; each value may be enclosed in single quotes (') or
@@ -674,9 +688,8 @@ function odbc_statistics ($connection_id, $qualifier, $owner, $table_name, $uniq
  * <b>odbc_tables</b> does not return any results for
  * that type.
  * </p>
- * @return resource|false an ODBC result identifier containing the information
+ * @return Odbc\Result|resource|false an ODBC result identifier containing the information
  * or <b>FALSE</b> on failure.
- * </p>
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -684,19 +697,20 @@ function odbc_statistics ($connection_id, $qualifier, $owner, $table_name, $uniq
  * TABLE_NAME
  * TABLE_TYPE
  * REMARKS
+ * </p>
  */
-function odbc_tables ($connection_id, $qualifier = null, $owner = null, $name = null, $types = null) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_tables(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog = null, ?string $schema = null, ?string $table = null, ?string $types = null) {}
 
 /**
  * Gets the primary keys for a table
  * @link https://php.net/manual/en/function.odbc-primarykeys.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier
- * @param string $owner
+ * @param string|null $catalog The catalog ('qualifier' in ODBC 2 parlance).
+ * @param string $schema The schema ('owner' in ODBC 2 parlance).
  * @param string $table
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on failure.
- * </p>
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on failure.
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -705,32 +719,33 @@ function odbc_tables ($connection_id, $qualifier = null, $owner = null, $name = 
  * COLUMN_NAME
  * KEY_SEQ
  * PK_NAME
+ * </p>
  */
-function odbc_primarykeys ($connection_id, $qualifier, $owner, $table) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_primarykeys(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog, string $schema, string $table) {}
 
 /**
  * Lists columns and associated privileges for the given table
  * @link https://php.net/manual/en/function.odbc-columnprivileges.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier <p>
+ * @param string|null $catalog <p>
  * The qualifier.
  * </p>
- * @param string $owner <p>
+ * @param string $schema <p>
  * The owner.
  * </p>
- * @param string $table_name <p>
+ * @param string $table <p>
  * The table name.
  * </p>
- * @param string $column_name <p>
+ * @param string $column <p>
  * The <i>column_name</i> argument accepts search
  * patterns ('%' to match zero or more characters and '_' to match a
  * single character).
  * </p>
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on failure.
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on failure.
  * This result identifier can be used to fetch a list of columns and
  * associated privileges.
- * </p>
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -744,27 +759,28 @@ function odbc_primarykeys ($connection_id, $qualifier, $owner, $table) {}
  * <p>
  * The result set is ordered by TABLE_QUALIFIER, TABLE_OWNER and
  * TABLE_NAME.
+ * </p>
  */
-function odbc_columnprivileges ($connection_id, $qualifier, $owner, $table_name, $column_name) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_columnprivileges(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog, string $schema, string $table, string $column) {}
 
 /**
  * Lists tables and the privileges associated with each table
  * @link https://php.net/manual/en/function.odbc-tableprivileges.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $qualifier <p>
+ * @param string|null $catalog <p>
  * The qualifier.
  * </p>
- * @param string $owner <p>
+ * @param string $schema <p>
  * The owner. Accepts the following search patterns:
  * ('%' to match zero or more characters and '_' to match a single character)
  * </p>
- * @param string $name <p>
+ * @param string $table <p>
  * The name. Accepts the following search patterns:
  * ('%' to match zero or more characters and '_' to match a single character)
  * </p>
- * @return resource|false An ODBC result identifier or <b>FALSE</b> on failure.
- * </p>
+ * @return Odbc\Result|resource|false An ODBC result identifier or <b>FALSE</b> on failure.
  * <p>
  * The result set has the following columns:
  * TABLE_QUALIFIER
@@ -774,34 +790,35 @@ function odbc_columnprivileges ($connection_id, $qualifier, $owner, $table_name,
  * GRANTEE
  * PRIVILEGE
  * IS_GRANTABLE
+ * </p>
  */
-function odbc_tableprivileges ($connection_id, $qualifier, $owner, $name) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_tableprivileges(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog, string $schema, string $table) {}
 
 /**
  * Retrieves a list of foreign keys
  * @link https://php.net/manual/en/function.odbc-foreignkeys.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @param string $pk_qualifier <p>
+ * @param string|null $pk_catalog <p>
  * The primary key qualifier.
  * </p>
- * @param string $pk_owner <p>
+ * @param string $pk_schema <p>
  * The primary key owner.
  * </p>
  * @param string $pk_table <p>
  * The primary key table.
  * </p>
- * @param string $fk_qualifier <p>
+ * @param string $fk_catalog <p>
  * The foreign key qualifier.
  * </p>
- * @param string $fk_owner <p>
+ * @param string $fk_schema <p>
  * The foreign key owner.
  * </p>
  * @param string $fk_table <p>
  * The foreign key table.
  * </p>
- * @return resource|false an ODBC result identifier or <b>FALSE</b> on failure.
- * </p>
+ * @return Odbc\Result|resource|false an ODBC result identifier or <b>FALSE</b> on failure.
  * <p>
  * The result set has the following columns:
  * PKTABLE_QUALIFIER
@@ -818,6 +835,7 @@ function odbc_tableprivileges ($connection_id, $qualifier, $owner, $name) {}
  * FK_NAME
  * PK_NAME
  * </p>
+ * <p>
  * If <i>pk_table</i> contains a table name,
  * <b>odbc_foreignkeys</b> returns a result set
  * containing the primary key of the specified table and all of the
@@ -831,16 +849,23 @@ function odbc_tableprivileges ($connection_id, $qualifier, $owner, $name) {}
  * <b>odbc_foreignkeys</b> returns the foreign keys in
  * the table specified in <i>fk_table</i> that refer
  * to the primary key of the table specified in
- * <i>pk_table
+ * <i>pk_table</i>
+ * </p>
  */
-function odbc_foreignkeys ($connection_id, $pk_qualifier, $pk_owner, $pk_table, $fk_qualifier, $fk_owner, $fk_table) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_foreignkeys(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $pk_catalog, string $pk_schema, string $pk_table, string $fk_catalog, string $fk_schema, string $fk_table) {}
 
 /**
  * Get the list of procedures stored in a specific data source
  * @link https://php.net/manual/en/function.odbc-procedures.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @return resource|false an ODBC
+ * @param string|null $catalog <p>The catalog ('qualifier' in ODBC 2 parlance).</p>
+ * @param string|null $schema <p>The schema ('owner' in ODBC 2 parlance). This parameter accepts the
+ *  following search patterns: % to match zero or more characters, and _ to match a single character.</p>
+ * @param string|null $procedure <p>The proc. This parameter accepts the following search patterns:
+ *  % to match zero or more characters, and _ to match a single character.</p>
+ * @return Odbc\Result|resource|false <p>an ODBC
  * result identifier containing the information or <b>FALSE</b> on failure.
  * </p>
  * <p>
@@ -853,15 +878,24 @@ function odbc_foreignkeys ($connection_id, $pk_qualifier, $pk_owner, $pk_table, 
  * NUM_RESULT_SETS
  * REMARKS
  * PROCEDURE_TYPE
+ * </p>
  */
-function odbc_procedures ($connection_id) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_procedures(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog = null, ?string $schema = null, ?string $procedure = null) {}
 
 /**
  * Retrieve information about parameters to procedures
  * @link https://php.net/manual/en/function.odbc-procedurecolumns.php
- * @param resource $connection_id The ODBC connection identifier,
+ * @param Odbc\Connection|resource $odbc <p>The ODBC connection identifier,
  * see <b>odbc_connect</b> for details.</p>
- * @return resource|false the list of input and output parameters, as well as the
+ * @param string|null $catalog <p>The catalog ('qualifier' in ODBC 2 parlance).</p>
+ * @param string|null $schema <p>The schema ('owner' in ODBC 2 parlance). This parameter accepts the
+ * following search patterns: % to match zero or more characters, and _ to match a single character.</p>
+ * @param string|null $procedure <p>The proc. This parameter accepts the following search patterns:
+ * % to match zero or more characters, and _ to match a single character.</p>
+ * @param string|null $column <p>The column. This parameter accepts the following search patterns:
+ * % to match zero or more characters, and _ to match a single character.</p>
+ * @return Odbc\Result|resource|false <p>the list of input and output parameters, as well as the
  * columns that make up the result set for the specified procedures.
  * Returns an ODBC result identifier or <b>FALSE</b> on failure.
  * </p>
@@ -880,84 +914,119 @@ function odbc_procedures ($connection_id) {}
  * RADIX
  * NULLABLE
  * REMARKS
+ * </p>
  */
-function odbc_procedurecolumns ($connection_id) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_procedurecolumns(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, ?string $catalog = null, ?string $schema = null, ?string $procedure = null, ?string $column = null) {}
 
 /**
  * Alias of <b>odbc_exec</b>
  * @link https://php.net/manual/en/function.odbc-do.php
- * @param $connection_id
- * @param $query
- * @param $flags [optional]
+ * @param Odbc\Connection $odbc
+ * @param string $query
+ * @return Odbc\Result|resource|false ODBC result identifier or <b>FALSE</b> on failure.
  */
-function odbc_do ($connection_id, $query, $flags) {}
+#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result|false'], default: 'resource|false')]
+function odbc_do(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Connection'], default: 'resource')] $odbc, string $query) {}
 
 /**
  * Alias of <b>odbc_field_len</b>
  * @link https://php.net/manual/en/function.odbc-field-precision.php
- * @param $result_id
- * @param $field_number
+ * @param Odbc\Result $statement
+ * @param int $field
  */
-function odbc_field_precision ($result_id, $field_number) {}
+function odbc_field_precision(#[LanguageLevelTypeAware(['8.4' => '\Odbc\Result'], default: 'resource')] $statement, int $field): int|false {}
 
-define ('ODBC_TYPE', "unixODBC");
-define ('ODBC_BINMODE_PASSTHRU', 0);
-define ('ODBC_BINMODE_RETURN', 1);
-define ('ODBC_BINMODE_CONVERT', 2);
-define ('SQL_ODBC_CURSORS', 110);
-define ('SQL_CUR_USE_DRIVER', 2);
-define ('SQL_CUR_USE_IF_NEEDED', 0);
-define ('SQL_CUR_USE_ODBC', 1);
-define ('SQL_CONCURRENCY', 7);
-define ('SQL_CONCUR_READ_ONLY', 1);
-define ('SQL_CONCUR_LOCK', 2);
-define ('SQL_CONCUR_ROWVER', 3);
-define ('SQL_CONCUR_VALUES', 4);
-define ('SQL_CURSOR_TYPE', 6);
-define ('SQL_CURSOR_FORWARD_ONLY', 0);
-define ('SQL_CURSOR_KEYSET_DRIVEN', 1);
-define ('SQL_CURSOR_DYNAMIC', 2);
-define ('SQL_CURSOR_STATIC', 3);
-define ('SQL_KEYSET_SIZE', 8);
-define ('SQL_FETCH_FIRST', 2);
-define ('SQL_FETCH_NEXT', 1);
-define ('SQL_CHAR', 1);
-define ('SQL_VARCHAR', 12);
-define ('SQL_LONGVARCHAR', -1);
-define ('SQL_DECIMAL', 3);
-define ('SQL_NUMERIC', 2);
-define ('SQL_BIT', -7);
-define ('SQL_TINYINT', -6);
-define ('SQL_SMALLINT', 5);
-define ('SQL_INTEGER', 4);
-define ('SQL_BIGINT', -5);
-define ('SQL_REAL', 7);
-define ('SQL_FLOAT', 6);
-define ('SQL_DOUBLE', 8);
-define ('SQL_BINARY', -2);
-define ('SQL_VARBINARY', -3);
-define ('SQL_LONGVARBINARY', -4);
-define ('SQL_DATE', 9);
-define ('SQL_TIME', 10);
-define ('SQL_TIMESTAMP', 11);
-define ('SQL_TYPE_DATE', 91);
-define ('SQL_TYPE_TIME', 92);
-define ('SQL_TYPE_TIMESTAMP', 93);
-define ('SQL_WCHAR', -8);
-define ('SQL_WVARCHAR', -9);
-define ('SQL_WLONGVARCHAR', -10);
-define ('SQL_BEST_ROWID', 1);
-define ('SQL_ROWVER', 2);
-define ('SQL_SCOPE_CURROW', 0);
-define ('SQL_SCOPE_TRANSACTION', 1);
-define ('SQL_SCOPE_SESSION', 2);
-define ('SQL_NO_NULLS', 0);
-define ('SQL_NULLABLE', 1);
-define ('SQL_INDEX_UNIQUE', 0);
-define ('SQL_INDEX_ALL', 1);
-define ('SQL_ENSURE', 1);
-define ('SQL_QUICK', 0);
+/**
+ * Determines if a string is properly quoted for an ODBC connection string value.
+ * ODBC connection string quoting is performed using curly braces, and ending braces within a string must be escaped through
+ * repeating them twice, similar to SQL quoting.
+ * @link https://php.net/manual/en/function.odbc-connection-string-is-quoted.php
+ * @param string $str The string to check for quoting.
+ * @return bool true if quoted properly, false if not.
+ */
+function odbc_connection_string_is_quoted(string $str): bool {}
 
+/**
+ * Determines if a string needs to be quoted for an ODBC connection string value; that is, if it contains special characters.
+ *
+ * Note that this does not check if the string is already quoted; an already quoted string will contain characters that
+ * will make this function return true. You should call odbc_connection_string_is_quoted() to check.
+ * @link https://php.net/manual/en/function.odbc-connection-string-should-quote.php
+ * @param string $str The string to check for.
+ * @return bool true if the string should be quoted; false otherwise.
+ */
+function odbc_connection_string_should_quote(string $str): bool {}
+
+/**
+ * Quotes a value for a connection string, according to ODBC rules. That is, it will be surrounded by quotes, and any
+ * ending curly braces will be escaped. This should be done for any connection string values that come from user input.
+ * Not doing so can lead to issues with parsing the connection string, or values being injected into the connection string.
+ *
+ * Note that this function does not check if the string is already quoted, nor if the string needs quoting.
+ * For that, call odbc_connection_string_is_quoted() and odbc_connection_string_should_quote().
+ * @link https://php.net/manual/en/function.odbc-connection-string-quote.php
+ * @param string $str The unquoted string.
+ * @return string A quoted string, surrounded by curly braces, and properly escaped.
+ */
+function odbc_connection_string_quote(string $str): string {}
+
+define('ODBC_TYPE', "unixODBC");
+define('ODBC_BINMODE_PASSTHRU', 0);
+define('ODBC_BINMODE_RETURN', 1);
+define('ODBC_BINMODE_CONVERT', 2);
+define('SQL_ODBC_CURSORS', 110);
+define('SQL_CUR_USE_DRIVER', 2);
+define('SQL_CUR_USE_IF_NEEDED', 0);
+define('SQL_CUR_USE_ODBC', 1);
+define('SQL_CONCURRENCY', 7);
+define('SQL_CONCUR_READ_ONLY', 1);
+define('SQL_CONCUR_LOCK', 2);
+define('SQL_CONCUR_ROWVER', 3);
+define('SQL_CONCUR_VALUES', 4);
+define('SQL_CURSOR_TYPE', 6);
+define('SQL_CURSOR_FORWARD_ONLY', 0);
+define('SQL_CURSOR_KEYSET_DRIVEN', 1);
+define('SQL_CURSOR_DYNAMIC', 2);
+define('SQL_CURSOR_STATIC', 3);
+define('SQL_KEYSET_SIZE', 8);
+define('SQL_FETCH_FIRST', 2);
+define('SQL_FETCH_NEXT', 1);
+define('SQL_CHAR', 1);
+define('SQL_VARCHAR', 12);
+define('SQL_LONGVARCHAR', -1);
+define('SQL_DECIMAL', 3);
+define('SQL_NUMERIC', 2);
+define('SQL_BIT', -7);
+define('SQL_TINYINT', -6);
+define('SQL_SMALLINT', 5);
+define('SQL_INTEGER', 4);
+define('SQL_BIGINT', -5);
+define('SQL_REAL', 7);
+define('SQL_FLOAT', 6);
+define('SQL_DOUBLE', 8);
+define('SQL_BINARY', -2);
+define('SQL_VARBINARY', -3);
+define('SQL_LONGVARBINARY', -4);
+define('SQL_DATE', 9);
+define('SQL_TIME', 10);
+define('SQL_TIMESTAMP', 11);
+define('SQL_TYPE_DATE', 91);
+define('SQL_TYPE_TIME', 92);
+define('SQL_TYPE_TIMESTAMP', 93);
+define('SQL_WCHAR', -8);
+define('SQL_WVARCHAR', -9);
+define('SQL_WLONGVARCHAR', -10);
+define('SQL_BEST_ROWID', 1);
+define('SQL_ROWVER', 2);
+define('SQL_SCOPE_CURROW', 0);
+define('SQL_SCOPE_TRANSACTION', 1);
+define('SQL_SCOPE_SESSION', 2);
+define('SQL_NO_NULLS', 0);
+define('SQL_NULLABLE', 1);
+define('SQL_INDEX_UNIQUE', 0);
+define('SQL_INDEX_ALL', 1);
+define('SQL_ENSURE', 1);
+define('SQL_QUICK', 0);
 
 // End of odbc v.1.0
-?>

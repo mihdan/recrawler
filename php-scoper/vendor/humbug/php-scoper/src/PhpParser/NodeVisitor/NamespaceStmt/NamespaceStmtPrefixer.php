@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\PhpParser\NodeVisitor\NamespaceStmt;
 
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\EnrichedReflector;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Namespace_;
@@ -37,36 +37,24 @@ use PhpParser\NodeVisitorAbstract;
  */
 final class NamespaceStmtPrefixer extends NodeVisitorAbstract
 {
-    private $prefix;
-    private $whitelist;
-    private $namespaceStatements;
-
-    public function __construct(string $prefix, Whitelist $whitelist, NamespaceStmtCollection $namespaceStatements)
-    {
-        $this->prefix = $prefix;
-        $this->whitelist = $whitelist;
-        $this->namespaceStatements = $namespaceStatements;
+    public function __construct(
+        private readonly string $prefix,
+        private readonly EnrichedReflector $enrichedReflector,
+        private readonly NamespaceStmtCollection $namespaceStatements,
+    ) {
     }
 
-    /**
-     * @inheritdoc
-     */
     public function enterNode(Node $node): Node
     {
         return ($node instanceof Namespace_)
             ? $this->prefixNamespaceStmt($node)
-            : $node
-        ;
+            : $node;
     }
 
     private function prefixNamespaceStmt(Namespace_ $namespace): Node
     {
         if ($this->shouldPrefixStmt($namespace)) {
-            $originalName = $namespace->name;
-
-            $namespace->name = Name::concat($this->prefix, $namespace->name);
-
-            NamespaceManipulator::setOriginalName($namespace, $originalName);
+            self::prefixStmt($namespace, $this->prefix);
         }
 
         $this->namespaceStatements->add($namespace);
@@ -76,12 +64,23 @@ final class NamespaceStmtPrefixer extends NodeVisitorAbstract
 
     private function shouldPrefixStmt(Namespace_ $namespace): bool
     {
-        if ($this->whitelist->isWhitelistedNamespace((string) $namespace->name)) {
+        $name = $namespace->name;
+
+        if ($this->enrichedReflector->isExcludedNamespace((string) $name)) {
             return false;
         }
 
-        $nameFirstPart = null === $namespace->name ? '' : $namespace->name->getFirst();
+        $nameFirstPart = null === $name ? '' : $name->getFirst();
 
         return $this->prefix !== $nameFirstPart;
+    }
+
+    private static function prefixStmt(Namespace_ $namespace, string $prefix): void
+    {
+        $originalName = $namespace->name;
+
+        $namespace->name = Name::concat($prefix, $originalName);
+
+        NamespaceManipulator::setOriginalName($namespace, $originalName);
     }
 }

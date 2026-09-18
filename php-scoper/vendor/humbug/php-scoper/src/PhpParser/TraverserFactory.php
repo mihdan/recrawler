@@ -14,52 +14,139 @@ declare(strict_types=1);
 
 namespace Humbug\PhpScoper\PhpParser;
 
+use Humbug\PhpScoper\PhpParser\NodeVisitor\ExcludedFunctionExistsEnricher;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\ExcludedFunctionExistsStringNodeStack;
 use Humbug\PhpScoper\PhpParser\NodeVisitor\NamespaceStmt\NamespaceStmtCollection;
-use Humbug\PhpScoper\PhpParser\NodeVisitor\Resolver\FullyQualifiedNameResolver;
+use Humbug\PhpScoper\PhpParser\NodeVisitor\Resolver\IdentifierResolver;
 use Humbug\PhpScoper\PhpParser\NodeVisitor\UseStmt\UseStmtCollection;
-use Humbug\PhpScoper\Reflector;
 use Humbug\PhpScoper\Scoper\PhpScoper;
-use Humbug\PhpScoper\Whitelist;
+use Humbug\PhpScoper\Symbol\EnrichedReflector;
+use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use PhpParser\NodeTraverser as PhpParserNodeTraverser;
 use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor as PhpParserNodeVisitor;
+use PhpParser\NodeVisitor\NameResolver;
 
 /**
  * @private
  */
 class TraverserFactory
 {
-    private $reflector;
-
-    public function __construct(Reflector $reflector)
-    {
-        $this->reflector = $reflector;
+    public function __construct(
+        private readonly EnrichedReflector $reflector,
+        private readonly string $prefix,
+        private readonly SymbolsRegistry $symbolsRegistry,
+    ) {
     }
 
-    public function create(PhpScoper $scoper, string $prefix, Whitelist $whitelist): NodeTraverserInterface
+    public function create(PhpScoper $scoper): NodeTraverserInterface
     {
-        $traverser = new NodeTraverser();
+        return self::createTraverser(
+            self::createNodeVisitors(
+                $this->prefix,
+                $this->reflector,
+                $scoper,
+                $this->symbolsRegistry,
+            ),
+        );
+    }
 
+    /**
+     * @param PhpParserNodeVisitor[] $nodeVisitors
+     */
+    private static function createTraverser(array $nodeVisitors): NodeTraverserInterface
+    {
+        $traverser = new NodeTraverser(
+            new PhpParserNodeTraverser(),
+        );
+
+        foreach ($nodeVisitors as $nodeVisitor) {
+            $traverser->addVisitor($nodeVisitor);
+        }
+
+        return $traverser;
+    }
+
+    /**
+     * @return PhpParserNodeVisitor[]
+     */
+    private static function createNodeVisitors(
+        string $prefix,
+        EnrichedReflector $reflector,
+        PhpScoper $scoper,
+        SymbolsRegistry $symbolsRegistry,
+    ): array {
         $namespaceStatements = new NamespaceStmtCollection();
         $useStatements = new UseStmtCollection();
 
-        $nameResolver = new FullyQualifiedNameResolver($namespaceStatements, $useStatements);
+        $nameResolver = new NameResolver(
+            null,
+            ['preserveOriginalNames' => true],
+        );
+        $identifierResolver = new IdentifierResolver($nameResolver);
+        $stringNodePrefixer = new StringNodePrefixer($scoper);
 
-        $traverser->addVisitor(new NodeVisitor\ParentNodeAppender());
+        $excludedFunctionExistsStringNodeStack = new ExcludedFunctionExistsStringNodeStack();
 
-        $traverser->addVisitor(new NodeVisitor\NamespaceStmt\NamespaceStmtPrefixer($prefix, $whitelist, $namespaceStatements));
+        return [
+            $nameResolver,
+            new NodeVisitor\AttributeAppender\ParentNodeAppender(),
+            new NodeVisitor\AttributeAppender\IdentifierNameAppender($identifierResolver),
 
-        $traverser->addVisitor(new NodeVisitor\UseStmt\UseStmtCollector($namespaceStatements, $useStatements));
-        $traverser->addVisitor(new NodeVisitor\UseStmt\UseStmtPrefixer($prefix, $whitelist, $this->reflector));
+            new NodeVisitor\NamespaceStmt\NamespaceStmtPrefixer(
+                $prefix,
+                $reflector,
+                $namespaceStatements,
+            ),
 
-        $traverser->addVisitor(new NodeVisitor\NamespaceStmt\FunctionIdentifierRecorder($prefix, $nameResolver, $whitelist, $this->reflector));
-        $traverser->addVisitor(new NodeVisitor\ClassIdentifierRecorder($prefix, $nameResolver, $whitelist));
-        $traverser->addVisitor(new NodeVisitor\NameStmtPrefixer($prefix, $whitelist, $namespaceStatements, $useStatements, $nameResolver, $this->reflector));
-        $traverser->addVisitor(new NodeVisitor\StringScalarPrefixer($prefix, $whitelist, $this->reflector));
-        $traverser->addVisitor(new NodeVisitor\NewdocPrefixer($scoper, $prefix, $whitelist));
-        $traverser->addVisitor(new NodeVisitor\EvalPrefixer($scoper, $prefix, $whitelist));
+            new NodeVisitor\UseStmt\UseStmtCollector(
+                $namespaceStatements,
+                $useStatements,
+            ),
+            new NodeVisitor\UseStmt\UseStmtPrefixer(
+                $prefix,
+                $reflector,
+            ),
 
-        $traverser->addVisitor(new NodeVisitor\ClassAliasStmtAppender($prefix, $whitelist, $nameResolver));
-        $traverser->addVisitor(new NodeVisitor\ConstStmtReplacer($whitelist, $nameResolver));
+            new NodeVisitor\FunctionIdentifierRecorder(
+                $prefix,
+                $identifierResolver,
+                $symbolsRegistry,
+                $reflector,
+            ),
+            new NodeVisitor\ClassIdentifierRecorder(
+                $prefix,
+                $identifierResolver,
+                $symbolsRegistry,
+                $reflector,
+            ),
+            new NodeVisitor\NameStmtPrefixer(
+                $prefix,
+                $namespaceStatements,
+                $useStatements,
+                $reflector,
+            ),
+            new NodeVisitor\StringScalarPrefixer(
+                $prefix,
+                $reflector,
+                $excludedFunctionExistsStringNodeStack,
+            ),
+            new NodeVisitor\NewdocPrefixer($stringNodePrefixer),
+            new NodeVisitor\EvalPrefixer($stringNodePrefixer),
 
-        return $traverser;
+            new NodeVisitor\ClassAliasStmtAppender(
+                $identifierResolver,
+                $symbolsRegistry,
+            ),
+            new ExcludedFunctionExistsEnricher(
+                $prefix,
+                $excludedFunctionExistsStringNodeStack,
+            ),
+            new NodeVisitor\MultiConstStmtReplacer(),
+            new NodeVisitor\ConstStmtReplacer(
+                $identifierResolver,
+                $reflector,
+            ),
+        ];
     }
 }

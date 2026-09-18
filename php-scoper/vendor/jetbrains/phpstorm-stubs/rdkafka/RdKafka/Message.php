@@ -45,14 +45,13 @@ class Message
     public $offset;
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     public $headers;
+    public $opaque;
 
     /**
      * @return string
      */
-    public function errstr()
-    {
-    }
+    public function errstr() {}
 }

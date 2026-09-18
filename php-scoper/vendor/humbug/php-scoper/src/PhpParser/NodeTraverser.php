@@ -22,8 +22,9 @@ use PhpParser\Node\Stmt\GroupUse;
 use PhpParser\Node\Stmt\InlineHTML;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Use_;
-use PhpParser\Node\Stmt\UseUse;
-use PhpParser\NodeTraverser as PhpParserNodeTraverser;
+use PhpParser\Node\UseItem;
+use PhpParser\NodeTraverserInterface;
+use PhpParser\NodeVisitor;
 use function array_map;
 use function array_slice;
 use function array_splice;
@@ -34,17 +35,28 @@ use function current;
 /**
  * @private
  */
-final class NodeTraverser extends PhpParserNodeTraverser
+final readonly class NodeTraverser implements NodeTraverserInterface
 {
-    /**
-     * @inheritdoc
-     */
+    public function __construct(private NodeTraverserInterface $decoratedTraverser)
+    {
+    }
+
+    public function addVisitor(NodeVisitor $visitor): void
+    {
+        $this->decoratedTraverser->addVisitor($visitor);
+    }
+
+    public function removeVisitor(NodeVisitor $visitor): void
+    {
+        $this->decoratedTraverser->removeVisitor($visitor);
+    }
+
     public function traverse(array $nodes): array
     {
         $nodes = $this->wrapInNamespace($nodes);
         $nodes = $this->replaceGroupUseStatements($nodes);
 
-        return parent::traverse($nodes);
+        return $this->decoratedTraverser->traverse($nodes);
     }
 
     /**
@@ -105,10 +117,17 @@ final class NodeTraverser extends PhpParserNodeTraverser
 
         $firstRealStatement = current($realStatements);
 
-        if (false !== $firstRealStatement && false === ($firstRealStatement instanceof Namespace_)) {
+        if (false !== $firstRealStatement
+            && !($firstRealStatement instanceof Namespace_)
+        ) {
             $wrappedStatements = new Namespace_(null, $realStatements);
 
-            array_splice($nodes, $firstRealStatementIndex, count($realStatements), [$wrappedStatements]);
+            array_splice(
+                $nodes,
+                $firstRealStatementIndex,
+                count($realStatements),
+                [$wrappedStatements],
+            );
         }
 
         return $nodes;
@@ -122,11 +141,10 @@ final class NodeTraverser extends PhpParserNodeTraverser
     private function replaceGroupUseStatements(array $nodes): array
     {
         foreach ($nodes as $node) {
-            if (false === ($node instanceof Namespace_)) {
+            if (!($node instanceof Namespace_)) {
                 continue;
             }
 
-            /** @var Namespace_ $node */
             $statements = $node->stmts;
 
             $newStatements = [];
@@ -135,7 +153,12 @@ final class NodeTraverser extends PhpParserNodeTraverser
                 if ($statement instanceof GroupUse) {
                     $uses_ = $this->createUses_($statement);
 
-                    array_splice($newStatements, count($newStatements), 0, $uses_);
+                    array_splice(
+                        $newStatements,
+                        count($newStatements),
+                        0,
+                        $uses_,
+                    );
                 } else {
                     $newStatements[] = $statement;
                 }
@@ -148,28 +171,39 @@ final class NodeTraverser extends PhpParserNodeTraverser
     }
 
     /**
-     * @param GroupUse $node
-     *
      * @return Use_[]
      */
     private function createUses_(GroupUse $node): array
     {
         return array_map(
-            static function (UseUse $use) use ($node): Use_ {
-                $newUse = new UseUse(
-                    NameFactory::concat($node->prefix, $use->name, $use->name->getAttributes()),
-                    $use->alias,
-                    $use->type,
-                    $use->getAttributes()
-                );
+            static fn (UseItem $use): Use_ => self::createUseNode($use, $node),
+            $node->uses,
+        );
+    }
 
-                return new Use_(
-                    [$newUse],
-                    $node->type,
-                    $node->getAttributes()
-                );
-            },
-            $node->uses
+    private static function createUseNode(UseItem $use, GroupUse $groupUse): Use_
+    {
+        $newUseItem = self::prefixName($use, $groupUse);
+
+        return new Use_(
+            [$newUseItem],
+            $groupUse->type,
+            $groupUse->getAttributes(),
+        );
+    }
+
+    private static function prefixName(UseItem $use, GroupUse $groupUse): UseItem
+    {
+        $prefixedName = NameFactory::concat(
+            $groupUse->prefix,
+            $use->name,
+        );
+
+        return new UseItem(
+            $prefixedName,
+            $use->alias,
+            $use->type,
+            $use->getAttributes(),
         );
     }
 }

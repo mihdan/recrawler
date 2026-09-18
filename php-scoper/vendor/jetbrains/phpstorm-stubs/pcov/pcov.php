@@ -2,8 +2,7 @@
 
 /** @link https://github.com/krakjoe/pcov/blob/develop/README.md */
 
-namespace
-{
+namespace {
     define('pcov\all', 0);
     define('pcov\inclusive', 1);
     define('pcov\exclusive', 2);
@@ -17,7 +16,7 @@ namespace pcov
      * Shall start recording coverage information
      * @return void
      */
-    function start () {}
+    function start() {}
 
     /**
      * (PHP &gt;= 7.0, PECL pcov &gt;= 1.0.0)<br/>
@@ -34,12 +33,12 @@ namespace pcov
      * pcov\inclusive shall collect coverage information for the specified files
      * pcov\exclusive shall collect coverage information for all but the specified files
      * </p>
-     * @param array $filenames [optional] <p>
-     * Note: paths in filter must be realpath
+     * @param array $filter <p>
+     * path of files (realpath) that should be filtered
      * </p>
      * @return array
      */
-    function collect($type = all, $filter = []) {}
+    function collect(int $type = all, array $filter = []) {}
 
     /**
      * (PHP &gt;= 7.0, PECL pcov &gt;= 1.0.0)<br/>
@@ -50,7 +49,7 @@ namespace pcov
      * </p>
      * @return void
      */
-    function clear($files = false) {}
+    function clear(bool $files = false) {}
 
     /**
      * (PHP &gt;= 7.0, PECL pcov &gt;= 1.0.0)<br/>

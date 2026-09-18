@@ -8,7 +8,6 @@
 // PHP Libevent extension documentation:
 // https://php.net/libevent
 
-
 // Event flags
 
 /**
@@ -62,7 +61,6 @@ define('EV_SIGNAL', 8);
  */
 define('EV_PERSIST', 16);
 
-
 // Event loop modes
 
 /**
@@ -81,7 +79,6 @@ define('EVLOOP_ONCE', 1);
  * @see event_base_loop
  */
 define('EVLOOP_NONBLOCK', 2);
-
 
 // Buffered event error codes (second argument in buffer's error-callback)
 
@@ -113,19 +110,16 @@ define('EVBUFFER_ERROR', 32);
  */
 define('EVBUFFER_TIMEOUT', 64);
 
-
-
-
 /**
  * <p>Create and initialize new event base</p>
  *
  * <p>Returns new event base, which can be used later in {@link event_base_set}(), {@link event_base_loop}() and other functions.</p>
  *
- * @link https://php.net/event_base_new
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-new
  *
  * @return resource|false returns valid event base resource on success or FALSE on error.
  */
-function event_base_new(){}
+function event_base_new() {}
 
 /**
  * <p>Destroy event base</p>
@@ -134,7 +128,7 @@ function event_base_new(){}
  * <p>Destroys the specified event_base and frees all the resources associated.
  * Note that it's not possible to destroy an event base with events attached to it.</p>
  *
- * @link https://php.net/event_base_free
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-free
  *
  * @param resource $event_base Valid event base resource.
  *
@@ -164,7 +158,7 @@ function event_base_free($event_base) {}
  * and run their callbacks if so.
  * </p>
  *
- * @link https://php.net/event_base_loop
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-loop
  *
  * @param resource $event_base Valid event base resource.
  * @param int $flags [optional] Optional parameter, which can take any combination of EVLOOP_ONCE and EVLOOP_NONBLOCK.
@@ -185,7 +179,7 @@ function event_base_loop($event_base, $flags = null) {}
  * running callbacks for any active events, it will exit immediately after finishing the
  * one it's currently processing. The behaviour is similar to break statement.</p>
  *
- * @link https://php.net/event_base_loopbreak
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-loopbreak
  *
  * @param resource $event_base Valid event base resource.
  *
@@ -204,7 +198,7 @@ function event_base_loopbreak($event_base) {}
  * of the event loop to stop right after the next round of callbacks are run (as if it had
  * been invoked with EVLOOP_ONCE).</p>
  *
- * @link https://php.net/event_base_loopexit
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-loopexit
  *
  * @param resource $event_base <p>
  * Valid event base resource.
@@ -224,7 +218,7 @@ function event_base_loopexit($event_base, $timeout = -1) {}
  *
  * <p>Associates the event_base with the event.</p>
  *
- * @link https://php.net/event_base_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-set
  *
  * @param resource $event Valid event resource.
  * @param resource $base Valid event base resource.
@@ -241,7 +235,7 @@ function event_base_set($event, $base) {}
  * Using {@link event_base_priority_init}() you can change the number of event priority
  * levels and then set a desired priority for each event.</p>
  *
- * @link https://php.net/event_base_priority_init
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-base-priority-init
  *
  * @param resource $event_base Valid event base resource.
  * @param int $npriorities The number of event priority levels.
@@ -250,12 +244,11 @@ function event_base_set($event, $base) {}
  */
 function event_base_priority_init($event_base, $npriorities) {}
 
-
 /**
  * <p>Creates and returns a new event resource.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_new
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-new
  *
  * @return resource|false returns a new event resource on success or FALSE on error.
  */
@@ -344,7 +337,7 @@ function event_add($event, $timeout = -1) {}
  * The additional flag EV_PERSIST makes the event to persist until {@link event_del}() is
  * called, otherwise the callback is invoked only once.
  * </p>
- * @param callback $callback <p>
+ * @param callable $callback <p>
  * Callback function to be called when the matching event occurs.
  * </p>
  * @param mixed $arg [optional] <p>
@@ -370,7 +363,6 @@ function event_set($event, $fd, $events, $callback, $arg = null) {}
  */
 function event_del($event) {}
 
-
 /**
  * <p>Create new buffered event</p>
  * <p>(PECL libevent >= 0.0.1)</p>
@@ -390,12 +382,12 @@ function event_del($event) {}
  * the application about non-data-oriented events, like when a connection is closed or
  * an error occurs.</p>
  *
- * @link https://php.net/event_buffer_new
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-new
  *
  * @param resource      $stream  Valid PHP stream resource. Must be castable to file descriptor.
- * @param callback|null $readcb  Callback to invoke where there is data to read, or NULL if no callback is desired.
- * @param callback|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
- * @param callback      $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
+ * @param callable|null $readcb  Callback to invoke where there is data to read, or NULL if no callback is desired.
+ * @param callable|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
+ * @param callable      $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
  * @param mixed         $arg     An argument that will be passed to each of the callbacks (optional).
  *
  * @return resource|false returns new buffered event resource on success or FALSE on error.
@@ -406,7 +398,7 @@ function event_buffer_new($stream, $readcb, $writecb, $errorcb, $arg = null) {}
  * <p>Destroys the specified buffered event and frees all the resources associated.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_buffer_free
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-free
  *
  * @param resource $bevent Valid buffered event resource.
  *
@@ -420,7 +412,7 @@ function event_buffer_free($bevent) {}
  *
  * <p>Assign the specified bevent to the event_base.</p>
  *
- * @link https://php.net/event_buffer_base_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-base-set
  *
  * @param resource $bevent Valid buffered event resource.
  * @param resource $event_base Valid event base resource.
@@ -448,7 +440,7 @@ function event_buffer_base_set($bevent, $event_base) {}
  * <p>When you do not set the priority for an event, the default
  * is the number of queues in the event base, divided by 2.</p>
  *
- * @link https://php.net/event_buffer_priority_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-priority-set
  *
  * @see event_base_priority_init
  *
@@ -471,7 +463,7 @@ function event_buffer_priority_set($bevent, $priority) {}
  * <p>The data is appended to the output buffer and written
  * to the descriptor when it becomes available for writing.</p>
  *
- * @link https://php.net/event_buffer_write
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-write
  *
  * @param resource $bevent Valid buffered event resource.
  * @param string $data The data to be written.
@@ -485,7 +477,7 @@ function event_buffer_write($bevent, $data, $data_size = -1) {}
  * <p>Reads data from the input buffer of the buffered event.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_buffer_read
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-read
  *
  * @param resource $bevent Valid buffered event resource.
  * @param int $data_size Data size in bytes.
@@ -498,7 +490,7 @@ function event_buffer_read($bevent, $data_size) {}
  * <p>Enables the specified buffered event.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_buffer_enable
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-enable
  *
  * @param resource $bevent Valid buffered event resource.
  * @param int $events Any combination of EV_READ and EV_WRITE.
@@ -513,7 +505,7 @@ function event_buffer_enable($bevent, $events) {}
  *
  * <p>Disables the specified buffered event.</p>
  *
- * @link https://php.net/event_buffer_disable
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-disable
  *
  * @param resource $bevent Valid buffered event resource.
  * @param int $events Any combination of EV_READ and EV_WRITE.
@@ -526,7 +518,7 @@ function event_buffer_disable($bevent, $events) {}
  * <p>Sets the read and write timeouts for the specified buffered event.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_buffer_timeout_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-timeout-set
  *
  * @param resource $bevent Valid buffered event resource.
  * @param int $read_timeout Read timeout (in seconds).
@@ -567,7 +559,7 @@ function event_buffer_timeout_set($bevent, $read_timeout, $write_timeout) {}
  * reading is stopped. On output, the write callback is invoked whenever
  * the buffered data falls below the lowmark.</p>
  *
- * @link https://php.net/event_buffer_watermark_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-watermark-set
  *
  * @param resource $bevent   Valid buffered event resource.
  * @param int      $events   Any combination of EV_READ and EV_WRITE.
@@ -582,7 +574,7 @@ function event_buffer_watermark_set($bevent, $events, $lowmark, $highmark) {}
  * <p>Changes the file descriptor on which the buffered event operates.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
  *
- * @link https://php.net/event_buffer_fd_set
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-fd-set
  *
  * @param resource $bevent Valid buffered event resource.
  * @param resource $fd Valid PHP stream, must be castable to file descriptor.
@@ -597,18 +589,17 @@ function event_buffer_fd_set($bevent, $fd) {}
  *
  * <p>Sets or changes existing callbacks for the buffered event.</p>
  *
- * @link https://php.net/event_buffer_set_callback
+ * @link https://php-legacy-docs.zend.com/manual/php5/en/function.event-buffer-set-callback
  *
  * @param resource $bevent Valid buffered event resource.
- * @param callback|null $readcb Callback to invoke where there is data to read, or NULL if no callback is desired.
- * @param callback|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
- * @param callback $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
+ * @param callable|null $readcb Callback to invoke where there is data to read, or NULL if no callback is desired.
+ * @param callable|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
+ * @param callable $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
  * @param mixed $arg An argument that will be passed to each of the callbacks (optional).
  *
  * @return bool returns TRUE on success or FALSE on error.
  */
 function event_buffer_set_callback($bevent, $readcb, $writecb, $errorcb, $arg = null) {}
-
 
 /**
  * <p>Alias of {@link event_new}().</p>
@@ -645,7 +636,7 @@ function event_timer_new() {}
  * @param resource $event <p>
  * Valid event resource.
  * </p>
- * @param callback $callback <p>
+ * @param callable $callback <p>
  * Callback function to be called when the matching event occurs.
  * </p>
  * @param mixed $arg [optional] <p>
@@ -692,6 +683,5 @@ function event_timer_add($event, $timeout = -1) {}
  * @return bool returns TRUE on success or FALSE on error.
  */
 function event_timer_del($event) {}
-
 
 // End of PECL libevent v.0.0.4

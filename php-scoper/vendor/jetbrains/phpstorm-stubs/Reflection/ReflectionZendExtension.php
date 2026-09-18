@@ -1,10 +1,14 @@
 <?php
 
 use JetBrains\PhpStorm\Immutable;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\TentativeType;
 use JetBrains\PhpStorm\Pure;
 
 /**
- * @link https://secure.php.net/manual/en/class.reflectionzendextension.php
+ * The ReflectionZendExtension class reports information about a zend extension.
+ * @link https://php.net/manual/en/class.reflectionzendextension.php
  * @since 5.4
  */
 class ReflectionZendExtension implements Reflector
@@ -13,19 +17,18 @@ class ReflectionZendExtension implements Reflector
      * @var string Name of the extension, same as calling the {@see ReflectionZendExtension::getName()} method
      */
     #[Immutable]
+    #[LanguageLevelTypeAware(['8.1' => 'string'], default: '')]
     public $name;
 
     /**
      * Constructs a ReflectionZendExtension object
      *
      * @link https://php.net/manual/en/reflectionzendextension.construct.php
-     * @param string $name
-     * @throws \ReflectionException if the extension does not exist.
+     * @param string $name The extension name.
+     * @throws ReflectionException if the extension does not exist.
      * @since 5.4
      */
-    public function __construct($name)
-    {
-    }
+    public function __construct(#[LanguageLevelTypeAware(['8.0' => 'string'], default: '')] $name) {}
 
     /**
      * Exports a reflected zend extension.
@@ -37,10 +40,10 @@ class ReflectionZendExtension implements Reflector
      * will do the opposite.
      * @return string|null If the $return parameter is set to {@see true}, then
      * the export is returned as a string, otherwise {@see null} is returned.
+     * @removed 8.0
      */
-    public static function export($name, $return = false)
-    {
-    }
+    #[Deprecated(since: '7.4')]
+    public static function export($name, $return = false) {}
 
     /**
      * To string handler
@@ -49,9 +52,8 @@ class ReflectionZendExtension implements Reflector
      * @return string
      * @since 5.4
      */
-    public function __toString()
-    {
-    }
+    #[LanguageLevelTypeAware(['7.0' => 'string'], default: '')]
+    public function __toString() {}
 
     /**
      * Gets name
@@ -61,9 +63,8 @@ class ReflectionZendExtension implements Reflector
      * @since 5.4
      */
     #[Pure]
-	public function getName()
-    {
-    }
+    #[TentativeType]
+    public function getName(): string {}
 
     /**
      * Gets version
@@ -73,9 +74,8 @@ class ReflectionZendExtension implements Reflector
      * @since 5.4
      */
     #[Pure]
-	public function getVersion()
-    {
-    }
+    #[TentativeType]
+    public function getVersion(): string {}
 
     /**
      * Gets author
@@ -85,9 +85,8 @@ class ReflectionZendExtension implements Reflector
      * @since 5.4
      */
     #[Pure]
-	public function getAuthor()
-    {
-    }
+    #[TentativeType]
+    public function getAuthor(): string {}
 
     /**
      * Gets URL
@@ -97,9 +96,8 @@ class ReflectionZendExtension implements Reflector
      * @since 5.4
      */
     #[Pure]
-	public function getURL()
-    {
-    }
+    #[TentativeType]
+    public function getURL(): string {}
 
     /**
      * Gets copyright
@@ -109,9 +107,8 @@ class ReflectionZendExtension implements Reflector
      * @since 5.4
      */
     #[Pure]
-	public function getCopyright()
-    {
-    }
+    #[TentativeType]
+    public function getCopyright(): string {}
 
     /**
      * Clone handler
@@ -120,8 +117,16 @@ class ReflectionZendExtension implements Reflector
      * @return void
      * @since 5.4
      */
-    final private function __clone()
-    {
-    }
+    #[PhpStormStubsElementAvailable(from: "5.4", to: "8.0")]
+    final private function __clone(): void {}
 
+    /**
+     * Clone handler
+     *
+     * @link https://php.net/manual/en/reflectionzendextension.clone.php
+     * @return void
+     * @since 5.4
+     */
+    #[PhpStormStubsElementAvailable(from: "8.1")]
+    private function __clone(): void {}
 }

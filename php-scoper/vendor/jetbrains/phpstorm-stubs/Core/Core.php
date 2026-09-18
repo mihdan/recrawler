@@ -3,6 +3,8 @@
 // Start of Core v.5.3.6-13ubuntu3.2
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -11,7 +13,7 @@ use JetBrains\PhpStorm\Pure;
  * @return string the Zend Engine version number, as a string.
  */
 #[Pure]
-function zend_version (): string {}
+function zend_version(): string {}
 
 /**
  * Returns the number of arguments passed to the function
@@ -20,7 +22,7 @@ function zend_version (): string {}
  * function.
  */
 #[Pure]
-function func_num_args (): int {}
+function func_num_args(): int {}
 
 /**
  * Return an item from the argument list
@@ -32,7 +34,7 @@ function func_num_args (): int {}
  * @return mixed|false the specified argument, or false on error.
  */
 #[Pure]
-function func_get_arg (int $position): mixed {}
+function func_get_arg(int $position): mixed {}
 
 /**
  * Returns an array comprising a function's argument list
@@ -41,7 +43,7 @@ function func_get_arg (int $position): mixed {}
  * member of the current user-defined function's argument list.
  */
 #[Pure]
-function func_get_args (): array {}
+function func_get_args(): array {}
 
 /**
  * Get string length
@@ -49,11 +51,11 @@ function func_get_args (): array {}
  * @param string $string <p>
  * The string being measured for length.
  * </p>
- * @return int The length of the <i>string</i> on success,
+ * @return int<0,max> The length of the <i>string</i> on success,
  * and 0 if the <i>string</i> is empty.
  */
 #[Pure]
-function strlen (string $string): int {}
+function strlen(string $string): int {}
 
 /**
  * Binary safe string comparison
@@ -70,8 +72,7 @@ function strlen (string $string): int {}
  * equal.
  */
 #[Pure]
-function strcmp (string $string1, string $string2): int
-{}
+function strcmp(string $string1, string $string2): int {}
 
 /**
  * Binary safe string comparison of the first n characters
@@ -91,8 +92,7 @@ function strcmp (string $string1, string $string2): int
  * equal.
  */
 #[Pure]
-function strncmp (string $string1, string $string2, int $length): int
-{}
+function strncmp(string $string1, string $string2, int $length): int {}
 
 /**
  * Binary safe case-insensitive string comparison
@@ -109,8 +109,7 @@ function strncmp (string $string1, string $string2, int $length): int
  * equal.
  */
 #[Pure]
-function strcasecmp (string $string1, string $string2): int
-{}
+function strcasecmp(string $string1, string $string2): int {}
 
 /**
  * Binary safe case-insensitive string comparison of the first n characters
@@ -129,44 +128,71 @@ function strcasecmp (string $string1, string $string2): int
  * greater than <i>str2</i>, and 0 if they are equal.
  */
 #[Pure]
-function strncasecmp (string $string1, string $string2, int $length): int
-{}
+function strncasecmp(string $string1, string $string2, int $length): int {}
 
 /**
  * The function returns {@see true} if the passed $haystack starts from the
  * $needle string or {@see false} otherwise.
  *
- * @param string $haystack
- * @param string $needle
- * @return bool
+ * @link https://php.net/manual/en/function.str-starts-with.php
+ * @param string $haystack The string to search in.
+ * @param string $needle The substring to search for in the haystack.
+ * @return bool Returns true if haystack begins with needle, false otherwise.
  * @since 8.0
  */
 #[Pure]
-function str_starts_with(string $haystack, string $needle) : bool {}
+function str_starts_with(string $haystack, string $needle): bool {}
 
 /**
  * The function returns {@see true} if the passed $haystack ends with the
  * $needle string or {@see false} otherwise.
  *
- * @param string $haystack
- * @param string $needle
- * @return bool
+ * @link https://php.net/manual/en/function.str-ends-with.php
+ * @param string $haystack The string to search in.
+ * @param string $needle The substring to search for in the haystack.
+ * @return bool Returns true if haystack ends with needle, false otherwise.
  * @since 8.0
  */
 #[Pure]
-function str_ends_with(string $haystack, string $needle) : bool {}
+function str_ends_with(string $haystack, string $needle): bool {}
 
 /**
  * Checks if $needle is found in $haystack and returns a boolean value
  * (true/false) whether or not the $needle was found.
  *
- * @param string $haystack
- * @param string $needle
- * @return bool
+ * @link https://php.net/manual/en/function.str-contains.php
+ * @param string $haystack The string to search in.
+ * @param string $needle The substring to search for in the haystack.
+ * @return bool Returns true if needle is in haystack, false otherwise.
  * @since 8.0
  */
 #[Pure]
-function str_contains(string $haystack, string $needle) : bool {}
+function str_contains(string $haystack, string $needle): bool {}
+
+/**
+ * Decrement an alphanumeric string
+ *
+ * Returns the decremented alphanumeric ASCII string.
+ *
+ * @link https://php.net/manual/en/function.str-decrement.php
+ * @since 8.3
+ * @throws \ValueError A ValueError is thrown if string is empty. A ValueError is thrown if string
+ * is not an alphanumeric ASCII string. A ValueError is thrown if string cannot be decremented. For
+ * example, "A" or "0".
+ */
+function str_decrement(string $string): string {}
+
+/**
+ * Increment an alphanumeric string
+ *
+ * Returns the incremented alphanumeric ASCII string.
+ *
+ * @link https://php.net/manual/en/function.str-increment.php
+ * @since 8.3
+ * @throws \ValueError A ValueError is thrown if string is empty. A ValueError is thrown if string
+ * is not an alphanumeric ASCII string.
+ */
+function str_increment(string $string): string {}
 
 /**
  * Return the current key and value pair from an array and advance the array cursor
@@ -174,7 +200,7 @@ function str_contains(string $haystack, string $needle) : bool {}
  * @param array|ArrayObject &$array <p>
  * The input array.
  * </p>
- * @return array the current key and value pair from the array
+ * @return array|false the current key and value pair from the array
  * <i>array</i>. This pair is returned in a four-element
  * array, with the keys 0, 1,
  * key, and value. Elements
@@ -189,8 +215,7 @@ function str_contains(string $haystack, string $needle) : bool {}
  * @removed 8.0
  */
 #[Deprecated(reason: "Use a foreach loop instead", since: "7.2")]
-function each (array &$array): array
-{}
+function each(&$array): array|false {}
 
 /**
  * Sets which PHP errors are reported
@@ -314,8 +339,7 @@ function each (array &$array): array
  * level or the current level if no <i>level</i> parameter is
  * given.
  */
-function error_reporting (?int $error_level): int
-{}
+function error_reporting(?int $error_level = null): int {}
 
 /**
  * Defines a named constant
@@ -342,8 +366,11 @@ function error_reporting (?int $error_level): int
  * </p>
  * @return bool true on success or false on failure.
  */
-function define (string $constant_name, $value, #[Deprecated] bool $case_insensitive = false): bool
-{}
+function define(
+    string $constant_name,
+    #[LanguageLevelTypeAware(['8.1' => 'mixed'], default: 'null|array|bool|int|float|string')] $value,
+    #[Deprecated(since: "7.3")] bool $case_insensitive = false
+): bool {}
 
 /**
  * Checks whether a given named constant exists
@@ -354,9 +381,8 @@ function define (string $constant_name, $value, #[Deprecated] bool $case_insensi
  * @return bool true if the named constant given by <i>name</i>
  * has been defined, false otherwise.
  */
-#[Pure]
-function defined (string $constant_name): bool
-{}
+#[Pure(true)]
+function defined(string $constant_name): bool {}
 
 /**
  * Returns the name of the class of an object
@@ -367,20 +393,26 @@ function defined (string $constant_name): bool
  * @return string <p>The name of the class of which <i>object</i> is an
  * instance.
  * If <i>object</i> is omitted when inside a class, the
- * name of that class is returned.
+ * name of that class is returned.</p>
+ * @throws \TypeError If get_class is called with anything other than an object, TypeError is
+ * raised. Prior to PHP 8.0.0, an E_WARNING level error was raised.
+ * @throws \Error If get_class is called with anything other than an object, TypeError is raised.
+ * Prior to PHP 8.0.0, an E_WARNING level error was raised. If get_class is called with no arguments
+ * from outside a class, an Error is thrown. Prior to PHP 8.0.0, an E_WARNING level error was
+ * raised.
  */
 #[Pure]
-function get_class (object $object): string
-{}
+function get_class(object $object): string {}
 
 /**
  * the "Late Static Binding" class name
  * @link https://php.net/manual/en/function.get-called-class.php
- * @return string
+ * @return string Returns the class name.
+ * @throws \Error If get_called_class is called from outside a class, an Error is thrown. Prior to
+ * PHP 8.0.0, an E_WARNING level error was raised.
  */
 #[Pure]
-function get_called_class (): string
-{}
+function get_called_class(): string {}
 
 /**
  * Retrieves the parent class name for object or class
@@ -395,11 +427,10 @@ function get_called_class (): string
  * If the object does not have a parent false will be returned.
  * </p>
  * <p>
- * If called without parameter outside object, this function returns false.
+ * If called without parameter outside object, this function returns false.</p>
  */
 #[Pure]
-function get_parent_class (object|string $object_or_class): string|false
-{}
+function get_parent_class(object|string $object_or_class): string|false {}
 
 /**
  * Checks if the class method exists
@@ -415,8 +446,7 @@ function get_parent_class (object|string $object_or_class): string|false
  * otherwise.
  */
 #[Pure]
-function method_exists (mixed $object_or_class, string $method): bool
-{}
+function method_exists($object_or_class, string $method): bool {}
 
 /**
  * Checks if the object or class has a property
@@ -427,23 +457,20 @@ function method_exists (mixed $object_or_class, string $method): bool
  * @param string $property <p>
  * The name of the property
  * </p>
- * @return bool true if the property exists, false if it doesn't exist or
- * null in case of an error.
+ * @return bool true if the property exists, false otherwise
  */
 #[Pure]
-function property_exists (mixed $object_or_class, string $property): bool
-{}
+function property_exists($object_or_class, string $property): bool {}
 
 /**
  * Checks if the trait exists
  * @param string $trait Name of the trait to check
  * @param bool $autoload [optional] Whether to autoload if not already loaded.
- * @return bool Returns TRUE if trait exists, FALSE if not, NULL in case of an error.
- * @link https://secure.php.net/manual/en/function.trait-exists.php
+ * @return bool Returns true if trait exists, false otherwise
+ * @link https://php.net/manual/en/function.trait-exists.php
  * @since 5.4
  */
-function trait_exists(string $trait, bool $autoload): bool
-{}
+function trait_exists(string $trait, bool $autoload = true): bool {}
 
 /**
  * Checks if the class has been defined
@@ -457,8 +484,7 @@ function trait_exists(string $trait, bool $autoload): bool
  * @return bool true if <i>class_name</i> is a defined class,
  * false otherwise.
  */
-function class_exists (string $class, bool $autoload = true): bool
-{}
+function class_exists(string $class, bool $autoload = true): bool {}
 
 /**
  * Checks if the interface has been defined
@@ -471,10 +497,9 @@ function class_exists (string $class, bool $autoload = true): bool
  * </p>
  * @return bool true if the interface given by
  * <i>interface_name</i> has been defined, false otherwise.
- * @since 5.0.2
+ * @since 5.0
  */
-function interface_exists (string $interface, bool $autoload = true): bool
-{}
+function interface_exists(string $interface, bool $autoload = true): bool {}
 
 /**
  * Return true if the given function has been defined
@@ -489,9 +514,23 @@ function interface_exists (string $interface, bool $autoload = true): bool
  * This function will return false for constructs, such as
  * <b>include_once</b> and <b>echo</b>.
  */
-#[Pure]
-function function_exists (string $function): bool
-{}
+#[Pure(true)]
+function function_exists(string $function): bool {}
+
+/**
+ * Checks if the enum has been defined
+ * @link https://php.net/manual/en/function.enum-exists.php
+ * @param string $enum <p>
+ * The enum name. The name is matched in a case-insensitive manner.
+ * </p>
+ * @param bool $autoload [optional] <p>
+ * Whether or not to call autoload by default.
+ * </p>
+ * @return bool true if <i>enum</i> is a defined enum,
+ * false otherwise.
+ * @since 8.1
+ */
+function enum_exists(string $enum, bool $autoload = true): bool {}
 
 /**
  * Creates an alias for a class
@@ -501,14 +540,12 @@ function function_exists (string $function): bool
  * @param bool $autoload [optional] Whether to autoload if the original class is not found.
  * @return bool true on success or false on failure.
  */
-function class_alias (string $class, string $alias, bool $autoload = true): bool
-{}
+function class_alias(string $class, string $alias, bool $autoload = true): bool {}
 
 /**
  * Returns an array with the names of included or required files
  * @link https://php.net/manual/en/function.get-included-files.php
  * @return string[] an array of the names of all files.
- * </p>
  * <p>
  * The script originally called is considered an "included file," so it will
  * be listed together with the files referenced by
@@ -517,19 +554,18 @@ function class_alias (string $class, string $alias, bool $autoload = true): bool
  * <p>
  * Files that are included or required multiple times only show up once in
  * the returned array.
+ * </p>
  */
-#[Pure]
-function get_included_files (): array
-{}
+#[Pure(true)]
+function get_included_files(): array {}
 
 /**
  * Alias of <b>get_included_files</b>
  * @link https://php.net/manual/en/function.get-required-files.php
  * @return string[]
  */
-#[Pure]
-function get_required_files (): array
-{}
+#[Pure(true)]
+function get_required_files(): array {}
 
 /**
  * checks if the object has this class as one of its parents or implements it
@@ -549,8 +585,7 @@ function get_required_files (): array
  * <i>class_name</i>, false otherwise.
  */
 #[Pure]
-function is_subclass_of (mixed $object_or_class, string $class, bool $allow_string = true): bool
-{}
+function is_subclass_of(mixed $object_or_class, string $class, bool $allow_string = true): bool {}
 
 /**
  * Checks if the object is of this class or has this class as one of its parents
@@ -569,8 +604,7 @@ function is_subclass_of (mixed $object_or_class, string $class, bool $allow_stri
  * its parents, <b>FALSE</b> otherwise.
  */
 #[Pure]
-function is_a (mixed $object_or_class, string $class, bool $allow_string = false): bool
-{}
+function is_a(mixed $object_or_class, string $class, bool $allow_string = false): bool {}
 
 /**
  * Get the default properties of the class
@@ -584,8 +618,7 @@ function is_a (mixed $object_or_class, string $class, bool $allow_string = false
  * varname => value.
  */
 #[Pure]
-function get_class_vars (string $class): array
-{}
+function get_class_vars(string $class): array {}
 
 /**
  * Gets the properties of the given object
@@ -597,9 +630,8 @@ function get_class_vars (string $class): array
  * for the specified <i>object</i> in scope. If a property have
  * not been assigned a value, it will be returned with a null value.
  */
-#[Pure]
-function get_object_vars (object $object): array
-{}
+#[Pure(true)]
+function get_object_vars(object $object): array {}
 
 /**
  * Gets the class methods' names
@@ -608,11 +640,11 @@ function get_object_vars (object $object): array
  * The class name or an object instance
  * </p>
  * @return string[] an array of method names defined for the class specified by
- * <i>class_name</i>. In case of an error, it returns null.
+ * <i>class_name</i>. Prior to PHP 8.0, passing a value that was neither an object nor a class name
+ * raised a warning and returned null; since 8.0 a TypeError is thrown instead.
  */
 #[Pure]
-function get_class_methods (object|string $object_or_class): array
-{}
+function get_class_methods(object|string $object_or_class): array {}
 
 /**
  * Generates a user-level error/warning/notice message
@@ -628,9 +660,11 @@ function get_class_methods (object|string $object_or_class): array
  * </p>
  * @return bool This function returns false if wrong <i>error_type</i> is
  * specified, true otherwise.
+ * @throws \ValueError This function throws a ValueError if error_level is not one of E_USER_ERROR,
+ * E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED.
  */
-function trigger_error (string $message, int $error_level = E_USER_NOTICE): bool
-{}
+#[LanguageLevelTypeAware(['8.4' => 'true'], default: 'bool')]
+function trigger_error(string $message, int $error_level = E_USER_NOTICE) {}
 
 /**
  * Alias of <b>trigger_error</b>
@@ -640,8 +674,8 @@ function trigger_error (string $message, int $error_level = E_USER_NOTICE): bool
  * @return bool This function returns false if wrong <i>error_type</i> is
  * specified, true otherwise.
  */
-function user_error (string $message, int $error_level = E_USER_NOTICE): bool
-{}
+#[LanguageLevelTypeAware(['8.4' => 'true'], default: 'bool')]
+function user_error(string $message, int $error_level = E_USER_NOTICE) {}
 
 /**
  * Sets a user-defined error handler function
@@ -663,7 +697,11 @@ function user_error (string $message, int $error_level = E_USER_NOTICE): bool
  * <b>array<i>errcontext</i></b>
  * <i>errno</i>
  * The first parameter, <i>errno</i>, contains the
- * level of the error raised, as an integer.
+ * level of the error raised, as an integer.</p>
+ * The user function should stop execution if necessary by calling `exit()`.
+ * If the function returns a value other than false, script execution will
+ * continue with the next statement after the one that caused an error.
+ * If the function returns false, the standard PHP error handler is called.
  * @param int $error_levels [optional] <p>
  * Can be used to mask the triggering of the
  * <i>error_handler</i> function just like the error_reporting ini setting
@@ -676,18 +714,37 @@ function user_error (string $message, int $error_level = E_USER_NOTICE): bool
  * in case of an error such as an invalid callback. If the previous error handler
  * was a class method, this function will return an indexed array with the class
  * and the method name.
+ *
+ * Note that error_handler chaining is possible by passing the output value as a reference:
+ * ```
+ * $previousErrorHandler = set_error_handler(
+ *     static function (int $errNo, string $errstr, string $errFile, int $errLine) use (&$previousErrorHandler): bool {
+ *         // Handle specific scenarios
+ *
+ *         return $previousErrorHandler !== null ? (bool) $previousErrorHandler(...func_get_args()) : false;
+ *     }
+ * );
+ * ```
  */
-function set_error_handler (?callable $callback, int $error_levels = E_ALL | E_STRICT)
-{}
+function set_error_handler(?callable $callback, int $error_levels = E_ALL) {}
 
 /**
  * Restores the previous error handler function
  * @link https://php.net/manual/en/function.restore-error-handler.php
  * @return bool This function always returns true.
  */
-function restore_error_handler (): bool
-{}
+#[LanguageLevelTypeAware(['8.2' => 'true'], default: 'bool')]
+function restore_error_handler() {}
 
+/**
+ * Gets the user-defined error handler function
+ *
+ * Returns the current error handler function, if any.
+ *
+ * @link https://php.net/manual/en/function.get-error-handler.php
+ * @since 8.5
+ */
+function get_error_handler(): ?callable {}
 /**
  * Sets a user-defined exception handler function
  * @link https://php.net/manual/en/function.set-exception-handler.php
@@ -702,16 +759,25 @@ function restore_error_handler (): bool
  * @return callable|null the name of the previously defined exception handler, or null on error. If
  * no previous handler was defined, null is also returned.
  */
-function set_exception_handler (?callable $callback)
-{}
+function set_exception_handler(?callable $callback) {}
+
+/**
+ * Gets the user-defined exception handler function
+ *
+ * Returns the current exception handler function, if any.
+ *
+ * @link https://php.net/manual/en/function.get-exception-handler.php
+ * @since 8.5
+ */
+function get_exception_handler(): ?callable {}
 
 /**
  * Restores the previously defined exception handler function
  * @link https://php.net/manual/en/function.restore-exception-handler.php
  * @return bool This function always returns true.
  */
-function restore_exception_handler (): bool
-{}
+#[LanguageLevelTypeAware(['8.2' => 'true'], default: 'bool')]
+function restore_exception_handler() {}
 
 /**
  * Returns an array with the name of the defined classes
@@ -725,9 +791,8 @@ function restore_exception_handler (): bool
  * the appendices.
  * </p>
  */
-#[Pure]
-function get_declared_classes (): array
-{}
+#[Pure(true)]
+function get_declared_classes(): array {}
 
 /**
  * Returns an array of all declared interfaces
@@ -735,20 +800,18 @@ function get_declared_classes (): array
  * @return string[] an array of the names of the declared interfaces in the current
  * script.
  */
-#[Pure]
-function get_declared_interfaces (): array
-{}
+#[Pure(true)]
+function get_declared_interfaces(): array {}
 
 /**
  * Returns an array of all declared traits
- * @return array with names of all declared traits in values. Returns NULL in case of a failure.
- * @link https://secure.php.net/manual/en/function.get-declared-traits.php
+ * @return array with names of all declared traits in values.
+ * @link https://php.net/manual/en/function.get-declared-traits.php
  * @see class_uses()
  * @since 5.4
  */
-#[Pure]
-function get_declared_traits(): array
-{}
+#[Pure(true)]
+function get_declared_traits(): array {}
 
 /**
  * Returns an array of all defined functions
@@ -760,18 +823,16 @@ function get_declared_traits(): array
  * the user defined ones using $arr["user"] (see example
  * below).
  */
-#[Pure]
-function get_defined_functions (bool $exclude_disabled = false): array
-{}
+#[Pure(true)]
+function get_defined_functions(#[PhpStormStubsElementAvailable(from: '7.1')] #[Deprecated('Deprecated: has no effect since PHP 8.0', since:'8.5')] bool $exclude_disabled = true): array {}
 
 /**
  * Returns an array of all defined variables
  * @link https://php.net/manual/en/function.get-defined-vars.php
  * @return array A multidimensional array with all the variables.
  */
-#[Pure]
-function get_defined_vars (): array
-{}
+#[Pure(true)]
+function get_defined_vars(): array {}
 
 /**
  * Create an anonymous (lambda-style) function
@@ -786,8 +847,7 @@ function get_defined_vars (): array
  * @removed 8.0
  */
 #[Deprecated(reason: "Use anonymous functions instead", since: "7.2")]
-function create_function (string $args, string $code): bool|string
-{}
+function create_function(string $args, string $code): false|string {}
 
 /**
  * Returns the resource type
@@ -800,8 +860,8 @@ function create_function (string $args, string $code): bool|string
  * by this function, the return value will be the string
  * Unknown.
  */
-function get_resource_type ($resource): string
-{}
+#[Pure(true)]
+function get_resource_type($resource): string {}
 
 /**
  * Returns an array with the names of all modules compiled and loaded
@@ -813,8 +873,7 @@ function get_resource_type ($resource): string
  * @return string[] an indexed array of all the modules names.
  */
 #[Pure]
-function get_loaded_extensions (bool $zend_extensions = false): array
-{}
+function get_loaded_extensions(bool $zend_extensions = false): array {}
 
 /**
  * Find out whether an extension is loaded
@@ -849,8 +908,7 @@ function get_loaded_extensions (bool $zend_extensions = false): array
  * is loaded, false otherwise.
  */
 #[Pure]
-function extension_loaded (string $extension): bool
-{}
+function extension_loaded(string $extension): bool {}
 
 /**
  * Returns an array with the names of the functions of a module
@@ -865,8 +923,7 @@ function extension_loaded (string $extension): bool
  * <i>module_name</i> is not a valid extension.
  */
 #[Pure]
-function get_extension_funcs (string $extension): array|false
-{}
+function get_extension_funcs(string $extension): array|false {}
 
 /**
  * Returns an associative array with the names of all the constants and their values
@@ -920,19 +977,19 @@ function get_extension_funcs (string $extension): array|false
  * )
  * </pre>
  * </p>
- * @return array
+ * @return array Returns an array of constant name => constant value array, optionally grouped by
+ * extension name registering the constant.
  */
-#[Pure]
-function get_defined_constants (bool $categorize = false): array
-{}
+#[Pure(true)]
+function get_defined_constants(bool $categorize = false): array {}
 
 /**
  * Generates a backtrace
  * @link https://php.net/manual/en/function.debug-backtrace.php
  * @param int $options [optional] <p>
- * As of 5.3.6, this parameter is a bitmask for the following options:
- * <table>
+ * As of 5.3.6, this parameter is a bitmask for the following options:</p>
  * <b>debug_backtrace</b> options
+ * <table>
  * <tr valign="top">
  * <td>DEBUG_BACKTRACE_PROVIDE_OBJECT</td>
  * <td>
@@ -947,6 +1004,7 @@ function get_defined_constants (bool $categorize = false): array
  * </td>
  * </tr>
  * </table>
+ * <p>
  * Before 5.3.6, the only values recognized are true or false, which are the same as
  * setting or not setting the <b>DEBUG_BACKTRACE_PROVIDE_OBJECT</b> option respectively.
  * </p>
@@ -954,15 +1012,16 @@ function get_defined_constants (bool $categorize = false): array
  * As of 5.4.0, this parameter can be used to limit the number of stack frames returned.
  * By default (<i>limit</i>=0) it returns all stack frames.
  * </p>
- * @return array an array of associative arrays. The possible returned elements
+ * @return array <p>an array of associative arrays. The possible returned elements
  * are as follows:
  * </p>
  * <p>
- * <table>
  * Possible returned elements from <b>debug_backtrace</b>
+ * </p>
+ * <table>
  * <tr valign="top">
- * <td>&Name;</td>
- * <td>&Type;</td>
+ * <td>Name</td>
+ * <td>Type</td>
  * <td>Description</td>
  * </tr>
  * <tr valign="top">
@@ -1022,18 +1081,18 @@ function get_defined_constants (bool $categorize = false): array
  * </tr>
  * </table>
  */
-function debug_backtrace (int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT, int $limit = 0): array
-{}
+#[Pure(true)]
+function debug_backtrace(int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT, int $limit = 0): array {}
 
 /**
  * Prints a backtrace
  * @link https://php.net/manual/en/function.debug-print-backtrace.php
  * @param int $options [optional] <p>
  * As of 5.3.6, this parameter is a bitmask for the following options:
- * <table>
  * <b>debug_print_backtrace</b> options
+ * <table>
  * <tr valign="top">
- * <td>DEBUG_BACKTRACE_IGNORE_ARGS</td>
+ * <td><b>DEBUG_BACKTRACE_IGNORE_ARGS</b></td>
  * <td>
  * Whether or not to omit the "args" index, and thus all the function/method arguments,
  * to save memory.
@@ -1043,42 +1102,43 @@ function debug_backtrace (int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT, int $li
  * </p>
  * @param int $limit [optional] <p>
  * As of 5.4.0, this parameter can be used to limit the number of stack frames printed.
- * By default (<i>limit</i>=0) it prints all stack frames.
+ * By default (<i>limit</i> = 0) it prints all stack frames.
  * </p>
- * @return void
+ * @return void No value is returned.
  */
-function debug_print_backtrace (int $options = 0, int $limit = 0): void {}
+function debug_print_backtrace(
+    int $options = 0,
+    #[PhpStormStubsElementAvailable(from: '7.0')] int $limit = 0
+): void {}
 
 /**
  * Forces collection of any existing garbage cycles
  * @link https://php.net/manual/en/function.gc-collect-cycles.php
  * @return int number of collected cycles.
  */
-function gc_collect_cycles (): int
-{}
+function gc_collect_cycles(): int {}
 
 /**
  * Returns status of the circular reference collector
  * @link https://php.net/manual/en/function.gc-enabled.php
  * @return bool true if the garbage collector is enabled, false otherwise.
  */
-#[Pure]
-function gc_enabled (): bool
-{}
+#[Pure(true)]
+function gc_enabled(): bool {}
 
 /**
  * Activates the circular reference collector
  * @link https://php.net/manual/en/function.gc-enable.php
- * @return void
+ * @return void No value is returned.
  */
-function gc_enable (): void {}
+function gc_enable(): void {}
 
 /**
  * Deactivates the circular reference collector
  * @link https://php.net/manual/en/function.gc-disable.php
- * @return void
+ * @return void No value is returned.
  */
-function gc_disable (): void {}
+function gc_disable(): void {}
 
 /**
  * Gets information about the garbage collector
@@ -1093,9 +1153,8 @@ function gc_disable (): void {}
  * @since 7.3
  */
 #[ArrayShape(["runs" => "int", "collected" => "int", "threshold" => "int", "roots" => "int"])]
-#[Pure]
-function gc_status (): array
-{}
+#[Pure(true)]
+function gc_status(): array {}
 
 /**
  * Reclaims memory used by the Zend Engine memory manager
@@ -1103,8 +1162,7 @@ function gc_status (): array
  * @return int Returns the number of bytes freed.
  * @since 7.0
  */
-function gc_mem_caches (): int
-{}
+function gc_mem_caches(): int {}
 
 /**
  * Returns active resources
@@ -1120,6 +1178,30 @@ function gc_mem_caches (): int
  * @return resource[] Returns an array of currently active resources, indexed by resource number.
  * @since 7.0
  */
-#[Pure]
-function get_resources (?string $type): array
-{}
+#[Pure(true)]
+function get_resources(?string $type = null): array {}
+
+/**
+ * Terminate the current script with a status code or message
+ *
+ * Terminates execution of the script. Shutdown functions and object destructors will always be
+ * executed even if exit is called. However, finally blocks are never executed.
+ *
+ * @link https://php.net/manual/en/function.exit.php
+ * @since 8.4
+ */
+function exit(string|int $status = 0): never {}
+
+/**
+ * @since 8.4
+ */
+function die(string|int $status = 0): never {}
+
+/**
+ * @template TObject of object
+ * @param TObject $object
+ * @param array $withProperties [optional]
+ * @return TObject
+ * @since 8.5
+ */
+function clone(object $object, array $withProperties = []): object {}

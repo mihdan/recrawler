@@ -2,21 +2,19 @@
 
 namespace RdKafka;
 
+use JetBrains\PhpStorm\Internal\TentativeType;
+
 /**
  * Configuration reference: https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
  */
 class Conf
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function dump()
-    {
-    }
+    public function dump() {}
 
     /**
      * @param string $name
@@ -24,79 +22,64 @@ class Conf
      *
      * @return void
      */
-    public function set($name, $value)
-    {
-    }
+    public function set($name, $value) {}
 
     /**
      * @param TopicConf $topic_conf
      *
      * @return void
      */
-    public function setDefaultTopicConf(TopicConf $topic_conf)
-    {
-    }
+    public function setDefaultTopicConf($topic_conf) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setDrMsgCb(callable $callback)
-    {
-    }
+    public function setDrMsgCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setErrorCb(callable $callback)
-    {
-    }
+    public function setErrorCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setRebalanceCb(callable $callback)
-    {
-    }
+    public function setRebalanceCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setStatsCb(callable $callback)
-    {
-    }
+    public function setStatsCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setOffsetCommitCb(callable $callback)
-    {
-    }
+    public function setOffsetCommitCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setConsumeCb(callable $callback)
-    {
-    }
+    public function setConsumeCb($callback) {}
 
     /**
      * @param callable $callback
      *
      * @return void
      */
-    public function setLogCb(callable $callback)
-    {
-    }
+    public function setLogCb($callback) {}
+
+    #[TentativeType]
+    public function setOauthbearerTokenRefreshCb(callable $callback): void {}
 }

@@ -1,11 +1,12 @@
 <?php
 
-
 namespace Parle;
-
 
 use JetBrains\PhpStorm\Immutable;
 
+/**
+ * @template TValue
+ */
 class Stack
 {
     /* Properties */
@@ -22,7 +23,7 @@ class Stack
     public $size = 0;
 
     /**
-     * @var mixed Element on the top of the stack.
+     * @var TValue Element on the top of the stack.
      */
     public $top;
 
@@ -31,16 +32,16 @@ class Stack
      * Pop an item from the stack
      *
      * @link https://php.net/manual/en/parle-stack.pop.php
-     * @return void
+     * @return void No value is returned.
      */
-    public function pop() : void {}
+    public function pop(): void {}
 
     /**
      * Push an item into the stack
      *
      * @link https://php.net/manual/en/parle-stack.push.php
-     * @param mixed $item Variable to be pushed.
-     * @return void
+     * @param TValue $item Variable to be pushed.
+     * @return void No value is returned.
      */
     public function push($item) {}
 }
