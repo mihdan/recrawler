@@ -1,0 +1,1940 @@
+<?php
+
+namespace StubTests\Framework\Validator\KnownProblems;
+
+use StubTests\Framework\Runner\PhpVersionRange;
+use StubTests\Framework\Runner\PhpVersions;
+
+/**
+ * Default implementation of KnownProblemsProvider.
+ *
+ * Defines all known validation problems for PHP stubs.
+ * Problems are defined as type-safe PHP objects with compile-time validation.
+ */
+class DefaultKnownProblemsProvider implements KnownProblemsProvider
+{
+    /** @var ProblemDefinition[]|null Cached problems */
+    private ?array $problems = null;
+
+    /**
+     * @inheritDoc
+     */
+    public function getProblems(): array
+    {
+        if ($this->problems !== null) {
+            return $this->problems;
+        }
+
+        $this->problems = [
+            // DBA extension - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\dba_fetch',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'dba_fetch has 2 overloaded signatures: dba_fetch($key, $handle) (2 params) and dba_fetch($key, $skip, $dba) (3 params, deprecated in 8.3). Reflection only returns one signature.'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\dba_open',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'dba_open has 2 overloaded signatures with different parameter counts'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\dba_popen',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'dba_popen has 2 overloaded signatures with different parameter counts'
+            ),
+
+            // String functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\strtr',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'strtr has 2 overloaded signatures: strtr($string, $from, $to) (3 params) and strtr($str, $replace_pairs) (2 params with array). Reflection returns only one.'
+            ),
+
+            // Session functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\session_set_save_handler',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'session_set_save_handler has 2 overloaded signatures: one with 9 callable parameters, one with SessionHandlerInterface object (2 params)'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\session_set_cookie_params',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'session_set_cookie_params has 2 overloaded signatures with different parameter structures'
+            ),
+
+            // Cookie functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\setcookie',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'setcookie has 2 overloaded signatures: multiple scalar params vs array options param'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\setrawcookie',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'setrawcookie has 2 overloaded signatures: multiple scalar params vs array options param'
+            ),
+
+            // GD functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\imagefilledpolygon',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'imagefilledpolygon has 2 overloaded signatures with different parameter structures'
+            ),
+
+            // Stream functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\stream_context_set_option',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'stream_context_set_option has 2 overloaded signatures: array param vs individual scalar params'
+            ),
+
+            // Multibyte string functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\mb_parse_str',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'mb_parse_str has 2 overloaded signatures with different parameter structures'
+            ),
+
+            // CUBRID database functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\cubrid_execute',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'cubrid_execute has 2 overloaded signatures with different parameter structures'
+            ),
+
+            // Standard functions - overloaded signatures
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\crypt',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETER_NAMES, CheckType::PARAMETER_TYPES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'crypt has 2 overloaded signatures with different parameter structures'
+            ),
+
+            // SimpleXMLElement - ArrayAccess implemented at C level, not visible to reflection
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SimpleXMLElement',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'SimpleXMLElement implements ArrayAccess at the C level without declaring it via `implements`. PHP reflection never reports ArrayAccess, but the stub adds it explicitly so PhpStorm can perform array-offset type inference on SimpleXMLElement instances.'
+            ),
+
+            // SplFileInfo - Stringable added in PHP 8.0; stubs already declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SplFileInfo',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SplFileInfo gained Stringable in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare Stringable for all versions. Reflection for PHP 5.6–7.4 does not report Stringable.'
+            ),
+
+            // SplObjectStorage - SeekableIterator added in PHP 8.4; stubs already declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SplObjectStorage',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_8_3),
+                reason: 'SplObjectStorage gained SeekableIterator in PHP 8.4. PhpStorm cannot express per-version interface declarations, so stubs declare SeekableIterator for all versions. Reflection for PHP 5.6–8.3 does not report SeekableIterator.'
+            ),
+
+            // Exception - Throwable did not exist in PHP 5.6; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\Exception',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_5_6),
+                reason: 'Throwable was introduced in PHP 7.0. Stubs declare Exception implements Throwable for all versions, but PHP 5.6 reflection does not report it.'
+            ),
+
+            // GMP - Serializable implemented internally, never visible to reflection
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\GMP',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'GMP implements Serializable at the C level. PHP reflection never reports Serializable for GMP across any version, but stubs declare it explicitly for serialization support in PhpStorm.'
+            ),
+
+            // ReflectionType - Stringable added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ReflectionType',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_0, PhpVersions::PHP_7_4),
+                reason: 'ReflectionType gained Stringable in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare Stringable for all versions. Reflection for PHP 7.0–7.4 does not report Stringable.'
+            ),
+
+            // ReflectionAttribute - Reflector added in PHP 8.1; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ReflectionAttribute',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::PHP_8_0),
+                reason: 'ReflectionAttribute gained Reflector in PHP 8.1. PhpStorm cannot express per-version interface declarations, so stubs declare Reflector for all versions. Reflection for PHP 8.0 does not report Reflector.'
+            ),
+
+            // DatePeriod - IteratorAggregate added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DatePeriod',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DatePeriod gained IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare IteratorAggregate for all versions. Reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // IntlBreakIterator - IteratorAggregate added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\IntlBreakIterator',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'IntlBreakIterator gained IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare IteratorAggregate for all versions. Reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // PDOStatement - IteratorAggregate added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\PDOStatement',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'PDOStatement gained IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare IteratorAggregate for all versions. Reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // mysqli_result - IteratorAggregate added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\mysqli_result',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'mysqli_result gained IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare IteratorAggregate for all versions. Reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // CachingIterator - Stringable added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\CachingIterator',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'CachingIterator gained Stringable in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare Stringable for all versions. Reflection for PHP 5.6–7.4 does not report Stringable.'
+            ),
+
+            // SimpleXMLIterator - Stringable added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SimpleXMLIterator',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SimpleXMLIterator gained Stringable in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare Stringable for all versions. Reflection for PHP 5.6–7.4 does not report Stringable.'
+            ),
+
+            // DOMCharacterData - DOMChildNode added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMCharacterData',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMCharacterData gained DOMChildNode in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare DOMChildNode for all versions. Reflection for PHP 5.6–7.4 does not report DOMChildNode.'
+            ),
+
+            // DOMDocumentFragment - DOMParentNode added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMDocumentFragment',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocumentFragment gained DOMParentNode in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare DOMParentNode for all versions. Reflection for PHP 5.6–7.4 does not report DOMParentNode.'
+            ),
+
+            // DOMDocument - DOMParentNode added in PHP 8.0; stubs declare it for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMDocument',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocument gained DOMParentNode in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare DOMParentNode for all versions. Reflection for PHP 5.6–7.4 does not report DOMParentNode.'
+            ),
+
+            // DOMElement - DOMChildNode and DOMParentNode added in PHP 8.0; stubs declare them for all versions
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMElement',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMElement gained DOMChildNode and DOMParentNode in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare both for all versions. Reflection for PHP 5.6–7.4 does not report them.'
+            ),
+
+            // DOMNamedNodeMap - Countable added in PHP 7.2, IteratorAggregate added in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMNamedNodeMap',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMNamedNodeMap gained Countable in PHP 7.2 and IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare both for all versions. Reflection for PHP 5.6–7.1 does not report Countable; reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // DOMNodeList - Countable added in PHP 7.2, IteratorAggregate added in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMNodeList',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMNodeList gained Countable in PHP 7.2 and IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare both for all versions. Reflection for PHP 5.6–7.1 does not report Countable; reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // ResourceBundle - Countable added in PHP 7.4, IteratorAggregate added in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ResourceBundle',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'ResourceBundle gained Countable in PHP 7.4 and IteratorAggregate in PHP 8.0. PhpStorm cannot express per-version interface declarations, so stubs declare both for all versions. Reflection for PHP 5.6–7.3 does not report Countable; reflection for PHP 5.6–7.4 does not report IteratorAggregate.'
+            ),
+
+            // SimpleXMLElement::__construct - final at C level in PHP 5.6–7.4; changed in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SimpleXMLElement::__construct',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SimpleXMLElement::__construct was marked final at the C level in PHP 5.6–7.4. This was changed in PHP 8.0. The stub declares the constructor without final (matching PHP 8.0+ behaviour), but reflection for PHP 5.6–7.4 reports isFinal=true.'
+            ),
+
+            // SimpleXMLIterator::__construct - inherits SimpleXMLElement::__construct which was final at C level in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SimpleXMLIterator::__construct',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SimpleXMLIterator extends SimpleXMLElement and inherits __construct. Since SimpleXMLElement::__construct was marked final at the C level in PHP 5.6–7.4, reflection reports isFinal=true for the inherited constructor on SimpleXMLIterator as well. This was changed in PHP 8.0. The stub declares the constructor without final (matching PHP 8.0+ behaviour).'
+            ),
+
+            // XMLReader::open - became truly static in PHP 8.0; stubs declare it static for all versions
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\XMLReader::open',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STATIC_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'XMLReader::open was a non-static instance method in PHP 5.6–7.4 (though callable statically with a deprecation notice). It was made officially static in PHP 8.0. The stub declares it static to match the PHP 8.0+ signature; reflection for PHP 5.6–7.4 reports isStatic=false.'
+            ),
+
+            // XMLReader::XML - became truly static in PHP 8.0; stubs declare it static for all versions
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\XMLReader::XML',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STATIC_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'XMLReader::XML was a non-static instance method in PHP 5.6–7.4 (though callable statically with a deprecation notice). It was made officially static in PHP 8.0. The stub declares it static to match the PHP 8.0+ signature; reflection for PHP 5.6–7.4 reports isStatic=false.'
+            ),
+
+            // FFI::new / FFI::cast / FFI::type - declared static at the C level (reflection reports
+            // isStatic=true for all versions), but calling them statically is deprecated since PHP 8.3.
+            // The stubs declare them as instance methods to steer users toward `$ffi->new()` usage.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STATIC_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'FFI::new(), FFI::cast() and FFI::type() are declared static at the C level, so reflection reports isStatic=true for all versions. Calling them statically is deprecated since PHP 8.3, so the stubs declare them as instance methods to steer users toward instance usage ($ffi->new()).',
+                entityIds: ['\\FFI::new', '\\FFI::cast', '\\FFI::type']
+            ),
+
+            // ── ClassStaleMethodsCheck exceptions ──────────────────────────────────────────────
+            // Legitimate stub-only method declarations, i.e. methods the stubs must declare even
+            // though reflection does not report them. See ClassStaleMethodsCheck for the direction
+            // this check runs in and why its scope is limited to CORE and BUNDLED.
+
+            // PDO driver-specific methods: present only when the corresponding PDO driver is
+            // compiled into the running PHP. The reflecting containers build pdo_sqlite but not
+            // pdo_pgsql, so reflection reports neither the pgsql* nor (in some builds) the
+            // sqliteCreate* family. Stubs must declare them for users who do have those drivers.
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\PDO',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STALE_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PDO exposes driver-specific methods (sqliteCreateAggregate/Collation/Function, pgsqlCopyFrom*/CopyTo*, pgsqlLOB*, pgsqlGetNotify, pgsqlGetPid) that exist only when that driver is compiled in. Reflection in the cache-generating container reports only the drivers it was built with, so these read as stub-only regardless of whether the stub is correct.'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\PDOStatement',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STALE_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PDOStatement::connect is a driver-level entry point that reflection does not report on the base class; same rationale as \\PDO above.'
+            ),
+
+            // SimpleXMLElement implements ArrayAccess and Iterator through internal object handlers
+            // (get_dimension/has_dimension, get_iterator) rather than declared methods, so reflection
+            // lists none of them even though they are callable.
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SimpleXMLElement',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STALE_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'SimpleXMLElement satisfies ArrayAccess (offsetExists/Get/Set/Unset) and Iterator (rewind/valid/current/key/next) via internal C handlers rather than declared methods, so reflection reports none of them while they are all callable. Stubs must declare them for completion and type inference.'
+            ),
+
+            // DOM methods whose presence varies across versions in a way stubs cannot yet express.
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMNode',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_STALE_METHODS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'compareDocumentPosition and isEqualNode are reported by reflection at 7.4, absent 8.0-8.2, and present again from 8.3/8.4 onward. PHP documents both as added in 8.3, which contradicts the 7.4 reading, so the correct bound is unclear and the stubs are left unbounded pending investigation rather than annotated on an uncertain basis.'
+            ),
+
+            // SplFixedArray - interfaces changed across PHP versions; stubs declare the union
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SplFixedArray',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_INTERFACES],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'SplFixedArray interface list changed across PHP versions: Iterator (5.6–7.4) was replaced by IteratorAggregate (8.0+), and JsonSerializable was added in 8.1. PhpStorm cannot express per-version interface declarations, so stubs declare the union of all interfaces. Each individual PHP version\'s reflection only reports the subset current for that version.'
+            ),
+
+            // SoapClient - internal C-level implementation properties not declared in stubs
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SoapClient',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_PROPERTIES_EXIST],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_1, PhpVersions::LATEST),
+                reason: 'SoapClient exposes numerous private C-level implementation properties (e.g. $sdl, $typemap, $_encoding, $httpsocket) that became visible via reflection in PHP 8.1 after an internal refactoring. These are undocumented implementation details not intended for user access and are not declared in stubs.'
+            ),
+
+            // SoapServer - internal C-level implementation properties not declared in stubs
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\SoapServer',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_PROPERTIES_EXIST],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_1, PhpVersions::LATEST),
+                reason: 'SoapServer exposes internal C-level implementation properties ($service, $__soap_fault) that became visible via reflection in PHP 8.1 after an internal refactoring. These are undocumented implementation details not intended for user access and are not declared in stubs.'
+            ),
+
+            // ── ClassMethodsParametersCountCheck known problems ───────────────────────
+
+            // Closure::__invoke - reflection reports the concrete closure signature (0 params for the generic stub)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\Closure::__invoke',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_2, PhpVersions::LATEST),
+                reason: 'Closure::__invoke reflects the actual closure signature. PHP reflection returns 0 parameters for a generic Closure, but the stub declares 1 placeholder parameter for IDE support.'
+            ),
+
+            // DateTime::__set_state - reflection reports 0 params in PHP 5.6–7.2; PHP 7.3+ fixed
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DateTime::__set_state',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_2),
+                reason: 'DateTime::__set_state is documented with 1 parameter ($array), but reflection in PHP 5.6–7.2 reports 0 parameters. PHP 7.3 corrected the reflection metadata.'
+            ),
+
+            // DateTimeImmutable::__set_state - same issue
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DateTimeImmutable::__set_state',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_2),
+                reason: 'DateTimeImmutable::__set_state is documented with 1 parameter ($array), but reflection in PHP 5.6–7.2 reports 0 parameters. PHP 7.3 corrected the reflection metadata.'
+            ),
+
+            // DateTimeZone::__set_state - same issue
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DateTimeZone::__set_state',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_2),
+                reason: 'DateTimeZone::__set_state is documented with 1 parameter ($array), but reflection in PHP 5.6–7.2 reports 0 parameters. PHP 7.3 corrected the reflection metadata.'
+            ),
+
+            // DateInterval::__set_state - same issue
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DateInterval::__set_state',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_2),
+                reason: 'DateInterval::__set_state is documented with 1 parameter ($array), but reflection in PHP 5.6–7.2 reports 0 parameters. PHP 7.3 corrected the reflection metadata.'
+            ),
+
+            // DatePeriod::__construct - overloaded signature (DatePeriod accepts multiple constructor forms)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DatePeriod::__construct',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DatePeriod::__construct has multiple overloaded forms. Stubs document all parameters across all overloads (4 params), but reflection for PHP 5.6–7.4 returns only 3 parameters.'
+            ),
+
+            // DOMImplementation::hasFeature - deprecated no-op; reflection reports 0 params in older PHP
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMImplementation::hasFeature',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMImplementation::hasFeature is a deprecated no-op. Reflection in PHP 5.6–7.4 reports 0 parameters, but the stub correctly declares 2 parameters ($feature, $version) per the DOM specification.'
+            ),
+
+            // DOMDocument::save - optional $options parameter not reported by reflection in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMDocument::save',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocument::save has an optional $options parameter that was not exposed by reflection in PHP 5.6–7.4. The stub declares both $filename and $options (2 params), but reflection reports only 1.'
+            ),
+
+            // DOMDocument::saveHTML - optional $node parameter not reported by reflection in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMDocument::saveHTML',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocument::saveHTML has an optional $node parameter that was not exposed by reflection in PHP 5.6–7.4. The stub declares 1 parameter, but reflection reports 0.'
+            ),
+
+            // DOMDocument::schemaValidate - optional $flags parameter not in reflection for PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMDocument::schemaValidate',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocument::schemaValidate has an optional $flags parameter not reported by reflection in PHP 5.6–7.4. Stubs declare 2 params, reflection reports 1.'
+            ),
+
+            // DOMDocument::schemaValidateSource - optional $flags parameter not in reflection for PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMDocument::schemaValidateSource',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMDocument::schemaValidateSource has an optional $flags parameter not reported by reflection in PHP 5.6–7.4. Stubs declare 2 params, reflection reports 1.'
+            ),
+
+            // DOMXPath::registerPhpFunctions - optional $restrict parameter not in reflection for PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMXPath::registerPhpFunctions',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'DOMXPath::registerPhpFunctions has an optional $restrict parameter not reported by reflection in PHP 5.6–7.4. Stubs declare 1 parameter, reflection reports 0.'
+            ),
+
+            // ArrayObject::__construct - reflection in PHP 5.6 reports only 1 param; stub has 3
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\ArrayObject::__construct',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_5_6),
+                reason: 'ArrayObject::__construct reflection in PHP 5.6 reports only 1 parameter, but the stub declares 3 ($array, $flags, $iteratorClass). PHP 7.0+ reflection correctly reports all 3.'
+            ),
+
+            // SplHeap::compare - abstract method; reflection in PHP 5.6–7.4 reports 0 params
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SplHeap::compare',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SplHeap::compare is an abstract method. Reflection in PHP 5.6–7.4 reports 0 parameters, but the stub declares 2 ($value1, $value2) matching the intended override contract.'
+            ),
+
+            // PDO::query - overloaded signature; reflection reports fewer params in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\PDO::query',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'PDO::query has multiple overloaded forms with different parameter counts. Reflection in PHP 5.6–7.4 reports fewer parameters than the stub, which documents all forms.'
+            ),
+
+            // XMLWriter::writeDtdEntity - reflection reports 2 params in PHP 5.6–7.4; stub has 6
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\XMLWriter::writeDtdEntity',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'XMLWriter::writeDtdEntity reflection in PHP 5.6–7.4 reports only 2 parameters, but the stub declares 6 ($name, $content, $pe, $pubid, $sysid, $ndataid) per the XML spec. PHP 8.0+ reflection correctly reports all 6.'
+            ),
+
+            // mysqli_stmt::__construct - reflection reports 0 params in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\mysqli_stmt::__construct',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'mysqli_stmt::__construct reflection in PHP 5.6–7.4 reports 0 parameters, but the stub declares 2 ($mysql, $query). PHP 8.0+ reflection correctly reports them.'
+            ),
+
+            // mysqli_stmt::bind_param - variadic; reflection reports 2 params, stub has 3 (types + vars + variadic)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\mysqli_stmt::bind_param',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'mysqli_stmt::bind_param is variadic. Reflection reports 2 parameters ($types + variadic &$var), but the stub declares 3 ($types, $var1, &...$vars) to document the required first variable explicitly for IDE support.'
+            ),
+
+            // mysqli_stmt::bind_result - variadic; reflection reports 1 param, stub has 2
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\mysqli_stmt::bind_result',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'mysqli_stmt::bind_result is variadic. Reflection reports 1 parameter (variadic &$var), but the stub declares 2 ($var1, &...$vars) to document the required first variable explicitly for IDE support.'
+            ),
+
+            // SoapFault::__construct - reflection reports fewer params in PHP 5.6–7.4
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SoapFault::__construct',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SoapFault::__construct reflection in PHP 5.6–7.4 reports fewer parameters than the stub. The stub documents the full constructor signature including optional parameters not exposed by older reflection.'
+            ),
+
+            // ── FunctionParametersCountCheck known problems ───────────────────────
+
+            // dba_fetch - overloaded signature; reflection returns 3-param form, stub selects 2-param form
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\dba_fetch',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'dba_fetch has 2 overloaded signatures: dba_fetch($key, $handle) (2 params) and dba_fetch($key, $skip, $dba) (3 params, deprecated in 8.3). Reflection returns the 3-param form, but the stub selects the 2-param form.'
+            ),
+
+            // session_set_cookie_params - PHP 7.3+ reflection returns 5-param legacy form
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\session_set_cookie_params',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_3, PhpVersions::LATEST),
+                reason: 'session_set_cookie_params has two overloaded forms: a 1-param array form (PHP 7.3+) and a 5-param scalar form. PHP 7.3+ reflection returns 5 parameters (legacy form), but the stub selects the 1-param array variant.'
+            ),
+
+            // session_set_save_handler - 9-param stub form has 2 extra params not present in PHP 5.6
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\session_set_save_handler',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::PARAMETERS_COUNT],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_5_6),
+                reason: 'session_set_save_handler stub declares 9 callable parameters including validate_sid and update_timestamp added in PHP 7.0. Reflection in PHP 5.6 reports only 7 parameters.'
+            ),
+
+            // ── FunctionOptionalParametersCheck known problems ────────────────────────
+
+            // strtr - overloaded signature; $to is optional in the 2-arg form strtr($str, $pairs)
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\strtr',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'strtr has 2 overloaded signatures. In the 2-arg form strtr($str, $pairs_map), $to is absent; reflection reports $to as optional. Stubs cannot mark $to optional in the 3-arg overload without incorrectly allowing strtr($str, $from).'
+            ),
+
+            // crypt - $salt was optional in PHP 5.6-7.4 (deprecated auto-generation)
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\crypt',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'In PHP 5.6-7.4, crypt() could be called without $salt (deprecated auto-generation). Reflection marks $salt as optional. The stub requires $salt to discourage the deprecated usage.'
+            ),
+
+            // dba_fetch - overloaded signature; reflection reports $handle/$dba as optional
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\dba_fetch',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'dba_fetch has 2 overloaded signatures. Reflection marks the handle/dba parameter as optional because the function can accept either 2 or 3 args. Stubs cannot express this without marking the handle optional in the 2-arg overload.'
+            ),
+
+            // session_set_save_handler - 9-param overload; reflection marks params 2-9 as optional
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\session_set_save_handler',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'session_set_save_handler has 2 overloaded signatures. Reflection reports most callable parameters as optional (since the 2-arg SessionHandlerInterface form omits them), but the 9-arg callable form requires them.'
+            ),
+
+            // imagefilledpolygon - PHP 8.0 changed parameter order; reflection marks $color as optional
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\imagefilledpolygon',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::LATEST),
+                reason: 'imagefilledpolygon has 2 overloaded signatures in PHP 8.0+ (3-arg and 4-arg forms). Reflection marks $color as optional because the function can be called with 3 args. Stubs use separate version-specific definitions that cannot mark $color optional without breaking the 4-arg overload.'
+            ),
+
+            // stream_context_set_option - overloaded signature; reflection marks $option_name/$value as optional
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\stream_context_set_option',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_4, PhpVersions::LATEST),
+                reason: 'stream_context_set_option has 2 overloaded signatures: array-options form and individual scalar params form. Reflection marks $option_name and $value as optional since the function can be called with 2 args (context + options array). Stubs cannot express this without marking them optional in the 4-arg overload.'
+            ),
+
+            // implode - PHP 8.0+ $array is optional in the 1-arg BC form implode($array)
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\implode',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::LATEST),
+                reason: 'implode() accepts both implode($separator, $array) and the BC form implode($array). Reflection marks $array as optional. The stub uses array|string $separator to model both forms but cannot mark $array as truly optional without allowing a zero-argument call.'
+            ),
+
+            // join - alias of implode; same known problem
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\join',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::LATEST),
+                reason: 'join() is an alias of implode(). Same known problem: $array is optional in the 1-arg BC form, but the stub cannot express this without allowing a zero-argument call.'
+            ),
+
+            // hash_update_file - PHP 5.6-7.0 named the 3rd param "context" (same as 1st stub param); false-positive
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\hash_update_file',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_0),
+                reason: 'In PHP 5.6-7.0, the 3rd parameter of hash_update_file() was named "context" in reflection, colliding with the 1st stub param name "context" (HashContext). The optional-parameters check incorrectly matches the required 1st stub param against the optional 3rd reflection param.'
+            ),
+
+            // ── ClassMethodsOptionalParametersCheck known problems ───────────────────
+
+            // SoapFault::__construct - PHP 5.6-7.4 reflection marks $code as optional (C-extension quirk)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SoapFault::__construct',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'SoapFault::__construct in PHP 5.6-7.4: reflection marks $code as optional due to C-extension implementation detail. The parameter is required in the public API.'
+            ),
+
+            // DOMNamedNodeMap::item - PHP 7.1-7.4 reflection marks $index as optional (C-extension keeps default = 0)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DOMNamedNodeMap::item',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_1, PhpVersions::PHP_7_4),
+                reason: 'DOMNamedNodeMap::item in PHP 7.1-7.4: reflection marks $index as optional (default = 0 retained in C implementation). The stub intentionally requires $index for PHP 7.1+ to enforce correct usage.'
+            ),
+
+            // DatePeriod::__construct - PHP 8.0+ reflection marks $interval and $end as optional (overloaded constructor)
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\DatePeriod::__construct',
+                type: ProblemType::OVERLOADED_SIGNATURE,
+                affectedChecks: [CheckType::OPTIONAL_PARAMETERS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::LATEST),
+                reason: 'DatePeriod::__construct has 3 overloaded forms: (start, interval, end, options), (start, interval, recurrences, options), and (isostr, options). Reflection marks $interval and $end as optional due to multi-arity overloading. Stubs express each overload separately.'
+            ),
+
+            // ── ClassFinalCheck known problems ──────────────────────────────────────
+            // The `final` modifier cannot be expressed in a version-aware way in stubs,
+            // so the stub must match the latest PHP version.  For classes that became
+            // final after their introduction, the check reports a mismatch for the
+            // older versions where reflection still says non-final.
+
+            // DOMException - became final in PHP 7.0; stubs match PHP 7.0+
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\DOMException',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_5_6, PhpVersions::PHP_5_6),
+                reason: 'DOMException was made final in PHP 7.0. Stubs declare it final to match PHP 7.0+ behaviour; PHP 5.6 reflection reports non-final.'
+            ),
+
+            // GMP - became final in PHP 8.4; stubs match PHP 8.4
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\GMP',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_8_3),
+                reason: 'GMP was made final in PHP 8.4. Stubs declare it final to match the current PHP behaviour; PHP 5.6–8.3 reflection reports non-final.'
+            ),
+
+            // Directory - became final in PHP 8.5; the stub matches pre-8.5 behaviour here,
+            // so the mismatch runs the other way from the entries above.
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\Directory',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_5, PhpVersions::LATEST),
+                reason: 'Directory was marked final in PHP 8.5. The stub declares it without final (matching PHP <8.5 behaviour), but reflection for PHP 8.5 reports isFinal=true.'
+            ),
+
+            // ReflectionConstant - introduced and marked final in PHP 8.4
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ReflectionConstant',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_4, PhpVersions::PHP_8_4),
+                reason: 'ReflectionConstant was marked final in PHP 8.4. The stub declares it without final (matching other PHP versions), but reflection for PHP 8.4 reports isFinal=true.'
+            ),
+
+            // ReflectionGenerator - introduced in PHP 7.0, became final in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ReflectionGenerator',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_0, PhpVersions::PHP_7_4),
+                reason: 'ReflectionGenerator was made final in PHP 8.0. Stubs declare it final; PHP 7.0–7.4 reflection reports non-final.'
+            ),
+
+            // ReflectionReference - introduced in PHP 7.4, became final in PHP 8.0
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\ReflectionReference',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_4, PhpVersions::PHP_7_4),
+                reason: 'ReflectionReference was introduced in PHP 7.4 and made final in PHP 8.0. Stubs declare it final; PHP 7.4 reflection reports non-final.'
+            ),
+
+            // __PHP_Incomplete_Class - became final in PHP 8.0; stubs match PHP 8.0+
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\__PHP_Incomplete_Class',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: '__PHP_Incomplete_Class was made final in PHP 8.0. Stubs declare it final; PHP 5.6–7.4 reflection reports non-final.'
+            ),
+
+            // mysqli_sql_exception - became final in PHP 7.0; stubs match PHP 7.0+
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_TYPE,
+                entityId: '\\mysqli_sql_exception',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_FINAL],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_5_6, PhpVersions::PHP_5_6),
+                reason: 'mysqli_sql_exception was made final in PHP 7.0. Stubs declare it final to match PHP 7.0+ behaviour; PHP 5.6 reflection reports non-final.'
+            ),
+
+            // PDO - driver-specific constants not present in standard PHP builds
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\PDO',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PDO stubs include driver-specific constants (PGSQL_*, SQLSRV_*, OCI_*, FB_*) that are only available when the corresponding database driver extension is installed. These constants are absent from reflection in standard PHP builds without those drivers.',
+                entityIds: [
+                    '\\PDO::PGSQL_ASSOC',
+                    '\\PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT',
+                    '\\PDO::PGSQL_ATTR_DISABLE_PREPARES',
+                    '\\PDO::PGSQL_BAD_RESPONSE',
+                    '\\PDO::PGSQL_BOTH',
+                    '\\PDO::PGSQL_TRANSACTION_IDLE',
+                    '\\PDO::PGSQL_TRANSACTION_ACTIVE',
+                    '\\PDO::PGSQL_TRANSACTION_INTRANS',
+                    '\\PDO::PGSQL_TRANSACTION_INERROR',
+                    '\\PDO::PGSQL_TRANSACTION_UNKNOWN',
+                    '\\PDO::PGSQL_CONNECT_ASYNC',
+                    '\\PDO::PGSQL_CONNECT_FORCE_NEW',
+                    '\\PDO::PGSQL_CONNECTION_AUTH_OK',
+                    '\\PDO::PGSQL_CONNECTION_AWAITING_RESPONSE',
+                    '\\PDO::PGSQL_CONNECTION_BAD',
+                    '\\PDO::PGSQL_CONNECTION_OK',
+                    '\\PDO::PGSQL_CONNECTION_MADE',
+                    '\\PDO::PGSQL_CONNECTION_SETENV',
+                    '\\PDO::PGSQL_CONNECTION_SSL_STARTUP',
+                    '\\PDO::PGSQL_CONNECTION_STARTED',
+                    '\\PDO::PGSQL_COMMAND_OK',
+                    '\\PDO::PGSQL_CONV_FORCE_NULL',
+                    '\\PDO::PGSQL_CONV_IGNORE_DEFAULT',
+                    '\\PDO::PGSQL_CONV_IGNORE_NOT_NULL',
+                    '\\PDO::PGSQL_COPY_IN',
+                    '\\PDO::PGSQL_COPY_OUT',
+                    '\\PDO::PGSQL_DIAG_CONTEXT',
+                    '\\PDO::PGSQL_DIAG_INTERNAL_POSITION',
+                    '\\PDO::PGSQL_DIAG_INTERNAL_QUERY',
+                    '\\PDO::PGSQL_DIAG_MESSAGE_DETAIL',
+                    '\\PDO::PGSQL_DIAG_MESSAGE_HINT',
+                    '\\PDO::PGSQL_DIAG_MESSAGE_PRIMARY',
+                    '\\PDO::PGSQL_DIAG_SEVERITY',
+                    '\\PDO::PGSQL_DIAG_SOURCE_FILE',
+                    '\\PDO::PGSQL_DIAG_SOURCE_FUNCTION',
+                    '\\PDO::PGSQL_DIAG_SOURCE_LINE',
+                    '\\PDO::PGSQL_DIAG_SQLSTATE',
+                    '\\PDO::PGSQL_DIAG_STATEMENT_POSITION',
+                    '\\PDO::PGSQL_DML_ASYNC',
+                    '\\PDO::PGSQL_DML_EXEC',
+                    '\\PDO::PGSQL_DML_NO_CONV',
+                    '\\PDO::PGSQL_DML_STRING',
+                    '\\PDO::PGSQL_DML_ESCAPE',
+                    '\\PDO::PGSQL_EMPTY_QUERY',
+                    '\\PDO::PGSQL_ERRORS_DEFAULT',
+                    '\\PDO::PGSQL_ERRORS_TERSE',
+                    '\\PDO::PGSQL_ERRORS_VERBOSE',
+                    '\\PDO::PGSQL_FATAL_ERROR',
+                    '\\PDO::PGSQL_NONFATAL_ERROR',
+                    '\\PDO::PGSQL_NOTICE_ALL',
+                    '\\PDO::PGSQL_NOTICE_CLEAR',
+                    '\\PDO::PGSQL_NOTICE_LAST',
+                    '\\PDO::PGSQL_NUM',
+                    '\\PDO::PGSQL_POLLING_ACTIVE',
+                    '\\PDO::PGSQL_POLLING_FAILED',
+                    '\\PDO::PGSQL_POLLING_OK',
+                    '\\PDO::PGSQL_POLLING_READING',
+                    '\\PDO::PGSQL_POLLING_WRITING',
+                    '\\PDO::PGSQL_SEEK_CUR',
+                    '\\PDO::PGSQL_SEEK_END',
+                    '\\PDO::PGSQL_SEEK_SET',
+                    '\\PDO::PGSQL_STATUS_LONG',
+                    '\\PDO::PGSQL_STATUS_STRING',
+                    '\\PDO::PGSQL_TUPLES_OK',
+                    '\\PDO::SQLSRV_TXN_READ_UNCOMMITTED',
+                    '\\PDO::SQLSRV_TXN_READ_COMMITTED',
+                    '\\PDO::SQLSRV_TXN_REPEATABLE_READ',
+                    '\\PDO::SQLSRV_TXN_SNAPSHOT',
+                    '\\PDO::SQLSRV_TXN_SERIALIZABLE',
+                    '\\PDO::SQLSRV_ENCODING_BINARY',
+                    '\\PDO::SQLSRV_ENCODING_SYSTEM',
+                    '\\PDO::SQLSRV_ENCODING_UTF8',
+                    '\\PDO::SQLSRV_ENCODING_DEFAULT',
+                    '\\PDO::SQLSRV_ATTR_ENCODING',
+                    '\\PDO::SQLSRV_ATTR_QUERY_TIMEOUT',
+                    '\\PDO::SQLSRV_ATTR_DIRECT_QUERY',
+                    '\\PDO::SQLSRV_ATTR_CURSOR_SCROLL_TYPE',
+                    '\\PDO::SQLSRV_ATTR_CLIENT_BUFFER_MAX_KB_SIZE',
+                    '\\PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE',
+                    '\\PDO::SQLSRV_ATTR_FETCHES_DATETIME_TYPE',
+                    '\\PDO::SQLSRV_ATTR_FORMAT_DECIMALS',
+                    '\\PDO::SQLSRV_ATTR_DECIMAL_PLACES',
+                    '\\PDO::SQLSRV_ATTR_DATA_CLASSIFICATION',
+                    '\\PDO::SQLSRV_PARAM_OUT_DEFAULT_SIZE',
+                    '\\PDO::SQLSRV_CURSOR_KEYSET',
+                    '\\PDO::SQLSRV_CURSOR_DYNAMIC',
+                    '\\PDO::SQLSRV_CURSOR_STATIC',
+                    '\\PDO::SQLSRV_CURSOR_BUFFERED',
+                    '\\PDO::OCI_ATTR_ACTION',
+                    '\\PDO::OCI_ATTR_CLIENT_INFO',
+                    '\\PDO::OCI_ATTR_CLIENT_IDENTIFIER',
+                    '\\PDO::OCI_ATTR_MODULE',
+                    '\\PDO::OCI_ATTR_CALL_TIMEOUT',
+                    '\\PDO::FB_ATTR_DATE_FORMAT',
+                    '\\PDO::FB_ATTR_TIME_FORMAT',
+                    '\\PDO::FB_ATTR_TIMESTAMP_FORMAT',
+                    '\\PDO::MYSQL_ATTR_MAX_BUFFER_SIZE',
+                    '\\PDO::MYSQL_ATTR_READ_DEFAULT_FILE',
+                    '\\PDO::MYSQL_ATTR_READ_DEFAULT_GROUP',
+                ],
+            ),
+
+            // Normalizer - ICU-version-dependent constants (NFKC_CF, FORM_KC_CF, OPTION_DEFAULT)
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\Normalizer',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'Normalizer::NFKC_CF, FORM_KC_CF, and OPTION_DEFAULT depend on the ICU library version bundled with PHP. These constants require ICU 60+ and are absent from reflection when an older ICU is used.',
+                entityIds: [
+                    '\\Normalizer::NFKC_CF',
+                    '\\Normalizer::FORM_KC_CF',
+                    '\\Normalizer::OPTION_DEFAULT',
+                ],
+            ),
+
+            // Normalizer::NONE - absent from PHP 8.0 reflection (ICU build gap)
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\Normalizer::NONE',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::PHP_8_0),
+                reason: 'Normalizer::NONE is absent from reflection in PHP 8.0 builds on this machine. This appears to be an ICU version gap specific to the PHP 8.0 build.',
+            ),
+
+            // NumberFormatter - CURRENCY_ACCOUNTING requires ICU 53+ (not present in PHP 5.6-7.3 builds)
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\NumberFormatter::CURRENCY_ACCOUNTING',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_3),
+                reason: 'NumberFormatter::CURRENCY_ACCOUNTING requires ICU 53+. PHP 5.6-7.3 builds typically bundle an older ICU version that does not include this constant.',
+            ),
+
+            // IntlDateFormatter - RELATIVE_* constants require ICU 64+ (not present in PHP 5.6-8.3 builds)
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\IntlDateFormatter',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_8_3),
+                reason: 'IntlDateFormatter::RELATIVE_FULL, RELATIVE_LONG, RELATIVE_MEDIUM, and RELATIVE_SHORT require ICU 64+. PHP builds before 8.4 typically bundle an older ICU version that does not include these constants.',
+                entityIds: [
+                    '\\IntlDateFormatter::RELATIVE_FULL',
+                    '\\IntlDateFormatter::RELATIVE_LONG',
+                    '\\IntlDateFormatter::RELATIVE_MEDIUM',
+                    '\\IntlDateFormatter::RELATIVE_SHORT',
+                    '\\IntlDateFormatter::PATTERN',
+                ],
+            ),
+
+            // Spoofchecker - ICU-dependent constants absent from PHP 5.6-8.2 builds
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\Spoofchecker',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_8_2),
+                reason: 'Spoofchecker::ASCII, HIGHLY_RESTRICTIVE, MODERATELY_RESTRICTIVE, MINIMALLY_RESTRICTIVE, UNRESTRICTIVE, and SINGLE_SCRIPT_RESTRICTIVE depend on the ICU library version. These constants are absent from reflection in PHP 5.6-8.2 builds that bundle older ICU versions.',
+                entityIds: [
+                    '\\Spoofchecker::ASCII',
+                    '\\Spoofchecker::HIGHLY_RESTRICTIVE',
+                    '\\Spoofchecker::MODERATELY_RESTRICTIVE',
+                    '\\Spoofchecker::MINIMALLY_RESTRICTIVE',
+                    '\\Spoofchecker::UNRESTRICTIVE',
+                    '\\Spoofchecker::SINGLE_SCRIPT_RESTRICTIVE',
+                    '\\Spoofchecker::MIXED_NUMBERS',
+                    '\\Spoofchecker::HIDDEN_OVERLAY',
+                ],
+            ),
+
+            // Spoofchecker - MIXED_NUMBERS and HIDDEN_OVERLAY have ICU-version-dependent values
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\Spoofchecker',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CLASS_CONSTANTS_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'Spoofchecker::MIXED_NUMBERS and HIDDEN_OVERLAY map to ICU USpoofChecks flags whose values changed from 1/2 to 128/256 in ICU 75+, so they depend on the bundled ICU version and cannot be pinned in stubs.',
+                entityIds: [
+                    '\\Spoofchecker::MIXED_NUMBERS',
+                    '\\Spoofchecker::HIDDEN_OVERLAY',
+                ],
+            ),
+
+            // ZipArchive - libzip-version-dependent constants absent from PHP 8.0-8.2 builds
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\ZipArchive',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CLASS_CONSTANTS],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_0, PhpVersions::PHP_8_2),
+                reason: 'Some ZipArchive constants depend on the libzip version bundled with PHP. Constants added in newer libzip releases are absent from reflection in PHP 8.0-8.2 builds that bundle older libzip versions.',
+                entityIds: [
+                    '\\ZipArchive::FL_OPEN_FILE_NOW',
+                    '\\ZipArchive::CM_ZSTD',
+                    '\\ZipArchive::ER_DATA_LENGTH',
+                    '\\ZipArchive::ER_NOT_ALLOWED',
+                    '\\ZipArchive::AFL_RDONLY',
+                    '\\ZipArchive::AFL_IS_TORRENTZIP',
+                    '\\ZipArchive::AFL_WANT_TORRENTZIP',
+                    '\\ZipArchive::AFL_CREATE_OR_KEEP_FILE_FOR_EMPTY_ARCHIVE',
+                    '\\ZipArchive::LENGTH_TO_END',
+                    '\\ZipArchive::LENGTH_UNCHECKED',
+                ],
+            ),
+
+            // IntlCalendar - FIELD_FIELD_COUNT value is ICU-version-dependent
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\IntlCalendar::FIELD_FIELD_COUNT',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CLASS_CONSTANTS_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'IntlCalendar::FIELD_FIELD_COUNT is the number of calendar fields, which grows as the bundled ICU library adds fields (e.g. 23 in older ICU, 24 in ICU 75+), so it depends on the ICU version and cannot be pinned in stubs.',
+            ),
+
+            // IntlChar - multiple constants have ICU-version-dependent values
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\IntlChar',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CLASS_CONSTANTS_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'These IntlChar constants (UNICODE_VERSION, PROPERTY_BINARY_LIMIT, PROPERTY_INT_LIMIT, BLOCK_CODE_COUNT, ...) reflect the Unicode/ICU version and change with each ICU update, so their values cannot be pinned in stubs. Across the per-version images the bundled ICU reports different Unicode versions (e.g. 9.0, 12.1, 13.0, 14.0, 15.1, 16.0), so the value check is muted for all versions.',
+                entityIds: [
+                    '\\IntlChar::UNICODE_VERSION',
+                    '\\IntlChar::PROPERTY_BINARY_LIMIT',
+                    '\\IntlChar::PROPERTY_INT_LIMIT',
+                    '\\IntlChar::BLOCK_CODE_COUNT',
+                    '\\IntlChar::PROPERTY_OTHER_PROPERTY_LIMIT',
+                    '\\IntlChar::JG_COUNT',
+                    '\\IntlChar::LB_COUNT',
+                ],
+            ),
+
+            // -----------------------------------------------------------------------
+            // Runtime-value constants: values depend on the installed library version
+            // or build/environment configuration and cannot be pinned in stubs.
+            // -----------------------------------------------------------------------
+
+            // ICU library version — reported by the intl extension
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'intl-icu-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'ICU library version constants depend on the ICU version bundled with the intl extension and differ per installation.',
+                entityIds: [
+                    '\\INTL_ICU_VERSION',
+                    '\\INTL_ICU_DATA_VERSION',
+                    '\\IDNA_DEFAULT',
+                    '\\U_FMT_PARSE_ERROR_LIMIT',
+                ],
+            ),
+
+            // libxml version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'libxml-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'libxml version/feature constants depend on the installed libxml2 library version.',
+                entityIds: [
+                    '\\LIBXML_VERSION',
+                    '\\LIBXML_LOADED_VERSION',
+                    '\\LIBXML_DOTTED_VERSION',
+                    '\\LIBXML_BIGLINES',
+                ],
+            ),
+
+            // libxslt / libexslt version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'libxslt-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'libxslt/libexslt version constants depend on the installed libxslt library version.',
+                entityIds: [
+                    '\\LIBXSLT_VERSION',
+                    '\\LIBXSLT_DOTTED_VERSION',
+                    '\\LIBEXSLT_VERSION',
+                    '\\LIBEXSLT_DOTTED_VERSION',
+                ],
+            ),
+
+            // tidy tag identifiers
+            //
+            // TIDY_TAG_* is not a set of independent numbers: it is the tidy library's internal
+            // TidyTagId enum, ordered alphabetically by tag name. Every tag the library learns about
+            // shifts the id of every tag after it, so upgrading tidy renumbers most of the family at
+            // once — the stubs were generated against a build that predates <main>, <picture> and
+            // friends, which is why the divergence grows from +1 near TIDY_TAG_MARQUEE to +3 by
+            // TIDY_TAG_XMP. A stub can only carry one number, and the number a user's runtime reports
+            // depends on which tidy their distribution ships, not on which PHP they run.
+            //
+            // The whole family is listed, not only the 76 that disagree today, because the ones that
+            // still agree do so purely by being alphabetically ahead of the first inserted tag — the
+            // next tidy release moves them too. Only CONSTANT_VALUE is waived: existence is still
+            // validated, so a constant vanishing from the stubs is still a failure.
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'tidy-tag-ids',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'TIDY_TAG_* values are indices into the tidy library\'s alphabetically ordered tag table and are renumbered by every tidy release that adds a tag.',
+                entityIds: [
+                    '\\TIDY_TAG_A',
+                    '\\TIDY_TAG_ABBR',
+                    '\\TIDY_TAG_ACRONYM',
+                    '\\TIDY_TAG_ADDRESS',
+                    '\\TIDY_TAG_ALIGN',
+                    '\\TIDY_TAG_APPLET',
+                    '\\TIDY_TAG_AREA',
+                    '\\TIDY_TAG_ARTICLE',
+                    '\\TIDY_TAG_ASIDE',
+                    '\\TIDY_TAG_AUDIO',
+                    '\\TIDY_TAG_B',
+                    '\\TIDY_TAG_BASE',
+                    '\\TIDY_TAG_BASEFONT',
+                    '\\TIDY_TAG_BDI',
+                    '\\TIDY_TAG_BDO',
+                    '\\TIDY_TAG_BGSOUND',
+                    '\\TIDY_TAG_BIG',
+                    '\\TIDY_TAG_BLINK',
+                    '\\TIDY_TAG_BLOCKQUOTE',
+                    '\\TIDY_TAG_BODY',
+                    '\\TIDY_TAG_BR',
+                    '\\TIDY_TAG_BUTTON',
+                    '\\TIDY_TAG_CANVAS',
+                    '\\TIDY_TAG_CAPTION',
+                    '\\TIDY_TAG_CENTER',
+                    '\\TIDY_TAG_CITE',
+                    '\\TIDY_TAG_CODE',
+                    '\\TIDY_TAG_COL',
+                    '\\TIDY_TAG_COLGROUP',
+                    '\\TIDY_TAG_COMMAND',
+                    '\\TIDY_TAG_COMMENT',
+                    '\\TIDY_TAG_DATALIST',
+                    '\\TIDY_TAG_DD',
+                    '\\TIDY_TAG_DEL',
+                    '\\TIDY_TAG_DETAILS',
+                    '\\TIDY_TAG_DFN',
+                    '\\TIDY_TAG_DIALOG',
+                    '\\TIDY_TAG_DIR',
+                    '\\TIDY_TAG_DIV',
+                    '\\TIDY_TAG_DL',
+                    '\\TIDY_TAG_DT',
+                    '\\TIDY_TAG_EM',
+                    '\\TIDY_TAG_EMBED',
+                    '\\TIDY_TAG_FIELDSET',
+                    '\\TIDY_TAG_FIGCAPTION',
+                    '\\TIDY_TAG_FIGURE',
+                    '\\TIDY_TAG_FONT',
+                    '\\TIDY_TAG_FOOTER',
+                    '\\TIDY_TAG_FORM',
+                    '\\TIDY_TAG_FRAME',
+                    '\\TIDY_TAG_FRAMESET',
+                    '\\TIDY_TAG_H1',
+                    '\\TIDY_TAG_H2',
+                    '\\TIDY_TAG_H3',
+                    '\\TIDY_TAG_H4',
+                    '\\TIDY_TAG_H5',
+                    '\\TIDY_TAG_H6',
+                    '\\TIDY_TAG_HEAD',
+                    '\\TIDY_TAG_HEADER',
+                    '\\TIDY_TAG_HGROUP',
+                    '\\TIDY_TAG_HR',
+                    '\\TIDY_TAG_HTML',
+                    '\\TIDY_TAG_I',
+                    '\\TIDY_TAG_IFRAME',
+                    '\\TIDY_TAG_ILAYER',
+                    '\\TIDY_TAG_IMG',
+                    '\\TIDY_TAG_INPUT',
+                    '\\TIDY_TAG_INS',
+                    '\\TIDY_TAG_ISINDEX',
+                    '\\TIDY_TAG_KBD',
+                    '\\TIDY_TAG_KEYGEN',
+                    '\\TIDY_TAG_LABEL',
+                    '\\TIDY_TAG_LAYER',
+                    '\\TIDY_TAG_LEGEND',
+                    '\\TIDY_TAG_LI',
+                    '\\TIDY_TAG_LINK',
+                    '\\TIDY_TAG_LISTING',
+                    '\\TIDY_TAG_MAIN',
+                    '\\TIDY_TAG_MAP',
+                    '\\TIDY_TAG_MARK',
+                    '\\TIDY_TAG_MARQUEE',
+                    '\\TIDY_TAG_MENU',
+                    '\\TIDY_TAG_MENUITEM',
+                    '\\TIDY_TAG_META',
+                    '\\TIDY_TAG_METER',
+                    '\\TIDY_TAG_MULTICOL',
+                    '\\TIDY_TAG_NAV',
+                    '\\TIDY_TAG_NOBR',
+                    '\\TIDY_TAG_NOEMBED',
+                    '\\TIDY_TAG_NOFRAMES',
+                    '\\TIDY_TAG_NOLAYER',
+                    '\\TIDY_TAG_NOSAVE',
+                    '\\TIDY_TAG_NOSCRIPT',
+                    '\\TIDY_TAG_OBJECT',
+                    '\\TIDY_TAG_OL',
+                    '\\TIDY_TAG_OPTGROUP',
+                    '\\TIDY_TAG_OPTION',
+                    '\\TIDY_TAG_OUTPUT',
+                    '\\TIDY_TAG_P',
+                    '\\TIDY_TAG_PARAM',
+                    '\\TIDY_TAG_PLAINTEXT',
+                    '\\TIDY_TAG_PRE',
+                    '\\TIDY_TAG_PROGRESS',
+                    '\\TIDY_TAG_Q',
+                    '\\TIDY_TAG_RB',
+                    '\\TIDY_TAG_RBC',
+                    '\\TIDY_TAG_RP',
+                    '\\TIDY_TAG_RT',
+                    '\\TIDY_TAG_RTC',
+                    '\\TIDY_TAG_RUBY',
+                    '\\TIDY_TAG_S',
+                    '\\TIDY_TAG_SAMP',
+                    '\\TIDY_TAG_SCRIPT',
+                    '\\TIDY_TAG_SECTION',
+                    '\\TIDY_TAG_SELECT',
+                    '\\TIDY_TAG_SERVER',
+                    '\\TIDY_TAG_SERVLET',
+                    '\\TIDY_TAG_SMALL',
+                    '\\TIDY_TAG_SOURCE',
+                    '\\TIDY_TAG_SPACER',
+                    '\\TIDY_TAG_SPAN',
+                    '\\TIDY_TAG_STRIKE',
+                    '\\TIDY_TAG_STRONG',
+                    '\\TIDY_TAG_STYLE',
+                    '\\TIDY_TAG_SUB',
+                    '\\TIDY_TAG_SUMMARY',
+                    '\\TIDY_TAG_SUP',
+                    '\\TIDY_TAG_TABLE',
+                    '\\TIDY_TAG_TBODY',
+                    '\\TIDY_TAG_TD',
+                    '\\TIDY_TAG_TEMPLATE',
+                    '\\TIDY_TAG_TEXTAREA',
+                    '\\TIDY_TAG_TFOOT',
+                    '\\TIDY_TAG_TH',
+                    '\\TIDY_TAG_THEAD',
+                    '\\TIDY_TAG_TIME',
+                    '\\TIDY_TAG_TITLE',
+                    '\\TIDY_TAG_TR',
+                    '\\TIDY_TAG_TRACK',
+                    '\\TIDY_TAG_TT',
+                    '\\TIDY_TAG_U',
+                    '\\TIDY_TAG_UL',
+                    '\\TIDY_TAG_UNKNOWN',
+                    '\\TIDY_TAG_VAR',
+                    '\\TIDY_TAG_VIDEO',
+                    '\\TIDY_TAG_WBR',
+                    '\\TIDY_TAG_XMP',
+                ],
+            ),
+            // OpenSSL version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'openssl-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'OpenSSL version constants depend on the installed OpenSSL library version.',
+                entityIds: [
+                    '\\OPENSSL_VERSION_NUMBER',
+                    '\\OPENSSL_VERSION_TEXT',
+                ],
+            ),
+
+            // PCRE version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'pcre-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PCRE version constants depend on the PCRE2 library bundled with PHP.',
+                entityIds: [
+                    '\\PCRE_VERSION',
+                    '\\PCRE_VERSION_MINOR',
+                ],
+            ),
+
+            // cURL version/flags
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'curl-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'cURL constants (debug-callback type flags, CURLVERSION_NOW, CURLINFO_LASTONE) depend on the linked libcurl version.',
+                entityIds: [
+                    '\\CURLINFO_TEXT',
+                    '\\CURLINFO_DATA_IN',
+                    '\\CURLINFO_DATA_OUT',
+                    '\\CURLINFO_SSL_DATA_IN',
+                    '\\CURLINFO_SSL_DATA_OUT',
+                    '\\CURLINFO_LASTONE',
+                    '\\CURLOPT_DEBUGFUNCTION',
+                    '\\CURLVERSION_NOW',
+                ],
+            ),
+
+            // iconv version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\ICONV_VERSION',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'ICONV_VERSION depends on the iconv library version installed on the system.',
+            ),
+
+            // Oniguruma version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\MB_ONIGURUMA_VERSION',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'MB_ONIGURUMA_VERSION depends on the Oniguruma regex library bundled with the mbstring extension.',
+            ),
+
+            // libsodium version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'libsodium-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'libsodium version constants depend on the libsodium library linked with PHP.',
+                entityIds: [
+                    '\\SODIUM_LIBRARY_VERSION',
+                    '\\SODIUM_LIBRARY_MINOR_VERSION',
+                ],
+            ),
+
+            // libpq (PostgreSQL client) version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'pgsql-libpq-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PGSQL_LIBPQ_VERSION constants depend on the libpq (PostgreSQL client library) version linked with PHP.',
+                entityIds: [
+                    '\\PGSQL_LIBPQ_VERSION',
+                    '\\PGSQL_LIBPQ_VERSION_STR',
+                ],
+            ),
+
+            // zlib version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'zlib-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'ZLIB_VERSION and ZLIB_VERNUM depend on the zlib library linked with PHP.',
+                entityIds: [
+                    '\\ZLIB_VERSION',
+                    '\\ZLIB_VERNUM',
+                ],
+            ),
+
+            // fileinfo/libmagic version
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\FILEINFO_EXTENSION',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'FILEINFO_EXTENSION flag value depends on the libmagic version; only available since libmagic 5.34 and the numeric value varies.',
+            ),
+
+            // MySQL/MariaDB driver constant
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\MYSQLI_IS_MARIADB',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'MYSQLI_IS_MARIADB is a boolean/truthy constant reported as an empty string by some MySQL builds and as 0 by others; its value depends on the MySQL/MariaDB driver.',
+            ),
+
+            // FFI::__BIGGEST_ALIGNMENT__ is CPU/ABI-dependent (8 on x86-64, 16 on some architectures)
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\FFI::__BIGGEST_ALIGNMENT__',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CLASS_CONSTANTS_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'FFI::__BIGGEST_ALIGNMENT__ reflects the largest alignment supported by the target CPU/ABI and therefore differs per architecture (e.g. 8 on x86-64, 16 elsewhere).',
+            ),
+
+            // ZipArchive::LIBZIP_VERSION reflects the bundled/system libzip version
+            new ProblemDefinition(
+                entityType: EntityType::CLASS_CONSTANT,
+                entityId: '\\ZipArchive::LIBZIP_VERSION',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CLASS_CONSTANTS_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'ZipArchive::LIBZIP_VERSION reports the version of the libzip library PHP was built against and therefore varies per system/build.',
+            ),
+
+            // LIBENCHANT_VERSION reflects the version of the libenchant system library PHP was built against
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\LIBENCHANT_VERSION',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'LIBENCHANT_VERSION reports the version of the libenchant system library PHP was compiled against and therefore varies per system/build.',
+            ),
+
+            // PHP version constants — always reflect the current runtime
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'php-version',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PHP version constants reflect the current PHP runtime version and cannot be pinned to a static value in stubs.',
+                entityIds: [
+                    '\\PHP_VERSION',
+                    '\\PHP_MAJOR_VERSION',
+                    '\\PHP_MINOR_VERSION',
+                    '\\PHP_RELEASE_VERSION',
+                    '\\PHP_VERSION_ID',
+                    '\\PHP_EXTRA_VERSION',
+                ],
+            ),
+
+            // PHP build-configuration path constants
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'php-build-paths',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PHP build-configuration path constants depend on where PHP was compiled and installed; they differ per system.',
+                entityIds: [
+                    '\\PHP_BUILD_DATE',
+                    '\\PHP_BINARY',
+                    '\\PHP_BINDIR',
+                    '\\PHP_CONFIG_FILE_PATH',
+                    '\\PHP_CONFIG_FILE_SCAN_DIR',
+                    '\\PHP_DATADIR',
+                    '\\PHP_EXTENSION_DIR',
+                    '\\PHP_LIBDIR',
+                    '\\PHP_LOCALSTATEDIR',
+                    '\\PHP_MANDIR',
+                    '\\PHP_PREFIX',
+                    '\\PHP_SYSCONFDIR',
+                    '\\DEFAULT_INCLUDE_PATH',
+                    '\\PEAR_INSTALL_DIR',
+                    '\\PEAR_EXTENSION_DIR',
+                ],
+            ),
+
+            // PHP build flags
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'php-build-flags',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'PHP_DEBUG and PHP_ZTS depend on whether PHP was compiled with debug mode or ZTS support; value is 0 in standard builds but may be reported as empty string by reflection.',
+                entityIds: [
+                    '\\PHP_DEBUG',
+                    '\\PHP_ZTS',
+                ],
+            ),
+
+            // POSIX resource-limit constants — values differ between Linux and macOS
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: 'posix-rlimit',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'POSIX resource-limit constants use OS-specific numeric values that differ between Linux and macOS.',
+                entityIds: [
+                    '\\POSIX_RLIMIT_AS',
+                    '\\POSIX_RLIMIT_MEMLOCK',
+                    '\\POSIX_RLIMIT_NOFILE',
+                    '\\POSIX_RLIMIT_NPROC',
+                    '\\POSIX_RLIMIT_INFINITY',
+                ],
+            ),
+
+            // CHAR_MAX — system-dependent (signed vs unsigned char)
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\CHAR_MAX',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::CONSTANT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'CHAR_MAX is 127 on systems with signed char and 255 on systems with unsigned char.',
+            ),
+
+            // TRUE, FALSE, NULL - PHP language keywords reported as constants by runtime reflection
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\TRUE',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CONSTANT_EXISTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: '\\TRUE is a PHP language keyword reported as a constant by runtime reflection, but cannot be defined in stubs as a constant declaration.'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\FALSE',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CONSTANT_EXISTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: '\\FALSE is a PHP language keyword reported as a constant by runtime reflection, but cannot be defined in stubs as a constant declaration.'
+            ),
+            new ProblemDefinition(
+                entityType: EntityType::GLOBAL_CONSTANT,
+                entityId: '\\NULL',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::CONSTANT_EXISTS],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: '\\NULL is a PHP language keyword reported as a constant by runtime reflection, but cannot be defined in stubs as a constant declaration.'
+            ),
+
+            // Tentative return types that only exist from PHP 8.3+ (DOMDocument methods got tentative in 8.3)
+            // Stubs mark them as tentative for all versions; skip the check for 8.1-8.2
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::TENTATIVE_RETURN_TYPE],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_1, PhpVersions::PHP_8_2),
+                reason: 'DOMDocument methods became tentative in PHP 8.3; stubs mark them for all versions',
+                entityIds: [
+                    '\\DOMDocument::adoptNode',
+                    '\\DOMDocument::load',
+                    '\\DOMDocument::loadHTML',
+                    '\\DOMDocument::loadHTMLFile',
+                    '\\DOMDocument::loadXML',
+                ],
+            ),
+
+            // Tentative return types that only exist in PHP 8.4+
+            // Stubs mark them as tentative for all versions; skip the check for 8.1-8.3
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::TENTATIVE_RETURN_TYPE],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_1, PhpVersions::PHP_8_3),
+                reason: 'Method became tentative in PHP 8.4; stubs mark it for all 8.1+ versions',
+                entityIds: [
+                    '\\Collator::setStrength',
+                    '\\DOMImplementation::createDocument',
+                    '\\IntlCalendar::clear',
+                    '\\IntlCalendar::set',
+                    '\\IntlCalendar::setFirstDayOfWeek',
+                    '\\IntlCalendar::setLenient',
+                    '\\IntlCalendar::setMinimalDaysInFirstWeek',
+                    '\\IntlCalendar::setRepeatedWallTimeOption',
+                    '\\IntlCalendar::setSkippedWallTimeOption',
+                    '\\IntlGregorianCalendar::clear',
+                    '\\IntlGregorianCalendar::set',
+                    '\\IntlGregorianCalendar::setFirstDayOfWeek',
+                    '\\IntlGregorianCalendar::setLenient',
+                    '\\IntlGregorianCalendar::setMinimalDaysInFirstWeek',
+                    '\\IntlGregorianCalendar::setRepeatedWallTimeOption',
+                    '\\IntlGregorianCalendar::setSkippedWallTimeOption',
+                    '\\Locale::setDefault',
+                    '\\PDOStatement::setFetchMode',
+                    '\\Phar::copy',
+                    '\\Phar::decompressFiles',
+                    '\\Phar::delMetadata',
+                    '\\Phar::delete',
+                    '\\Phar::setStub',
+                    '\\PharData::copy',
+                    '\\PharData::decompressFiles',
+                    '\\PharData::delMetadata',
+                    '\\PharData::delete',
+                    '\\PharFileInfo::compress',
+                    '\\PharFileInfo::decompress',
+                    '\\PharFileInfo::delMetadata',
+                    '\\SQLite3::close',
+                    '\\SQLite3Result::finalize',
+                    '\\SplFixedArray::setSize',
+                    '\\SplPriorityQueue::insert',
+                    '\\SplPriorityQueue::recoverFromCorruption',
+                    '\\XMLReader::close',
+                    '\\XSLTProcessor::setProfiling',
+                    '\\finfo::set_flags',
+                    '\\mysqli::close',
+                    '\\mysqli::debug',
+                    '\\mysqli::ssl_set',
+                    '\\mysqli_stmt::close',
+                ],
+            ),
+
+            // Tentative return types that PHP 8.5 promoted to real (enforced) return types.
+            // Verified against the committed reflection caches: hasTentativeReturnType is true
+            // for 8.1-8.4 and false for 8.5-8.6 on every id below. The stubs declare the plain
+            // concrete return type, which matches the current runtime, so the divergence is
+            // purely historical. It is suppressed for the versions where PHP still called them
+            // tentative rather than marking the stubs #[TentativeType] and having to suppress
+            // the newest versions instead.
+            //
+            // These 19 methods are why tests/ClassValidatorTest.php's and
+            // tests/FunctionValidatorTest.php's descriptors were narrowed to LATEST..LATEST in
+            // 06eb7e14 (an unrelated ICU/final commit) when 8.5 landed. Narrowing hid five
+            // versions of coverage and stranded the two definitions above, so the range is
+            // restored and the real reason recorded here instead.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::TENTATIVE_RETURN_TYPE],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_8_1, PhpVersions::PHP_8_4),
+                reason: 'PHP 8.5 turned these tentative return types into real ones; stubs declare the concrete type for all versions',
+                entityIds: [
+                    '\\Directory::close',
+                    '\\Directory::read',
+                    '\\Directory::rewind',
+                    '\\DirectoryIterator::_bad_state_ex',
+                    '\\FilesystemIterator::_bad_state_ex',
+                    '\\GlobIterator::_bad_state_ex',
+                    '\\Phar::_bad_state_ex',
+                    '\\PharData::_bad_state_ex',
+                    '\\PharFileInfo::_bad_state_ex',
+                    '\\RecursiveDirectoryIterator::_bad_state_ex',
+                    '\\ReflectionGenerator::getExecutingFile',
+                    '\\ReflectionGenerator::getExecutingGenerator',
+                    '\\ReflectionGenerator::getExecutingLine',
+                    '\\ReflectionGenerator::getFunction',
+                    '\\ReflectionGenerator::getThis',
+                    '\\ReflectionGenerator::getTrace',
+                    '\\SplFileInfo::_bad_state_ex',
+                    '\\SplFileObject::_bad_state_ex',
+                    '\\SplTempFileObject::_bad_state_ex',
+                ],
+            ),
+
+            // ── FunctionParameterDefaultValueCheck known problems ─────────────────
+
+            // round() - PHP 8.4 changed $mode default from int PHP_ROUND_HALF_UP (0) to
+            // the pure enum RoundingMode::HalfAwayFromZero. Stubs cannot represent enum
+            // defaults in a version-aware way, so the stub keeps 0 for all versions.
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\round',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::PARAMETER_DEFAULT_VALUE],
+                versionRange: new PhpVersionRange(PhpVersions::LATEST, PhpVersions::LATEST),
+                reason: 'PHP 8.4 changed the $mode default from int 0 (PHP_ROUND_HALF_UP) to RoundingMode::HalfAwayFromZero (pure enum). Stubs have no version-aware default mechanism, so 0 is kept for all versions.'
+            ),
+
+            // ── PhpDocConformsSignatureCheck known problems ───────────────────────
+
+            // get_headers() $associative: PHP 7.x sig=int, but PhpDoc says bool (modern type).
+            // PHP 8.0 changed the type to bool; PhpDoc was written for PHP 8.0+ behaviour.
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\get_headers',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::PHPDOC_CONFORMS_SIGNATURE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'get_headers() $associative was int before PHP 8.0; PhpDoc documents the PHP 8.0+ bool type. The int→bool change is intentional; the PhpDoc is correct for current PHP.'
+            ),
+
+            // imap_sort() $reverse: PHP 7.x sig=int, but PhpDoc says bool (modern type).
+            // PHP 8.0 changed the type to bool; PhpDoc was written for PHP 8.0+ behaviour.
+            new ProblemDefinition(
+                entityType: EntityType::FUNCTION,
+                entityId: '\\imap_sort',
+                type: ProblemType::RUNTIME_VALUE,
+                affectedChecks: [CheckType::PHPDOC_CONFORMS_SIGNATURE],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::PHP_7_4),
+                reason: 'imap_sort() $reverse was int before PHP 8.0; PhpDoc documents the PHP 8.0+ bool type. The int→bool change is intentional; the PhpDoc is correct for current PHP.'
+            ),
+
+            // ── MethodDeprecationCheck known problems ─────────────────────────────
+            //
+            // MethodDeprecationCheck compares both directions, so a deprecation the stub
+            // declares must also be reported by reflection for the version under test, and
+            // vice versa. Two situations below cannot satisfy that:
+            //
+            // 1. The deprecation window has an upper bound. StubsMetadata carries only
+            //    deprecatedSinceVersion — a lower bound — so a deprecation that PHP later
+            //    reverted cannot be expressed at all.
+            // 2. The deprecation is real but invisible to reflection, because PHP raises it as
+            //    an E_DEPRECATED at call time (or documents it only) rather than setting the
+            //    ZEND_ACC_DEPRECATED flag that ReflectionMethod::isDeprecated() reads.
+            //
+            // Version ranges below were read off the committed reflection caches, not assumed.
+
+            // ReflectionType::__toString — deprecated in 7.4, un-deprecated again in 8.0.
+            // Reflection reports isDeprecated=true for 7.4 only and false for 7.0-7.3 and 8.0+.
+            // Case 1: since:'7.4' would have to mean "7.4 onwards" and would wrongly mark the
+            // method deprecated for 8.0-8.6, so the stub carries no #[Deprecated] at all and
+            // the single 7.4 disagreement is suppressed here instead.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\ReflectionType::__toString',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_4, PhpVersions::PHP_7_4),
+                reason: 'ReflectionType::__toString was deprecated in PHP 7.4 and the deprecation was reverted in 8.0; reflection reports isDeprecated=true for 7.4 only. deprecatedSinceVersion is a lower bound with no upper bound, so no attribute value describes a single deprecated version: since:\'7.4\' would also claim 8.0-8.6. The stub therefore omits #[Deprecated] and this suppresses the resulting 7.4 mismatch.'
+            ),
+
+            // ReflectionNamedType inherits __toString from ReflectionType; the check resolves it
+            // through the stub hierarchy and reports it under the subclass id as well.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\ReflectionNamedType::__toString',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_4, PhpVersions::PHP_7_4),
+                reason: 'ReflectionNamedType inherits __toString from ReflectionType, which was deprecated in PHP 7.4 and un-deprecated in 8.0. Same cause as \\ReflectionType::__toString: the deprecation window has an upper bound that deprecatedSinceVersion cannot express.'
+            ),
+
+            // SplFileObject::fgetss — fgetss() was deprecated in PHP 7.3 and removed in 8.0
+            // (the stub records the removal as @removed 8.0). Case 2: PHP raised the
+            // deprecation as an E_DEPRECATED when the function was called and never set the
+            // reflection flag, so isDeprecated() is false for 7.3-7.4. The stub keeps
+            // #[Deprecated(since: '7.3')] so PhpStorm still warns users on those versions.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SplFileObject::fgetss',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_3, PhpVersions::PHP_7_4),
+                reason: 'fgetss() was deprecated in PHP 7.3 and removed in 8.0. PHP emitted the deprecation as a call-time E_DEPRECATED rather than setting the reflection deprecation flag, so ReflectionMethod::isDeprecated() returns false for 7.3-7.4. The stub keeps #[Deprecated(since: \'7.3\')] so the IDE reports it; only the unverifiable comparison is skipped.'
+            ),
+
+            // SplTempFileObject extends SplFileObject and inherits fgetss.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SplTempFileObject::fgetss',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_7_3, PhpVersions::PHP_7_4),
+                reason: 'SplTempFileObject extends SplFileObject and inherits fgetss. Same cause as \\SplFileObject::fgetss: the PHP 7.3 deprecation was call-time only and is not exposed through reflection.'
+            ),
+
+            // IntlDateFormatter::setTimeZoneId — deprecated in PHP 5.5 and removed in 7.0 (the
+            // stub records the removal as @removed 7.0). Case 2 again: the intl deprecation is
+            // documentation-level and not exposed through reflection, so isDeprecated() is
+            // false at 5.6 — the only cached version where the method still exists.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\IntlDateFormatter::setTimeZoneId',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::PHP_5_6, PhpVersions::PHP_5_6),
+                reason: 'IntlDateFormatter::setTimeZoneId was deprecated in PHP 5.5 and removed in 7.0, so 5.6 is the only validated version where it exists. The intl deprecation is documentation-level and never set the reflection deprecation flag, so isDeprecated() is false there. The stub keeps #[Deprecated(since: \'5.5\')] so the IDE reports it.'
+            ),
+
+            // SoapClient::__call — documented as deprecated in favour of __soapCall(), but PHP
+            // never set the reflection deprecation flag: isDeprecated() is false at every
+            // validated version (verified 5.6-8.6 against the committed caches). Case 2 again.
+            //
+            // The range is EARLIEST..LATEST because the gap is a property of ext-soap, not of a
+            // particular version, so it must keep applying to versions added later. The cost of
+            // that width: if PHP ever does flag the method, this entry hides the fact that the
+            // two sides finally agree instead of letting the check confirm it. Re-test by
+            // dropping this entry whenever ext-soap deprecations are revisited.
+            new ProblemDefinition(
+                entityType: EntityType::METHOD,
+                entityId: '\\SoapClient::__call',
+                type: ProblemType::INTERNAL_IMPLEMENTATION,
+                affectedChecks: [CheckType::DEPRECATION],
+                versionRange: new PhpVersionRange(PhpVersions::EARLIEST, PhpVersions::LATEST),
+                reason: 'SoapClient::__call is documented as deprecated in favour of SoapClient::__soapCall(), but ext-soap never set the reflection deprecation flag, so ReflectionMethod::isDeprecated() returns false for every validated version. The stub keeps #[Deprecated] so PhpStorm reports it; only the unverifiable comparison is skipped.'
+            ),
+        ];
+
+        return $this->problems;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getProblemsForEntity(EntityType $entityType, string $entityId): array
+    {
+        $allProblems = $this->getProblems();
+
+        return array_filter(
+            $allProblems,
+            fn (ProblemDefinition $problem) => $problem->entityType === $entityType
+                && (
+                    $problem->entityId === $entityId
+                    || (!empty($problem->entityIds) && in_array($entityId, $problem->entityIds, true))
+                )
+        );
+    }
+}

@@ -1,0 +1,57 @@
+name: PhpStorm Stubs Tests
+
+on: [push, pull_request, workflow_dispatch]
+
+# The validator framework no longer runs PHPUnit on each PHP runtime.
+# Per-version reflection is captured offline into the committed
+# tests/cache/Reflection<version>.json files (see tests/run-all-reflection-parsers.sh),
+# and the validators iterate every PHP version from those caches while running on a
+# single modern PHP (the test_runner image). The stub cache is regenerated here so the
+# checks always validate the stub files as they are in this revision.
+jobs:
+  general:
+    runs-on: ubuntu-latest
+    name: Validate stubs against reflection
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build test runner image
+        run: docker compose -f docker-compose.yml build test_runner >/dev/null
+
+      - name: Composer Install
+        run: docker compose -f docker-compose.yml run --rm test_runner composer install --no-progress
+
+      - name: Regenerate stubs cache from current stub files
+        run: docker compose -f docker-compose.yml run --rm test_runner php tests/run-stubs-parser.php
+
+      - name: Run tests (General)
+        run: docker compose -f docker-compose.yml run --rm test_runner vendor/bin/phpunit --no-progress --testsuite General
+
+  additional:
+    runs-on: ubuntu-latest
+    name: Run PhpDoc, structure, unit and cs-fixer tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build test runner image
+        run: docker compose -f docker-compose.yml build test_runner >/dev/null
+
+      - name: Composer Install
+        run: docker compose -f docker-compose.yml run --rm test_runner composer install --no-progress
+
+      - name: Regenerate stubs cache from current stub files
+        run: docker compose -f docker-compose.yml run --rm test_runner php tests/run-stubs-parser.php
+
+      - name: Test PhpDoc
+        run: docker compose -f docker-compose.yml run --rm test_runner vendor/bin/phpunit --no-progress --testsuite PhpDoc
+
+      - name: Test Stubs Map, Structure and PHP versions sync
+        run: docker compose -f docker-compose.yml run --rm test_runner vendor/bin/phpunit --no-progress --testsuite Structure
+
+      - name: Framework unit tests
+        run: docker compose -f docker-compose.yml run --rm test_runner vendor/bin/phpunit --no-progress --testsuite Unit
+
+      - name: run cs fixer
+        run: docker compose -f docker-compose.yml run --rm test_runner composer cs

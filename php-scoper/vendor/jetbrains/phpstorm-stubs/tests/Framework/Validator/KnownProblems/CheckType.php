@@ -1,0 +1,334 @@
+<?php
+
+namespace StubTests\Framework\Validator\KnownProblems;
+
+/**
+ * Enumeration of validator check types.
+ *
+ * Each case represents a specific validation check that can be affected
+ * by known problems. The enum value is the actual class name of the check.
+ */
+enum CheckType: string
+{
+    /**
+     * Validates that parameter names in stubs match reflection.
+     * Relevant for PHP 8.0+ where named parameters were introduced.
+     */
+    case PARAMETER_NAMES = 'ParameterNamesCheck';
+
+    /**
+     * Validates that methods with tentative return types in reflection
+     * are marked with #[TentativeType] in stubs.
+     * Relevant for PHP 8.1+ where tentative return types were introduced.
+     */
+    case TENTATIVE_RETURN_TYPE = 'TentativeReturnTypeCheck';
+
+    /**
+     * Validates that parameter types in stubs match reflection.
+     * Checks type hints for all parameters.
+     */
+    case PARAMETER_TYPES = 'ParameterTypesCheck';
+
+    /**
+     * Validates that return types in stubs match reflection.
+     * Checks return type declarations.
+     */
+    case RETURN_TYPES = 'ReturnTypesCheck';
+
+    /**
+     * Validates that a top-level entity (function, class, enum, or interface) present in
+     * reflection also exists in stubs. Reused across those entity types via EntityTypeConfig;
+     * the check reports this name for all of them, so the entity variant is distinguished by
+     * the EntityType of the known problem, not by a separate check name.
+     *
+     * Scope note: global constants have their own ConstantExistsCheck / CONSTANT_EXISTS, and
+     * member existence is covered by CLASS_METHODS_EXIST, CLASS_PROPERTIES_EXIST and ENUM_CASES.
+     */
+    case ENTITY_EXISTS = 'EntityExistsCheck';
+
+    /**
+     * Validates that parent class in stubs matches parent class in reflection.
+     */
+    case CLASS_PARENT = 'ClassParentClassCheck';
+
+    /**
+     * Validates that directly implemented interfaces in stubs match reflection.
+     * Reused for classes and enums via EntityTypeConfig; the check reports this
+     * name for both, so the entity variant is distinguished by the EntityType of
+     * the known problem, not by a separate check name.
+     */
+    case CLASS_INTERFACES = 'ClassInterfacesCheck';
+
+    /**
+     * Validates that all methods present in reflection also exist in stubs.
+     */
+    case CLASS_METHODS_EXIST = 'ClassMethodsExistCheck';
+
+    /**
+     * Validates the reverse of CLASS_METHODS_EXIST: that a method declared in stubs actually
+     * exists in reflection for the version under test.
+     *
+     * Every other check runs reflection->stubs, so a stub declaring a member that the runtime does
+     * not have was invisible to the whole suite — which is how five SplFixedArray iterator methods,
+     * DOMDocument::renameNode, DOMText::replaceWholeText and ReflectionZendExtension::export sat
+     * unbounded past their removal in 8.0 while 412k tests passed.
+     *
+     * Scoped to StubCategory::CORE and BUNDLED, and skips magic methods and
+     * PS_UNRESERVE_PREFIX_* — see ClassStaleMethodsCheck for why each exclusion is required.
+     */
+    case CLASS_STALE_METHODS = 'ClassStaleMethodsCheck';
+
+    /**
+     * Validates that the `final` attribute on methods in stubs matches reflection.
+     */
+    case CLASS_FINAL_METHODS = 'ClassFinalMethodsCheck';
+
+    /**
+     * Validates that the `static` attribute on methods in stubs matches reflection.
+     */
+    case CLASS_STATIC_METHODS = 'ClassStaticMethodsCheck';
+
+    /**
+     * Validates that all properties present in reflection also exist in stubs.
+     */
+    case CLASS_PROPERTIES_EXIST = 'ClassPropertiesExistCheck';
+
+    /**
+     * Validates that the visibility (public/protected/private) of methods in stubs matches reflection.
+     */
+    case CLASS_METHODS_VISIBILITY = 'ClassMethodsVisibilityCheck';
+
+    /**
+     * Validates that the `static` attribute on properties in stubs matches reflection.
+     */
+    case CLASS_STATIC_PROPERTIES = 'ClassStaticPropertiesCheck';
+
+    /**
+     * Validates that the visibility (public/protected/private) of properties in stubs matches reflection.
+     */
+    case CLASS_PROPERTIES_VISIBILITY = 'ClassPropertiesVisibilityCheck';
+
+    /**
+     * Validates that the declared type of properties in stubs matches reflection.
+     * Supports LanguageLevelTypeAware version-specific types.
+     */
+    case CLASS_PROPERTIES_TYPE = 'ClassPropertiesTypeCheck';
+
+    /**
+     * Validates that the number of parameters in stub methods/functions matches reflection.
+     * Accounts for PhpStormStubsElementAvailable version-filtered parameters.
+     * Used by both ClassMethodsParametersCountCheck and FunctionParametersCountCheck.
+     */
+    case PARAMETERS_COUNT = 'ParametersCountCheck';
+
+    /**
+     * Validates that functions/methods deprecated in reflection are also marked deprecated in stubs.
+     * Used by both FunctionDeprecationCheck and MethodDeprecationCheck.
+     */
+    case DEPRECATION = 'DeprecationCheck';
+
+    /**
+     * Validates that parameters optional in reflection are also optional in stubs.
+     * Used by both FunctionOptionalParametersCheck and ClassMethodsOptionalParametersCheck.
+     */
+    case OPTIONAL_PARAMETERS = 'OptionalParametersCheck';
+
+    /**
+     * Validates that all parent interfaces declared in the stubs hierarchy for an interface
+     * are themselves declared in the stubs (stubs self-consistency check).
+     */
+    case INTERFACE_PARENT_INTERFACES = 'InterfaceParentInterfacesCheck';
+
+    /**
+     * Validates that all enum cases present in reflection also exist in stubs.
+     */
+    case ENUM_CASES = 'EnumCasesCheck';
+
+    /**
+     * Validates that the `final` modifier in stubs matches reflection.
+     * Reused for classes and enums via EntityTypeConfig; the check reports this
+     * name regardless of entity type, so known problems for enums are keyed by
+     * (ENUM_TYPE, ClassFinalCheck), not a separate enum-specific name.
+     *
+     * Checked against every supported PHP version, not just the latest: registered
+     * EARLIEST..LATEST for classes and 8.1..LATEST for enums (8.1 being when enums were
+     * introduced), and AbstractFinalCheck::supports() accepts all versions.
+     *
+     * A stub declares `final` without version awareness, so a class whose finality changed
+     * across releases necessarily disagrees with reflection on one side of that boundary.
+     * Those cases are suppressed individually by a version-ranged known problem rather than
+     * by narrowing the check — see the CLASS_FINAL entries in DefaultKnownProblemsProvider,
+     * for example `\GMP` (final since 8.4, suppressed for EARLIEST..8.3) and `\Directory`
+     * (final since 8.5, suppressed for 8.5..LATEST). Keeping the check version-wide is what
+     * makes those boundaries explicit instead of silently unchecked.
+     */
+    case CLASS_FINAL = 'ClassFinalCheck';
+
+    /**
+     * Validates that constants declared in stubs exist in reflection.
+     * Reused for classes, interfaces and enums via EntityTypeConfig; the check
+     * reports this name for all three, so the entity variant is distinguished by
+     * the EntityType of the known problem, not by a separate check name.
+     */
+    case CLASS_CONSTANTS = 'ClassConstantsCheck';
+
+    /**
+     * Validates that the visibility (public/protected/private) of constants in stubs matches reflection.
+     * Reused for classes, interfaces and enums via EntityTypeConfig; the check
+     * reports this name for all three (see CLASS_CONSTANTS).
+     */
+    case CLASS_CONSTANTS_VISIBILITY = 'ClassConstantsVisibilityCheck';
+
+    /**
+     * Validates that the values of constants in stubs match reflection.
+     * Reused for classes, interfaces and enums via EntityTypeConfig; the check
+     * reports this name for all three (see CLASS_CONSTANTS).
+     * Value comparison is limited to the latest PHP version to avoid false positives.
+     */
+    case CLASS_CONSTANTS_VALUE = 'ClassConstantsValueCheck';
+
+    /**
+     * Validates that the `readonly` modifier on properties in stubs matches reflection.
+     * Relevant for PHP 8.1+ where readonly properties were introduced.
+     */
+    case CLASS_PROPERTIES_READONLY = 'ClassPropertyReadonlyCheck';
+
+    /**
+     * Validates that the `readonly` modifier on a class in stubs matches reflection.
+     * Relevant for PHP 8.2+ where readonly classes were introduced.
+     */
+    case CLASS_READONLY = 'ClassReadonlyCheck';
+
+    /**
+     * Validates that global constants from reflection exist in stubs.
+     */
+    case CONSTANT_EXISTS = 'ConstantExistsCheck';
+
+    /**
+     * Validates that the values of global constants in stubs match reflection.
+     * Value comparison is limited to the latest PHP version to avoid false positives.
+     */
+    case CONSTANT_VALUE = 'ConstantValueCheck';
+
+    /**
+     * Validates that default parameter values in stubs match reflection.
+     * Only checked against the latest PHP version since stubs do not support
+     * version-aware default values (no LanguageLevelTypeAware equivalent for defaults).
+     * Comparison is skipped when either side's value is null to avoid false positives
+     * from unevaluable constant expressions.
+     */
+    case PARAMETER_DEFAULT_VALUE = 'ParameterDefaultValueCheck';
+
+    /**
+     * Validates that PhpDoc types in stubs are compatible with their signature types.
+     * Used by FunctionPhpDocConformsSignatureCheck, ClassMethodsPhpDocConformsSignatureCheck,
+     * EnumMethodsPhpDocConformsSignatureCheck, and InterfaceMethodsPhpDocConformsSignatureCheck.
+     * The check is permissive: typed-array narrowing, phpstan generics, resource widening,
+     * and bool/false splitting are all accepted.
+     */
+    case PHPDOC_CONFORMS_SIGNATURE = 'PhpDocConformsSignatureCheck';
+
+    /**
+     * Validates that overridable methods available before PHP 7.0 do not declare any
+     * return type hint. Return type hints were introduced in PHP 7.0; using them on
+     * pre-7.0 methods prevents child classes targeting PHP 5.6 from providing a matching
+     * override. Only return types are checked — parameter type hints for class names,
+     * array, and callable were valid in PHP 5.x.
+     * Used by ClassMethodsReturnTypeForbiddenCheck, InterfaceMethodsReturnTypeForbiddenCheck,
+     * and EnumMethodsReturnTypeForbiddenCheck.
+     */
+    case RETURN_TYPE_FORBIDDEN = 'ReturnTypeForbiddenCheck';
+
+    /**
+     * Validates that overridable methods available before PHP 7.1 do not declare nullable
+     * type hints (?T) — on either the return type or any parameter. Nullable type hints were
+     * introduced in PHP 7.1; using them on pre-7.1 methods prevents child classes targeting
+     * PHP 5.6/7.0 from providing a matching override.
+     * Used by ClassMethodsNullableTypeForbiddenCheck, InterfaceMethodsNullableTypeForbiddenCheck,
+     * and EnumMethodsNullableTypeForbiddenCheck.
+     */
+    case NULLABLE_TYPE_FORBIDDEN = 'NullableTypeForbiddenCheck';
+
+    /**
+     * Validates that overridable methods available before PHP 8.0 do not declare union
+     * type hints (T1|T2) — on either the return type or any parameter. Union type hints
+     * were introduced in PHP 8.0; using them on pre-8.0 methods prevents child classes
+     * targeting PHP 5.6–7.4 from providing a matching override.
+     * Note: nullable ?T syntax (serialised as T|null) is excluded — it is valid from PHP 7.1.
+     * Used by ClassMethodsUnionTypeForbiddenCheck, InterfaceMethodsUnionTypeForbiddenCheck,
+     * and EnumMethodsUnionTypeForbiddenCheck.
+     */
+    case UNION_TYPE_FORBIDDEN = 'UnionTypeForbiddenCheck';
+
+    /**
+     * Validates that overridable methods available before PHP 7.0 do not declare scalar
+     * parameter type hints (int, float, string, bool). Scalar type hints were introduced
+     * in PHP 7.0; using them on pre-7.0 method parameters prevents child classes targeting
+     * PHP 5.6 from providing a matching override.
+     * Note: return type hints are already fully covered by RETURN_TYPE_FORBIDDEN.
+     * Used by ClassMethodsScalarTypeForbiddenCheck, InterfaceMethodsScalarTypeForbiddenCheck,
+     * and EnumMethodsScalarTypeForbiddenCheck.
+     */
+    case SCALAR_TYPE_FORBIDDEN = 'ScalarTypeForbiddenCheck';
+
+    /**
+     * Validates that PhpDoc comments in stubs contain only recognized tag names.
+     * Valid tags are phpDocumentor v3 standard tags, PHPStan non-prefixed tags,
+     * and a small set of custom tags used in phpstorm-stubs (@removed, @xglobal, @meta).
+     * Tags with phpstan-*, psalm-*, or phan-* prefixes are invalid.
+     * Used by PhpDocTagsCheck for functions, classes, interfaces, and enums.
+     */
+    case PHPDOC_TAGS = 'PhpDocTagsCheck';
+
+    /**
+     * Validates that @since, @deprecated, and @removed phpDoc tags use
+     * "major.minor" version format (e.g. "8.0") rather than "major.minor.patch"
+     * (e.g. "8.0.1") for style consistency.
+     * Only purely numeric three-or-more-component versions are flagged.
+     * Used by PhpDocVersionFormatCheck for functions, classes, interfaces, and enums.
+     */
+    case PHPDOC_VERSION_FORMAT = 'PhpDocVersionFormatCheck';
+
+    /**
+     * Validates that a phpDoc comment declares at most one return tag.
+     * A second return is silently discarded by every consumer (the stub parser
+     * keeps the first one), so a duplicate looks applied while having no effect.
+     * Used by PhpDocSingleReturnCheck for functions, classes, interfaces, and enums.
+     */
+    case PHPDOC_SINGLE_RETURN = 'PhpDocSingleReturnCheck';
+
+    /**
+     * Validates that every @link URL in phpDoc comments uses the https scheme
+     * and, when CHECK_LINKS=true, that the URL is reachable (not a dead link).
+     * Only entries starting with "http://" or "https://" are examined; plain
+     * cross-references like "ClassName::method" are ignored.
+     * Used by PhpDocLinksCheck for functions, classes, interfaces, and enums.
+     */
+    case PHPDOC_LINKS = 'PhpDocLinksCheck';
+
+    /**
+     * Validates that Reflection API methods which return type information
+     * (e.g. getReturnType, getType) declare LanguageLevelTypeAware version
+     * entries with concrete subtypes (ReflectionNamedType, ReflectionUnionType,
+     * ReflectionIntersectionType) rather than only the abstract ReflectionType base.
+     * This is a regression guard against inadvertent removal of version-specific
+     * type narrowing that the IDE uses for precise type inference.
+     * See: https://youtrack.jetbrains.com/issue/WI-61052
+     */
+    case REFLECTION_SPECIAL_TYPE_HINTS = 'ReflectionMethodSpecialTypeHintsCheck';
+
+    /**
+     * Validates that parameters deprecated in reflection are also marked deprecated in stubs.
+     * Used by FunctionParameterDeprecationCheck and ClassMethodsParameterDeprecationCheck.
+     */
+    case PARAMETER_DEPRECATION = 'ParameterDeprecationCheck';
+
+    /**
+     * Validates that the target flags of an attribute class declared via `#[Attribute(...)]`
+     * in stubs match reflection (e.g. that TARGET_CLASS_CONSTANT is present when the attribute
+     * may be applied to class constants). Attributes are declared without version awareness,
+     * so the comparison is limited to the latest PHP version.
+     * Used by ClassAttributeTargetsCheck.
+     */
+    case CLASS_ATTRIBUTE_TARGETS = 'ClassAttributeTargetsCheck';
+}

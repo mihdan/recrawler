@@ -1,0 +1,25 @@
+name: PhpStorm Stubs Check Links
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build test runner image
+        run: docker compose -f docker-compose.yml build test_runner >/dev/null
+
+      - name: Composer Install
+        run: docker compose -f docker-compose.yml run --rm test_runner composer install --no-progress
+
+      - name: Regenerate stubs cache from current stub files
+        run: docker compose -f docker-compose.yml run --rm test_runner php tests/run-stubs-parser.php
+
+      - name: Run Tests
+        run: docker compose -f docker-compose.yml run --rm -e CHECK_LINKS=true test_runner vendor/bin/phpunit --no-progress --testsuite PhpDoc
