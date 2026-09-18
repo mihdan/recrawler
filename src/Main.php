@@ -183,7 +183,7 @@ class Main {
 			return;
 		}
 
-		$last_update = (int) get_post_meta( $post_id, Utils::get_plugin_prefix() . '_last_update', true );
+		$last_update = (int) get_post_meta( $post_id, Utils::get_last_update_meta_key(), true );
 
 		if ( $last_update === 0 ) {
 			return;
@@ -204,7 +204,7 @@ class Main {
 		}
 
 		if ( $query->get( 'orderby' ) === 'recrawler' ) {
-			$query->set( 'meta_key', Utils::get_plugin_prefix() . '_last_update' );
+			$query->set( 'meta_key', Utils::get_last_update_meta_key() );
 			$query->set( 'orderby', 'meta_value_num' );
 		}
 	}

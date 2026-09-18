@@ -247,6 +247,7 @@ if (!function_exists('get_term_meta')) { function get_term_meta($term_id, $key, 
 if (!function_exists('update_term_meta')) { function update_term_meta($term_id, $meta_key, $meta_value, $prev_value = '') { return true; } }
 if (!function_exists('wp_is_post_revision')) { function wp_is_post_revision($post) { $r = _call_if_overridden('wp_is_post_revision', $post); return $r ?? false; } }
 if (!function_exists('wp_is_post_autosave')) { function wp_is_post_autosave($post) { $r = _call_if_overridden('wp_is_post_autosave', $post); return $r ?? false; } }
+if (!function_exists('get_post_time')) { function get_post_time($format = 'U', $gmt = false, $post = null, $translate = false) { $r = _call_if_overridden('get_post_time', $format, $gmt, $post, $translate); return $r ?? 0; } }
 if (!function_exists('header')) { function header($header, $replace = true, $http_response_code = null) {} }
 if (!function_exists('get_post_type_object')) { function get_post_type_object($post_type) { return false; } }
 if (!function_exists('get_post_type')) {

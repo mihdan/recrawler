@@ -153,4 +153,34 @@ final class HooksTest
         Assert::count($calls, 1);
         Assert::same($calls[0]['tag'], 'recrawler/term_updated');
     }
+
+    public function postUpdatedIgnoresLastUpdateMetaInheritedFromDuplicatedPost(): void
+    {
+        $hooks = $this->hooks(indexable: true);
+        $calls = $this->collectDoActionCalls();
+
+        // Дубликат товара (WooCommerce "Duplicate product") унаследовал
+        // _last_update оригинала: метка стоит до даты создания самого поста.
+        _set_wp_override('get_post_meta', static fn () => 990);
+        _set_wp_override('get_post_time', static fn () => 1000);
+        _set_wp_override('current_time', static fn () => 1000);
+
+        $post = new \WP_Post();
+        $post->ID = 42;
+        $post->post_type = 'post';
+
+        $hooks->post_updated('publish', 'draft', $post);
+
+        Assert::count($calls, 1);
+        Assert::same($calls[0]['tag'], 'recrawler/post_added');
+    }
+
+    public function excludeLastUpdateMetaFromDuplicateAppendsOurKey(): void
+    {
+        $hooks = $this->hooks();
+
+        $result = $hooks->exclude_last_update_meta_from_duplicate(['_sku']);
+
+        Assert::same($result, ['_sku', 'recrawler_last_update']);
+    }
 }
